@@ -108,6 +108,21 @@ public class DeviceDiscovery
    */
   public DeviceDiscovery(String deviceName, String deviceProtocol, String model)
   {
+    if (deviceName == null || deviceName.equals(""))
+    {
+      throw new IllegalArgumentException("Device name cannot be null or empty string.");
+    }
+
+    if (deviceProtocol == null || deviceProtocol.equals(""))
+    {
+      throw new IllegalArgumentException("Device protocol identifier cannot be null or empty string.");
+    }
+
+    if (model == null)
+    {
+      model = "";
+    }
+
     this.deviceName = deviceName.trim();
     this.protocol = deviceProtocol.trim();
     this.model = model.trim();
@@ -136,7 +151,10 @@ public class DeviceDiscovery
   {
     this(deviceName, deviceProtocol, model);
 
-    this.deviceAttributes = attributes;
+
+    this.deviceAttributes = (attributes == null)
+                          ? new HashMap<String, String>(0)
+                          : attributes;
   }
 
   /**
@@ -168,7 +186,9 @@ public class DeviceDiscovery
   {
     this(deviceName, deviceProtocol, model, attributes);
 
-    this.type = type;
+    this.type = (type == null)
+              ? ""
+              : type;
   }
 
 }
