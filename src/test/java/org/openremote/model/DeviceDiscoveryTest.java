@@ -139,11 +139,6 @@ public class DeviceDiscoveryTest
    */
   @Test public void testAttributeConstructorNullArg()
   {
-    Map<String, String> attrs = new HashMap<String, String>(3);
-    attrs.put("1", "one");
-    attrs.put("2", "two");
-    attrs.put("3", "three");
-
     DeviceDiscovery dd = new DeviceDiscovery("name", "protocol", null, null);
 
     Assert.assertTrue(dd.deviceName.equals("name"));
