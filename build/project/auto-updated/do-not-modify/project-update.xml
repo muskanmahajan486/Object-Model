@@ -116,7 +116,8 @@
       <url url = "${build.repository.uri}/project/${project.name}/project-update-script.xml"/>
       <url url = "${build.repository.uri}/project/${project.name}/project-template.xml"/>
       <url url = "${build.repository.uri}/project/${project.name}/task-definitions.xml"/>
-
+      <url url = "${build.repository.uri}/project/${project.name}/checkstyle-config.xml"/>
+      
     </get>
 
     <get dest = "${basedir}" usetimestamp = "true">
@@ -179,6 +180,22 @@
       <url url = "${build.repository.uri}/project/${project.name}/build/lib/cobertura-2.0.3-orpatch-1/lib/tagsoup-0.9.7.jar"/>
       <url url = "${build.repository.uri}/project/${project.name}/build/lib/cobertura-2.0.3-orpatch-1/lib/xmlParserAPIs-2.6.2.jar"/>
       <url url = "${build.repository.uri}/project/${project.name}/build/lib/cobertura-2.0.3-orpatch-1/lib/xom-1.0b3.jar"/>
+
+    </get>
+
+
+    <echo>
+    &gt;&gt; Updating Checkstyle libraries...
+    </echo>
+
+    <mkdir dir = "${checkstyle.path}"/>
+
+    <get dest = "${checkstyle.path}" usetimestamp = "true" verbose = "true">
+
+      <url url = "${build.repository.uri}/project/${project.name}/build/lib/checkstyle-5.7/checkstyle-5.7-all.jar"/>
+      <url url = "${build.repository.uri}/project/${project.name}/build/lib/checkstyle-5.7/LICENSE"/>
+      <url url = "${build.repository.uri}/project/${project.name}/build/lib/checkstyle-5.7/LICENSE.apache20"/>
+      <url url = "${build.repository.uri}/project/${project.name}/build/lib/checkstyle-5.7/RIGHTS.antlr"/>
 
     </get>
 

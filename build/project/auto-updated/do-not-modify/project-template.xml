@@ -44,6 +44,16 @@
 <project name = "OpenRemote Project Template" basedir = "."
          xmlns:openremote = "namespace://build.repository.openremote.org/project/tasks">
 
+  <!--
+   | Load local properties overriding other properties for values that
+   | are not intended for general use / commit to version control.
+   +-->
+  <property file = "local.properties"/>
+
+  <!--
+   | Load persistent build properties to configure this build.
+   +-->
+  <property file = "build.properties"/>
 
   <!--
    | Resolve the directory path of an imported build file...
@@ -93,7 +103,54 @@
     <mkdir dir = "${build.lib.dir}"/>
     <mkdir dir = "${lib.dir}"/>
 
+    <antcall target = "-java-style-check"/>
+
     <openremote:compile-java/>
+
+  </target>
+
+  <target name = "-java-style-check">
+
+    <openremote:java-style-check/>
+
+    <antcall target = "-report-java-style-check"/>
+
+  </target>
+
+  <target name = "-java-style-check-strict" depends = "-java-style-check" if = "checkstyle.fail">
+
+    <echo>
+
+    !! RELEASE FAILURE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+      Please fix the Java style convention errors before proceeding
+      with creating a release.
+
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    </echo>
+    <fail message = "Java style convention errors."/>
+
+  </target>
+
+  <target name = "-report-java-style-check" if = "checkstyle.fail">
+
+    <echo>
+
+    ** WARNING ******************************************************
+
+    Source code does not follow Java style conventions and will not
+    be releasable until corrected.
+
+    *****************************************************************
+
+    </echo>
+
+    <loadfile property = "checkstyle.report">
+      <file file = "${build.dir}/checkstyle-report.txt"/>
+    </loadfile>
+
+    <echo message = "${checkstyle.report}"/>
 
   </target>
 
@@ -189,7 +246,8 @@
 
     <echo>
 
-      Unit Test Coverage Report: ${unit.test.coverage.uri}index.html
+    REPORT: Test coverage report available at:
+    ${unit.test.coverage.uri}index.html
 
     </echo>
 
@@ -199,8 +257,12 @@
 
     <echo>
 
-    NOTE: Some unit tests failed. Please investigate the full report:
-          ${unit.test.report.uri}index.html
+    ** NOTE *********************************************************
+
+    Some unit tests failed. Please investigate the full report:
+    ${unit.test.report.uri}index.html
+
+    *****************************************************************
 
     </echo>
 
@@ -249,6 +311,8 @@
 
     <mkdir dir = "${build.package.dir}"/>
 
+    <antcall target = "-java-style-check-strict"/>
+
   </target>
 
   <extension-point name = "-before-package" depends = "clean, unit-test, -after-unit-test"/>
@@ -267,6 +331,7 @@
     <delete dir = "${build.package.dir}"/>
     <delete dir = "${classes.dir}"/>
     <delete dir = "${output.dir}"/>
+    <delete file = "${build.dir}/checkstyle-report.txt"/>
 
   </target>
 
