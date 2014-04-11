@@ -207,6 +207,22 @@
 
       </internal:cobertura-instrument>
 
+      <!-- Project dirs and paths as system properties to pass to the TestNG JVM... -->
+
+      <propertyset id = "unit.test.project.properties">
+        <propertyref prefix = "openremote.project"/>
+      </propertyset>
+
+      <!-- User defined properties to pass to the TestNG JVM... -->
+
+      <propertyset id = "unit.test.user.properties">
+        <propertyref prefix = "unit.test.user"/>
+      </propertyset>
+
+      <!-- Include project base dir as an absolute path... -->
+
+      <property name = "openremote.project.base.dir" location = "${basedir}"/>
+
       <!-- Run TestNG... -->
 
       <internal:testng
@@ -221,6 +237,12 @@
 
         <sysproperty key = "net.sourceforge.cobertura.datafile"
         		         file = "${build.test.dir}/instrumented-classes/cobertura-coverage.ser" />
+
+        <propertyset>
+          <propertyset refid = "unit.test.project.properties"/>
+          <propertyset refid = "unit.test.user.properties"/>
+          <propertyref name = "openremote.project.base.dir"/>
+        </propertyset>
 
       </internal:testng>
 

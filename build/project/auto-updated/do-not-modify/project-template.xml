@@ -237,6 +237,12 @@
 
     </echo>
 
+    <!-- Load all the default dirs and paths (relative) and the basedir (as absolute path)
+         into 'openremote.project.' prefix which the unit test task will pass as system properties
+         to JVM to make them available in tests.
+    -->
+    <property file = "${import.basedir}/default.properties" prefix = "openremote.project."/>
+
     <openremote:run-java-unit-test/>
 
     <makeurl file = "${unit.test.report.dir}" property = "unit.test.report.uri"/>
