@@ -163,7 +163,7 @@ public class DeviceDiscovery
 
 
     this.deviceAttributes = (attributes == null)
-                          ? new HashMap<String, String>(0)
+                          ? new ConcurrentHashMap<String, String>(0)
                           : attributes;
   }
 
