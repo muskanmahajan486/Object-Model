@@ -188,7 +188,7 @@ public class DeviceDiscovery
 
     this.type = (type == null)
               ? ""
-              : type;
+              : type.trim();
   }
 
 }
