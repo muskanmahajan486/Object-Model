@@ -161,10 +161,22 @@ public class DeviceDiscovery
   {
     this(deviceName, deviceProtocol, model);
 
+    if (attributes != null)
+    {
+      this.deviceAttributes = new ConcurrentHashMap<String, String>(attributes.size());
 
-    this.deviceAttributes = (attributes == null)
-                          ? new ConcurrentHashMap<String, String>(0)
-                          : attributes;
+      Set<Map.Entry<String, String>> entries = attributes.entrySet();
+
+      for (Map.Entry<String, String> entry : entries)
+      {
+        deviceAttributes.put(entry.getKey().trim(), entry.getValue().trim());
+      }
+    }
+
+    else
+    {
+      this.deviceAttributes = new ConcurrentHashMap<String, String>(0);
+    }
   }
 
   /**
