@@ -1,0 +1,69 @@
+// ------------------------------------------------------------------------------------------------
+//  OpenRemote, the Home of the Digital Home.
+//  Copyright 2008-2014, OpenRemote Inc.
+//
+//  See the contributors.txt file in the distribution for a
+//  full listing of individual contributors.
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU Affero General Public License as
+//  published by the Free Software Foundation; either version 3 of the
+//  License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//  GNU Affero General Public License for more details.
+//
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program; if not, see <http://www.gnu.org/licenses/>.
+// ------------------------------------------------------------------------------------------------
+
+
+// ================================================================================================
+//
+//  DeviceDiscovery JSON 1.0.0 Schema
+//
+// ================================================================================================
+object {
+
+  // Headers to support versioning and version migration.
+  //
+  //  - A library name property with a fixed value "OpenRemote Object Model"
+  //  - A fully qualified Java class name in package 'org.openremote.model'
+  //  - A serial format version number with 'major.minor.bugfix' and an optional
+  //    version identifier using '_' separator with 'bugfix' version.
+  //  - A current API implementation version with 'major.minor.bugfix' and an
+  //    optional version identifier using '_' separator with 'bugfix' version.
+
+  string libraryName       /^OpenRemote Object Model$/;
+  string javaFullClassName /^org.openremote.model(.[a-zA-Z0-9_]+)+$/;
+  string serialVersion     /^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,4}(_.*)?$/;
+  string apiVersion        /^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,4}(_.*)?$/;
+
+  object {
+
+    // The model object consists of mandatory device name, device protocol and device
+    // model properties. Each can have an arbitrary single line string with minimum length
+    // of one and maximum of 255 characters. An optional device type property and an optional
+    // arbitrary attribute key,value pairs object can be included.
+    //
+    // NOTE 1: If an optional device type value is not available, the property should be omitted
+    //         altogether rather than represented with null or empty string value. If the
+    //         deviceAttributes object is an empty object, it should be omitted altogether.
+    //
+    // NOTE 2: The current FlexJSON map transformation to JSON object in deviceAttributes does not
+    //         lend itself easily to schema validation, e.g. value string lengths cannot be
+    //         validated to maximum length of 255 characters when property names are unknown.
+    //         For a stricter schema validation, the Java Map transformation to JSON should be
+    //         implemented with a structure that is easier to validate.
+
+    string{1,255} deviceName     /^.*$/;
+    string{1,255} deviceProtocol /^.*$/;
+    string{1,255} deviceModel    /^.*$/;
+    string{1,255} deviceType     /^.*$/ ?;
+
+    object { } * deviceAttributes?;
+
+  } * model;
+} * ;
