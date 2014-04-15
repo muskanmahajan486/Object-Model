@@ -22,9 +22,19 @@ package org.openremote.model;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * TODO : A data structure used for device discovery service.
+ * This is a plain object model for device discovery data structure. Each discovered device
+ * must contain device name, device protocol and device model information. Additionally,
+ * a device type attribute (such as 'switch', 'dimmer', etc.) may be optionally included. Other
+ * arbitrary device attributes may be included in the {@link #deviceAttributes} key,value map.
+ *
+ * Persistence for this object model can be found in {@link org.openremote.model.persistence}
+ * package and its sub-packages. <p>
+ *
+ * The JSON serialization format for this class is described in the project's resources/json
+ * directory.
  *
  * @author <a href="mailto:juha@openremote.org">Juha Lindfors</a>
  */
@@ -68,7 +78,7 @@ public class DeviceDiscovery
    * A key,value map for storing an arbitrary number of data entries describing the discovered
    * device.
    */
-  protected Map<String, String> deviceAttributes = new HashMap<String, String>(0);
+  protected Map<String, String> deviceAttributes = new ConcurrentHashMap<String, String>(0);
 
 
   // Constructors ---------------------------------------------------------------------------------
