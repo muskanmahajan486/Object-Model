@@ -22,6 +22,7 @@ package org.openremote.model;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -97,7 +98,7 @@ public class DeviceDiscovery
 
     if (copy.deviceAttributes != null)
     {
-      this.deviceAttributes = new HashMap<String, String>(copy.deviceAttributes);
+      this.deviceAttributes = new ConcurrentHashMap<String, String>(copy.deviceAttributes);
     }
   }
 
