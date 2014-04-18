@@ -39,10 +39,11 @@
 
 -->
 <entity-mappings 
-    xmlns = "http://java.sun.com/xml/ns/persistence/orm" 
+    xmlns = "http://xmlns.jcp.org/xml/ns/persistence/orm"
     xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance" 
-    xsi:schemaLocation = "http://java.sun.com/xml/ns/persistence/orm orm_2_0.xsd"
-    version = "2.0">
+    xsi:schemaLocation = "http://xmlns.jcp.org/xml/ns/persistence/orm
+                          http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd"
+    version = "2.1">
 
   <!--
        Use Mapped superclass to pick up the fields from the domain object to include in
@@ -57,22 +58,26 @@
        The 'deviceAttributes' field requires special handling in order to map the internal
        key-value map to a separate table in relational schema. We'll end up with:
 
-       +- - - - - - - - - - - -+          +- - - - - - - - - - - - - - -+
-       |   DISCOVERED_DEVICE   |          | DISCOVERED_DEVICE_ATTRIBUTE |
-       +- - -+- - -+- - -+- - -+          +- - - - - -+- - - - -+- - - -+
-       | ID  | ... | ... | ... |  <- - -  | DD_ID(PK) | KEY(PK) | VALUE |
-       +- - -+- - -+- - -+- - -+          +- - - - - -+- - - - -+- - - -+
+       +- - - - - - - - - - - - -+          +- - - - - - - - - - - - - - - - -+
+       |    DISCOVERED_DEVICE    |          |   DISCOVERED_DEVICE_ATTRIBUTE   |
+       +- - - -+- - -+- - -+- - -+          +- - - - - - - -+- - - - -+- - - -+
+       |ID(PK) | ... | ... | ... |  <- - -  |  DD_ID(PK,FK) | KEY(PK) | VALUE |
+       +- - - -+- - -+- - -+- - -+          +- - - - - - - -+- - - - -+- - - -+
     -->
     <attributes>
       <element-collection name = "deviceAttributes">
 
         <!--
-          Name the device attribute key column in relational schema.
+          Name the device attribute key column in relational schema. Default length is 255
+          characters. Column is by default not nullable. Uniqueness of key is not enforced -
+          while key must be unique per instance, it does not need to be unique across all
+          instances stored in the table.
         -->
         <map-key-column name = "key"/>
 
         <!--
-          Name the value column in relational schema
+          Name the value column in relational schema. Set column length to 1000 characters.
+          Null values are not allowed, values are not unique.
         -->
         <column name = "value" length = "1000"/>
 
