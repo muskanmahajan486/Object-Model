@@ -74,7 +74,7 @@
         <!--
           Name the value column in relational schema
         -->
-        <column name = "value"/>
+        <column name = "value" length = "1000"/>
 
         <!--
           Name the device attribute key,value table and the join column used to map the
