@@ -42,6 +42,28 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DeviceDiscovery
 {
 
+  // Constants ------------------------------------------------------------------------------------
+
+  /**
+   * The serialization format version implemented by this class. The version value should only
+   * be changed when incompatible serialization format changes are introduced to this class.
+   */
+  public static final Version JSON_SERIAL_VERSION = new Version(1, 0, 0);
+
+  /**
+   * Constraint for the value string size in device attributes map. This is currently
+   * derived from the constraints in the persistence model defined in
+   * {@link org.openremote.model.persistence.jpa.PersistentDeviceDiscovery}
+   */
+  public static final int DEVICE_ATTRIBUTE_VALUE_LENGTH_CONSTRAINT = 1000;
+
+  /**
+   * The default string attribute length in the relational persistence model when no
+   * specific configuration is given.
+   */
+  public static final int DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT = 255;
+
+
   // Protected Instance Fields --------------------------------------------------------------------
 
   /**
@@ -134,14 +156,45 @@ public class DeviceDiscovery
       model = "";
     }
 
-    this.deviceName = deviceName.trim();
-    this.protocol = deviceProtocol.trim();
-    this.model = model.trim();
+    deviceName = deviceName.trim();
+    deviceProtocol = deviceProtocol.trim();
+    model = model.trim();
+
+    if (deviceName.length() > DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT)
+    {
+      throw new ConstraintException(
+          "Device name can be at most {0} characters long, name ''{1}'' is {2} characters long.",
+          DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT, deviceName, deviceName.length()
+      );
+    }
+
+    if (deviceProtocol.length() > DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT)
+    {
+      throw new ConstraintException(
+          "Device protocol string can be at most {0} characters, protocol ''{1}'' is {2} " +
+          "characters long.",
+          DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT, deviceProtocol, deviceProtocol.length()
+      );
+    }
+
+    if (model.length() > DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT)
+    {
+      throw new ConstraintException(
+          "Device model string can be at most {0} characters, model string ''{1}'' is {2} " +
+          "characters long.",
+          DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT, model, model.length()
+      );
+    }
+
+    this.deviceName = deviceName;
+    this.protocol = deviceProtocol;
+    this.model = model;
   }
+
 
   /**
    * Constructs a new device discovery data structure with a given device name, protocol,
-   * model and device attributes
+   * model and device attributes.
    *
    * @param deviceName
    *            A descriptive device name
@@ -155,12 +208,19 @@ public class DeviceDiscovery
    *            A device model identifier
    *
    * @param attributes
-   *            Device attributes
+   *            Device attributes which are copied to this instance.
    */
   public DeviceDiscovery(String deviceName, String deviceProtocol, String model,
                          Map<String, String> attributes)
   {
     this(deviceName, deviceProtocol, model);
+
+    // TODO :
+    //
+    //   Should recommend to use the {@link #addAttribute(String, String)} instead of
+    //   this constructor. In some multi-threaded scenarios with obscure corner cases
+    //   the addAttribute() call may behave more consistently. So should probably remove
+    //   this constructor altogether.
 
     if (attributes != null)
     {
@@ -170,7 +230,7 @@ public class DeviceDiscovery
 
       for (Map.Entry<String, String> entry : entries)
       {
-        deviceAttributes.put(entry.getKey().trim(), entry.getValue().trim());
+        addAttribute(entry.getKey(), entry.getValue());
       }
     }
 
@@ -182,7 +242,7 @@ public class DeviceDiscovery
 
   /**
    * Constructs a new device discovery data structure with a given device name, protocol,
-   * model, type and device attributes
+   * model, type and device attributes.
    *
    * @param deviceName
    *            A descriptive device name
@@ -203,15 +263,102 @@ public class DeviceDiscovery
    *
    * @param attributes
    *            Device attributes
+   *
+   * @throws  ConstraintException
+   *            if deviceName, deviceProtocol, model or type strings exceed the length defined
+   *            in {@link #DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT}, or if any of the key
+   *            or value strings in attribute map exceed their length constraints
    */
   public DeviceDiscovery(String deviceName, String deviceProtocol, String model,
                          String type, Map<String, String> attributes)
   {
+    // TODO :
+    //
+    //   Should recommend to use the {@link #addAttribute(String, String)} instead of
+    //   this constructor. In some multi-threaded scenarios with obscure corner cases
+    //   the addAttribute() call may behave more consistently. So should probably remove
+    //   this constructor altogether and replace with one that only takes the additional type.
+
     this(deviceName, deviceProtocol, model, attributes);
 
-    this.type = (type == null)
-              ? ""
-              : type.trim();
+    type = (type == null)
+          ? ""
+          : type.trim();
+
+    if (type.length() > DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT)
+    {
+      throw new ConstraintException(
+          "Device type attribute can be at most {0} characters, type attribute ''{1}'' is {2} " +
+          "characters long",
+          DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT, type, type.length()
+      );
+    }
+
+    this.type = type;
+  }
+
+
+  // Public Instance Methods ----------------------------------------------------------------------
+
+  /**
+   * Adds a device attribute to this device discovery structure. If a key value is <tt>null</tt>
+   * or empty string then this call will return without changes. Null values are converted to
+   * empty strings. All key and value strings are trimmed of white-space characters before adding
+   * the attribute. <p>
+   *
+   * The constraints limit the key string length to at most 255 characters and value strings at
+   * most 1000 characters in length.
+   *
+   * @param name
+   *          device attribute name
+   *
+   * @param value
+   *          device attribute value
+   *
+   * @return
+   *          reference to this updated device discovery structure to enable method chaining
+   *
+   * @throws  ConstraintException
+   *            If the name or value strings are not within defined constraints:
+   *            {@link #DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT} and
+   *            {@link #DEVICE_ATTRIBUTE_VALUE_LENGTH_CONSTRAINT}
+   */
+  public DeviceDiscovery addAttribute(String name, String value)
+  {
+    if (name == null || name.equals(""))
+    {
+      return this;
+    }
+
+    if (value == null)
+    {
+      value = "";
+    }
+
+    name = name.trim();
+    value = value.trim();
+
+    if (name.length() > DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT)
+    {
+      throw new ConstraintException(
+          "Device attribute name string can be at most {0} characters, name string ''{1}'' " +
+          "is {2} characters long.",
+          DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT, name, name.length()
+      );
+    }
+
+    if (value.length() > DEVICE_ATTRIBUTE_VALUE_LENGTH_CONSTRAINT)
+    {
+      throw new ConstraintException(
+          "Device attribute value string can be at most {0} characters, value string ''{1}'' " +
+          "is {2} characters long",
+          DEVICE_ATTRIBUTE_VALUE_LENGTH_CONSTRAINT, value, value.length()
+      );
+    }
+
+    deviceAttributes.put(name, value);
+
+    return this;
   }
 
 }
