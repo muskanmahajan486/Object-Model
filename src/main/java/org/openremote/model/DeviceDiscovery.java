@@ -20,7 +20,9 @@
  */
 package org.openremote.model;
 
-import java.util.HashMap;
+import org.openremote.model.serialization.json.DeviceDiscoveryTransformer;
+import org.openremote.model.serialization.json.JSONHeader;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -361,5 +363,19 @@ public class DeviceDiscovery
     return this;
   }
 
+  // Serialization --------------------------------------------------------------------------------
+
+  /**
+   * Serializes this object to a JSON format.  <p>
+   *
+   * See the project's resources/json directory for an Orderly definition of the data exchange
+   * format and the corresponding JSON schema.
+   *
+   * @return a JSON structure for transferring this device discovery information
+   */
+  public String toJSONString()
+  {
+    return JSONHeader.toJSON(this, JSON_SERIAL_VERSION, new DeviceDiscoveryTransformer());
+  }
 }
 
