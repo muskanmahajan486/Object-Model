@@ -20,6 +20,7 @@
  */
 package org.openremote.model;
 
+import org.openremote.base.Version;
 import org.openremote.model.serialization.json.DeviceDiscoveryTransformer;
 import org.openremote.model.serialization.json.JSONHeader;
 
