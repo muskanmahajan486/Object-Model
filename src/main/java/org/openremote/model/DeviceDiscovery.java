@@ -21,8 +21,8 @@
 package org.openremote.model;
 
 import org.openremote.base.Version;
-import org.openremote.model.serialization.json.DeviceDiscoveryTransformer;
-import org.openremote.model.serialization.json.JSONHeader;
+import org.openremote.model.data.json.DeviceDiscoveryTransformer;
+import org.openremote.model.data.json.JSONHeader;
 
 import java.util.Map;
 import java.util.Set;
