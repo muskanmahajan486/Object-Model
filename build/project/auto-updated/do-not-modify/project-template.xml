@@ -237,9 +237,15 @@
 
     </echo>
 
-    <!-- Load all the default dirs and paths (relative) and the basedir (as absolute path)
-         into 'openremote.project.' prefix which the unit test task will pass as system properties
-         to JVM to make them available in tests.
+    <!-- Load local and build properties into 'openremote.project' property namespace,
+         which are passed into the JVM executing the unit tests, making these property
+         values available to unit test code.
+    -->
+    <property file = "local.properties" prefix = "openremote.project."/>
+    <property file = "build.properties" prefix = "openremote.project."/>
+
+    <!-- Load project default properties into the 'openremote.project' property namespace
+         as well.
     -->
     <property file = "${import.basedir}/default.properties" prefix = "openremote.project."/>
 
