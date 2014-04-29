@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Created-By: OpenRemote, Inc.
+Name: openremote-object-model
+Specification-Title: OpenRemote Object Model
+Specification-Version: ${api.version}
+Specification-Vendor: OpenRemote, Inc.
+Implementation-Title: OpenRemote Object Model
+Implementation-Version: ${release.version}
+Implementation-Vendor: OpenRemote, Inc.
