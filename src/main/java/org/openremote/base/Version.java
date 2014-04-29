@@ -110,16 +110,28 @@ public class Version
   /**
    * Copy constructor for subclasses.
    *
-   * @param version   the version instance whose fields are copied to this copy instance
+   * @param version
+   *          the version instance whose fields are copied to this copy instance
+   *
+   * @throws IllegalArgumentException
+   *          if the version values are out of range
    */
-  protected Version(Version version) throws InvariantException
+  protected Version(Version version)
   {
     this.majorVersion = version.majorVersion;
     this.minorVersion = version.minorVersion;
     this.bugfixVersion = version.bugfixVersion;
     this.buildIdentifier = version.buildIdentifier;
 
-    invariant();
+    try
+    {
+      invariant();
+    }
+
+    catch (InvariantException e)
+    {
+      throw new IllegalArgumentException(e.getMessage(), e);
+    }
   }
 
 
