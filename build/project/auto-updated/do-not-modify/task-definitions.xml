@@ -176,6 +176,7 @@
 
         <fileset dir = "${java.src.dir}">
           <include name = "**/*.java"/>
+          <exclude name = "**/package-info.java"/>
         </fileset>
 
         <formatter type = "plain" toFile = "${build.dir}/checkstyle-report.txt"/>
