@@ -20,7 +20,7 @@
  */
 package org.openremote.model.data.json;
 
-import org.openremote.exception.IncorrectImplementationException;
+import org.openremote.base.exception.IncorrectImplementationException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

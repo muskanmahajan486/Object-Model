@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.exception;
+package org.openremote.base.exception;
 
 /**
  * A runtime (unchecked) exception type to indicate implementation errors (code paths that
@@ -62,5 +62,40 @@ public class IncorrectImplementationException extends OpenRemoteRuntimeException
   {
     super(msg, params);
   }
+
+  /**
+   * Constructs a new implementation exception with a given message and root cause.
+   *
+   * @param msg
+   *          human-readable error message
+   *
+   * @param cause
+   *          root exception cause
+   */
+  public IncorrectImplementationException(String msg, Throwable cause)
+  {
+    super(msg, cause);
+  }
+
+  /**
+   * Constructs a new implementation exception with a parameterized message and root cause.
+   *
+   * @param msg
+   *          human-readable error message
+   *
+   * @param cause
+   *          root exception cause
+   *
+   * @param params
+   *          exception message parameters -- message parameterization must be
+   *          compatible with {@link java.text.MessageFormat} API
+   *
+   * @see java.text.MessageFormat
+   */
+  public IncorrectImplementationException(String msg, Throwable cause, Object... params)
+  {
+    super(format(msg, params), cause);
+  }
+
 }
 

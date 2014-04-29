@@ -20,7 +20,7 @@
  */
 package org.openremote.model;
 
-import org.openremote.exception.OpenRemoteRuntimeException;
+import org.openremote.base.exception.OpenRemoteRuntimeException;
 
 /**
  * A constraint exception that can be used to indicate when domain object attribute

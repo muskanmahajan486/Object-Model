@@ -23,7 +23,7 @@ package org.openremote.model.data.json;
 import flexjson.JSONContext;
 import flexjson.TypeContext;
 import flexjson.transformer.AbstractTransformer;
-import org.openremote.exception.IncorrectImplementationException;
+import org.openremote.base.exception.IncorrectImplementationException;
 
 /**
  * This is a utility class that extends the AbstractTransformer API provided by the FlexJSON
