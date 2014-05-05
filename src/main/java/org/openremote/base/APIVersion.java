@@ -20,6 +20,8 @@
  */
 package org.openremote.base;
 
+import org.openremote.base.exception.OpenRemoteException;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -121,13 +123,25 @@ public class APIVersion extends Version
 
     try
     {
-      String value = System.getProperty("openremote.project.api.version");
+      String value = System.getProperty("openremote.project.api.version").trim();
 
       if (value != null && !value.equals(""))
       {
+        Matcher matcher = versionPattern.matcher(value);
+
         try
         {
-          return new Version(value.trim());
+          if (!matcher.matches())
+          {
+            throw new OpenRemoteException(
+                "Version value ''{0}'' does not match ''{1}''", value, versionPattern
+            );
+          }
+
+          String major = matcher.group(1);
+          String minor = matcher.group(2);
+
+          return new Version(Integer.parseInt(major), Integer.parseInt(minor), 0);
         }
 
         catch (Exception e)
