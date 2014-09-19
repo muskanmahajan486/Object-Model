@@ -63,10 +63,10 @@ public class JSONHeaderTest
   {
     String json = JSONHeader.toJSON(
         new DeviceDiscovery("mydevice", "myprotocol", "mymodel"),
-        DeviceDiscovery.JSON_SERIAL_VERSION, new DeviceDiscoveryTransformer()
+        DeviceDiscovery.JSON_SCHEMA_VERSION, new DeviceDiscoveryTransformer()
     );
 
-    assertDefaultHeaders(json, DeviceDiscovery.JSON_SERIAL_VERSION, DeviceDiscovery.class);
+    assertDefaultHeaders(json, DeviceDiscovery.JSON_SCHEMA_VERSION, DeviceDiscovery.class);
 
     Assert.assertTrue(json.contains("\"mydevice\""), json);
     Assert.assertTrue(json.contains("\"myprotocol\""), json);
@@ -90,7 +90,7 @@ public class JSONHeaderTest
     Assert.assertTrue(json.contains("\"javaFullClassName\""));
     Assert.assertTrue(json.contains("\"" + clazz.getName() + "\""));
 
-    Assert.assertTrue(json.contains("\"serialVersion\""));
+    Assert.assertTrue(json.contains("\"schemaVersion\""));
     Assert.assertTrue(json.contains("\"" + schemaVersion + "\""));
 
     Assert.assertTrue(json.contains("\"apiVersion\""));

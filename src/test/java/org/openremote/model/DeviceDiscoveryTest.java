@@ -25,14 +25,9 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * Unit tests for {@link org.openremote.model.DeviceDiscovery} class
@@ -634,11 +629,13 @@ public class DeviceDiscoveryTest
     Assert.assertTrue(json.contains("\"OpenRemote Object Model\""));
     Assert.assertTrue(json.contains("\"javaFullClassName\""));
     Assert.assertTrue(json.contains(DeviceDiscovery.class.getName()));
-    Assert.assertTrue(json.contains("\"serialVersion\""));
-    Assert.assertTrue(json.contains(DeviceDiscovery.JSON_SERIAL_VERSION.toString()));
+    Assert.assertTrue(json.contains("\"schemaVersion\""));
+    Assert.assertTrue(json.contains(DeviceDiscovery.JSON_SCHEMA_VERSION.toString()));
 
     Assert.assertTrue(json.contains("\"apiVersion\""));
-    Assert.assertTrue(json.contains("\"" + apiVersion + "\""), " API version is " + apiVersion);
+    Assert.assertTrue(
+        json.contains("\"" + apiVersion + "\""),
+        "API version is " + apiVersion + "\n" + json);
 
     Assert.assertTrue(apiVersion.equals(JSONHeader.API_VERSION.toString()));
 
@@ -668,8 +665,8 @@ public class DeviceDiscoveryTest
     Assert.assertTrue(json.contains("\"OpenRemote Object Model\""));
     Assert.assertTrue(json.contains("\"javaFullClassName\""));
     Assert.assertTrue(json.contains(DeviceDiscovery.class.getName()));
-    Assert.assertTrue(json.contains("\"serialVersion\""));
-    Assert.assertTrue(json.contains("\"" + DeviceDiscovery.JSON_SERIAL_VERSION.toString() + "\""));
+    Assert.assertTrue(json.contains("\"schemaVersion\""));
+    Assert.assertTrue(json.contains("\"" + DeviceDiscovery.JSON_SCHEMA_VERSION.toString() + "\""));
 
     Assert.assertTrue(json.contains("\"apiVersion\""));
     Assert.assertTrue(json.contains("\"" + apiVersion + "\""), " API version is " + apiVersion);
@@ -705,8 +702,8 @@ public class DeviceDiscoveryTest
     Assert.assertTrue(json.contains("\"OpenRemote Object Model\""));
     Assert.assertTrue(json.contains("\"javaFullClassName\""));
     Assert.assertTrue(json.contains(DeviceDiscovery.class.getName()));
-    Assert.assertTrue(json.contains("\"serialVersion\""));
-    Assert.assertTrue(json.contains(DeviceDiscovery.JSON_SERIAL_VERSION.toString()));
+    Assert.assertTrue(json.contains("\"schemaVersion\""));
+    Assert.assertTrue(json.contains(DeviceDiscovery.JSON_SCHEMA_VERSION.toString()));
 
     Assert.assertTrue(json.contains("\"apiVersion\""));
     Assert.assertTrue(json.contains("\"" + apiVersion + "\""), " API version is " + apiVersion);
@@ -746,8 +743,8 @@ public class DeviceDiscoveryTest
     Assert.assertTrue(json.contains("\"OpenRemote Object Model\""));
     Assert.assertTrue(json.contains("\"javaFullClassName\""));
     Assert.assertTrue(json.contains(DeviceDiscovery.class.getName()));
-    Assert.assertTrue(json.contains("\"serialVersion\""));
-    Assert.assertTrue(json.contains(DeviceDiscovery.JSON_SERIAL_VERSION.toString()));
+    Assert.assertTrue(json.contains("\"schemaVersion\""));
+    Assert.assertTrue(json.contains(DeviceDiscovery.JSON_SCHEMA_VERSION.toString()));
 
     Assert.assertTrue(json.contains("\"apiVersion\""));
     Assert.assertTrue(json.contains("\"" + apiVersion + "\""), " API version is " + apiVersion);
@@ -780,8 +777,8 @@ public class DeviceDiscoveryTest
     Assert.assertTrue(json.contains("\"OpenRemote Object Model\""));
     Assert.assertTrue(json.contains("\"javaFullClassName\""));
     Assert.assertTrue(json.contains(DeviceDiscovery.class.getName()));
-    Assert.assertTrue(json.contains("\"serialVersion\""));
-    Assert.assertTrue(json.contains(DeviceDiscovery.JSON_SERIAL_VERSION.toString()));
+    Assert.assertTrue(json.contains("\"schemaVersion\""));
+    Assert.assertTrue(json.contains(DeviceDiscovery.JSON_SCHEMA_VERSION.toString()));
 
     Assert.assertTrue(json.contains("\"apiVersion\""));
     Assert.assertTrue(json.contains("\"" + apiVersion + "\""), " API version is " + apiVersion);

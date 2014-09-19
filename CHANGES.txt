@@ -1,0 +1,8 @@
+
+Version 0.2.0
+-------------
+
+- schema and code rename of serialVersion to more
+  appropriate schemaVersion
+
+

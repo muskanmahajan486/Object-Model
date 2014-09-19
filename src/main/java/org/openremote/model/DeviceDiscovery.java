@@ -48,10 +48,10 @@ public class DeviceDiscovery
   // Constants ------------------------------------------------------------------------------------
 
   /**
-   * The serialization format version implemented by this class. The version value should only
-   * be changed when incompatible serialization format changes are introduced to this class.
+   * The schema version implemented by this class. The version value should only
+   * be changed when incompatible schema changes are introduced to this class.
    */
-  public static final Version JSON_SERIAL_VERSION = new Version(1, 0, 0);
+  public static final Version JSON_SCHEMA_VERSION = new Version(2, 0, 0);
 
   /**
    * Constraint for the value string size in device attributes map. This is currently
@@ -376,7 +376,7 @@ public class DeviceDiscovery
    */
   public String toJSONString()
   {
-    return JSONHeader.toJSON(this, JSON_SERIAL_VERSION, new DeviceDiscoveryTransformer());
+    return JSONHeader.toJSON(this, JSON_SCHEMA_VERSION, new DeviceDiscoveryTransformer());
   }
 }
 
