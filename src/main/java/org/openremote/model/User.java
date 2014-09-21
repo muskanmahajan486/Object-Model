@@ -74,13 +74,22 @@ public class User extends Model
     }
   }
 
-  private static Validator<String> userNameValidator = new Validator<String>()
+  /**
+   * This implementation delegates to
+   * {@link org.openremote.model.data.json.UserTransformer#getNameValidator()}
+   */
+  protected static Validator<String> defaultNameValidator = new Validator<String>()
   {
     @Override public void validate(String username) throws ValidationException
     {
-      UserTransformer.defaultUserNameValidator.validate(username);
+      UserTransformer.getNameValidator().validate(username);
     }
   };
+
+  /**
+   * Current name validator in use.
+   */
+  private static Validator<String> userNameValidator = defaultNameValidator;
 
 
   public static void setEmailValidator(Validator<String> emailValidator)
