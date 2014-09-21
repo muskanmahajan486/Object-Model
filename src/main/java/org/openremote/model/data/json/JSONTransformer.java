@@ -24,6 +24,7 @@ import flexjson.JSONContext;
 import flexjson.TypeContext;
 import flexjson.transformer.AbstractTransformer;
 import org.openremote.base.exception.IncorrectImplementationException;
+import org.openremote.model.Model;
 
 /**
  * This is a utility class that extends the AbstractTransformer API provided by the FlexJSON
@@ -34,10 +35,76 @@ import org.openremote.base.exception.IncorrectImplementationException;
  *
  * @param <T> the Java type to convert to JSON representation
  *
- * @author <a href="mailto:juha@openremote.org">Juha Lindfors</a>
+ * @author <a href = "mailto:juha@openremote.org">Juha Lindfors</a>
  */
 public abstract class JSONTransformer<T> extends AbstractTransformer
 {
+
+
+  // Class Members --------------------------------------------------------------------------------
+
+  /**
+   * A default validator for string type JSON attributes. This implementation ensures that
+   * JSON strings added to org.openremote.model instance representations do not contain
+   * null values and are not longer than {@link Model#DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT}
+   * value to ensure they can be added to database model without truncation.
+   */
+  protected static JSONValidator<String> defaultStringValidator = new JSONValidator<String>()
+  {
+    @Override public void validate(String attribute) throws Model.ValidationException
+    {
+      if (attribute == null)
+      {
+        throw new Model.ValidationException("String attribute has null value.");
+      }
+
+      if (attribute.length() > Model.DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT)
+      {
+        throw new Model.ValidationException(
+            "String attribute is too long. Maximum {0} characters allowed, " +
+            "given string has {1} characters.",
+            Model.DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT, attribute.length()
+        );
+      }
+    }
+  };
+
+  /**
+   * The JSON string validator made available by this class. Defaults to
+   * {@link #defaultStringValidator}.
+   *
+   * @see #setStringValidator(org.openremote.model.data.json.JSONTransformer.JSONValidator)
+   */
+  private static JSONValidator<String> jsonStringValidator = defaultStringValidator;
+
+  /**
+   * Returns the JSON string validator configured for the instances of this class.
+   *
+   * @see Model#DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT
+   *
+   * @return JSON
+   */
+  public static JSONValidator<String> getStringValidator()
+  {
+    return jsonStringValidator;
+  }
+
+  /**
+   * Sets a new JSON string validator for this class. This method should in general only
+   * be called at the application initialization time, and not again after, to ensure
+   * predictable operation. Setting a new JSON string validator mid-flight in the application
+   * will impact all the existing instances.
+   *
+   * @see #defaultStringValidator
+   * @see #getStringValidator()
+   *
+   * @param newValidator    a new JSON string validator
+   */
+  protected static void setStringValidator(JSONValidator<String> newValidator)
+  {
+    JSONTransformer.jsonStringValidator = newValidator;
+  }
+
 
   // Instance Fields ------------------------------------------------------------------------------
 
@@ -195,6 +262,21 @@ public abstract class JSONTransformer<T> extends AbstractTransformer
    *          the object instance to transform to JSON representation
    */
   protected abstract void write(T object);
+
+
+  // Nested Interfaces ----------------------------------------------------------------------------
+
+
+  /**
+   * A validator interface that can be used by implementations that want to check the incoming
+   * values adhere to given constraints before they are written to JSON serialization documents.
+   *
+   * @param <T>   Java type of the JSON attribute to be validated
+   */
+  public static interface JSONValidator<T>
+  {
+    public void validate(T attribute) throws Model.ValidationException;
+  }
 
 }
 
