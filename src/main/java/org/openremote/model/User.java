@@ -92,9 +92,23 @@ public class User extends Model
   private static Validator<String> userNameValidator = defaultNameValidator;
 
 
+  /**
+   * Sets a custom email validator for User instances. This method should only be called once
+   * at application initialization time. It will affect all User instances. <p>
+   *
+   * A default implementation delegates to {@link UserTransformer#defaultEmailValidator}
+   *
+   * @see Model.Validator
+   *
+   * @param emailValidator
+   *          new user email validator
+   */
   public static void setEmailValidator(Validator<String> emailValidator)
   {
-    User.emailValidator = emailValidator;
+    if (emailValidator != null)
+    {
+      User.emailValidator = emailValidator;
+    }
   }
 
   private static Validator<String> emailValidator = new Validator<String>()
