@@ -54,9 +54,24 @@ public class User extends Model
 
   // Class Members --------------------------------------------------------------------------------
 
+
+  /**
+   * Sets a custom name validator for User instances. This method should only be called once
+   * at application initialization time. It will affect all User instances. <p>
+   *
+   * A default implementation delegates to {@link UserTransformer#defaultUserNameValidator}.
+   *
+   * @see Model.Validator
+   *
+   * @param usernameValidator
+   *          new user name validator
+   */
   public static void setNameValidator(Validator<String> usernameValidator)
   {
-    User.userNameValidator = usernameValidator;
+    if (usernameValidator != null)
+    {
+      User.userNameValidator = usernameValidator;
+    }
   }
 
   private static Validator<String> userNameValidator = new Validator<String>()
