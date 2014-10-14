@@ -152,5 +152,108 @@
 
   </path>
 
+
+  <target name = "package" extensionOf = "-package-project"
+          depends = "clean, unit-test, -init-package">
+
+
+    <!--
+     |  Create domain model + data serialization archive...
+     +-->
+
+    <copy todir = "${build.package.dir}/META-INF"
+          file = "${resources.dir}/META-INF/MANIFEST.MF">
+      <filterchain>
+        <expandproperties/>
+      </filterchain>
+    </copy>
+
+    <!-- Include model classes and corresponding data classes only... -->
+
+    <copy todir = "${build.package.dir}">
+
+      <fileset dir = "${classes.dir}">
+        <include name = "org/openremote/model/*.class"/>
+      </fileset>
+
+      <fileset dir = "${classes.dir}">
+        <include name = "org/openremote/model/data/**/*.class"/>
+      </fileset>
+
+      <!-- TEMPORARY : copy the required base implementation until base becomes its own project -->
+      <fileset dir = "${classes.dir}">
+        <include name = "org/openremote/base/**/*.class"/>
+      </fileset>
+
+    </copy>
+
+    <!-- Package... -->
+
+    <zip basedir = "${build.package.dir}"
+         destfile = "${output.dir}/openremote-object-model-${release.version}.jar"/>
+
+
+    <!--
+     | Clear working dir for next archive preparation...
+     +-->
+
+    <delete dir = "${build.package.dir}"/>
+    <mkdir dir = "${build.package.dir}"/>
+
+
+    <!--
+     | Create relational persistence for domain model archive...
+     +-->
+
+    <copy todir = "${build.package.dir}/META-INF"
+          file = "${resources.dir}/META-INF/MANIFEST.MF">
+      <filterchain>
+        <expandproperties/>
+      </filterchain>
+    </copy>
+
+    <!-- Include JPA persistence unit configuration... -->
+
+    <copy todir = "${build.package.dir}/META-INF"
+              file = "${resources.dir}/META-INF/persistence.xml">
+    </copy>
+
+    <!-- Include entity mappings... -->
+
+    <copy todir = "${build.package.dir}">
+      <fileset dir = "${resources.dir}/jpa">
+        <include name = "*.xml"/>
+      </fileset>
+    </copy>
+
+    <!-- Include relational persistence classes only... -->
+
+    <copy todir = "${build.package.dir}">
+      <fileset dir = "${classes.dir}">
+        <include name = "org/openremote/model/persistence/jpa/**/*.class"/>
+      </fileset>
+    </copy>
+
+    <!-- Package... -->
+
+    <zip basedir = "${build.package.dir}"
+         destfile = "${output.dir}/openremote-object-model-persistence-${release.version}.jar"/>
+
+
+
+    <!--
+     | Copy domain model dependencies to output...
+     +-->
+
+    <copy todir = "${output.dir}" flatten = "true">
+      <fileset dir = "${lib.dir}">
+        <include name = "flexjson*/**/*.jar"/>
+      </fileset>
+    </copy>
+
+  </target>
+
+
+
 </project>
 
