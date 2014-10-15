@@ -20,10 +20,13 @@
  */
 package org.openremote.model.data.json;
 
+import org.openremote.base.Version;
 import org.openremote.base.exception.IncorrectImplementationException;
 import org.openremote.model.Model;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.util.Map;
 
 /**
  * Unit tests for {@link JSONTransformer} class.
@@ -172,6 +175,12 @@ public class JSONTransformerTest
     @Override public void write(String s)
     {
 
+    }
+
+    @Override public String deserialize(Version schemaVersion, String className,
+                                        Map<String, String> jsonProperties)
+    {
+      throw new IncorrectImplementationException("Not implemented.");
     }
   }
 }
