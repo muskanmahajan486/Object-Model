@@ -347,11 +347,11 @@ public abstract class JSONTransformer<T> extends AbstractTransformer
       throw new DeserializationException(
           "Model object JSON representation did not resolve correctly. " +
           "Class: '{1}', Schema : {1}, API : {2}",
-          prototype.fullJavaClassName, prototype.schemaVersion, prototype.apiVersion
+          prototype.javaFullClassName, prototype.schemaVersion, prototype.apiVersion
       );
     }
 
-    return deserialize(schemaVersion, prototype.fullJavaClassName, prototype.modelPrototype);
+    return deserialize(schemaVersion, prototype.javaFullClassName, prototype.modelPrototype);
   }
 
   /**
@@ -412,7 +412,7 @@ public abstract class JSONTransformer<T> extends AbstractTransformer
     private String schemaVersion;
     private String apiVersion;
     private String libraryName;
-    private String fullJavaClassName;
+    private String javaFullClassName;
 
 
     // Constructors -------------------------------------------------------------------------------
@@ -476,9 +476,9 @@ public abstract class JSONTransformer<T> extends AbstractTransformer
     /**
      * Private setter required by the FlexJSON framework to deserialize a JSONPrototype instance.
      */
-    private void setJavaClassName(String name)
+    private void setJavaFullClassName(String name)
     {
-      this.fullJavaClassName = name;
+      this.javaFullClassName = name;
     }
 
     @Override public String toString()
@@ -488,7 +488,7 @@ public abstract class JSONTransformer<T> extends AbstractTransformer
         return "Model prototype : (null)";
       }
 
-      return "Model prototype for " + fullJavaClassName + ", schema : " + schemaVersion +
+      return "Model prototype for " + javaFullClassName + ", schema : " + schemaVersion +
              ", API : " + apiVersion + "(" + libraryName + ")";
     }
   }
