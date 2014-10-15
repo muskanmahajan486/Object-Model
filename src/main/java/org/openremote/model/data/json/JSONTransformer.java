@@ -392,5 +392,129 @@ public abstract class JSONTransformer<T> extends AbstractTransformer
     public void validate(T attribute) throws Model.ValidationException;
   }
 
+
+
+  // Nested Classes -------------------------------------------------------------------------------
+
+  /**
+   * A deserialization data container used by FlexJSON deserializer to create a JSON prototype
+   * parsing the expected JSON data structure. This container still includes header fields such
+   * as library name and schema version that can be used to determine how to deserialize and
+   * construct the model objects contained within.
+   */
+  private static class JSONPrototype
+  {
+
+    // Instance Fields ----------------------------------------------------------------------------
+
+    private Map<String, String> modelPrototype;
+
+    private String schemaVersion;
+    private String apiVersion;
+    private String libraryName;
+    private String fullJavaClassName;
+
+
+    // Constructors -------------------------------------------------------------------------------
+
+    /**
+     * A no-args constructor required by the FlexJSON deserialization framework.
+     */
+    private JSONPrototype()
+    {
+
+    }
+
+
+    // Instance Methods ---------------------------------------------------------------------------
+
+    /**
+     * Checks the given library name in the header fields of this JSON representation against
+     * the library name this implementation belongs to.
+     *
+     * @return  true if library names match
+     */
+    private boolean isValidLibrary()
+    {
+      return libraryName != null && libraryName.equalsIgnoreCase(JSONHeader.LIBRARY_NAME);
+    }
+
+    /**
+     * Private setter required by the FlexJSON framework to deserialize a JSONPrototype instance.
+     */
+    private void setModel(Map<String, String> model)
+    {
+      // TODO : note on type safety
+
+      this.modelPrototype = model;
+    }
+
+    /**
+     * Private setter required by the FlexJSON framework to deserialize a JSONPrototype instance.
+     */
+    private void setSchemaVersion(String schema)
+    {
+      this.schemaVersion = schema;
+    }
+
+    /**
+     * Private setter required by the FlexJSON framework to deserialize a JSONPrototype instance.
+     */
+    private void setApiVersion(String api)
+    {
+      this.apiVersion = api;
+    }
+
+    /**
+     * Private setter required by the FlexJSON framework to deserialize a JSONPrototype instance.
+     */
+    private void setLibraryName(String name)
+    {
+      this.libraryName = name;
+    }
+
+    /**
+     * Private setter required by the FlexJSON framework to deserialize a JSONPrototype instance.
+     */
+    private void setJavaClassName(String name)
+    {
+      this.fullJavaClassName = name;
+    }
+
+    @Override public String toString()
+    {
+      if (modelPrototype == null)
+      {
+        return "Model prototype : (null)";
+      }
+
+      return "Model prototype for " + fullJavaClassName + ", schema : " + schemaVersion +
+             ", API : " + apiVersion + "(" + libraryName + ")";
+    }
+  }
+
+
+  public static class DeserializationException extends OpenRemoteException
+  {
+    public DeserializationException(String msg)
+    {
+      super(msg);
+    }
+
+    public DeserializationException(String msg, Object... params)
+    {
+      super(msg, params);
+    }
+
+    public DeserializationException(String msg, Throwable rootCause)
+    {
+      super(msg, rootCause);
+    }
+
+    public DeserializationException(String msg, Throwable rootCause, Object... params)
+    {
+      super(msg, rootCause, params);
+    }
+  }
 }
 
