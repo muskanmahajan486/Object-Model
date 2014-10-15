@@ -20,6 +20,8 @@
  */
 package org.openremote.model.data.json;
 
+import org.openremote.base.Version;
+import org.openremote.base.exception.IncorrectImplementationException;
 import org.openremote.model.DeviceDiscovery;
 
 import java.util.Map;
@@ -77,6 +79,15 @@ public class DeviceDiscoveryTransformer extends JSONTransformer<DeviceDiscovery>
     }
 
     endObject();
+  }
+
+
+  @Override protected DeviceDiscovery deserialize(Version schemaVersion, String className,
+                                                  Map<String, String> jsonProperties)
+  {
+    // TODO
+
+    throw new IncorrectImplementationException("Not Implemented.");
   }
 
 
