@@ -22,8 +22,12 @@ package org.openremote.model.data.json;
 
 import flexjson.JSONSerializer;
 import flexjson.transformer.Transformer;
+
 import org.openremote.base.APIVersion;
 import org.openremote.base.Version;
+import org.openremote.base.exception.IncorrectImplementationException;
+
+import java.util.Map;
 
 
 /**
@@ -272,6 +276,14 @@ public class JSONHeader<T>
 
       endObject();
     }
+
+    @Override public JSONHeader deserialize(Version schemaVersion, String className,
+                                            Map<String, String> jsonProperties)
+    {
+      // TODO
+
+      throw new IncorrectImplementationException("Not Implemented.");
+    }
   }
 
 
@@ -304,6 +316,14 @@ public class JSONHeader<T>
     @Override public void write(Version version)
     {
       writeValue(version.toString());
+    }
+
+    @Override public Version deserialize(Version schemaVersion, String className,
+                                         Map<String, String> jsonProperties)
+    {
+      // TODO
+
+      throw new IncorrectImplementationException("Not Implemented.");
     }
   }
 }
