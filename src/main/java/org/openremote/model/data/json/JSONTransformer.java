@@ -21,10 +21,18 @@
 package org.openremote.model.data.json;
 
 import flexjson.JSONContext;
+import flexjson.JSONDeserializer;
 import flexjson.TypeContext;
 import flexjson.transformer.AbstractTransformer;
+import org.openremote.base.Version;
 import org.openremote.base.exception.IncorrectImplementationException;
+import org.openremote.base.exception.OpenRemoteException;
 import org.openremote.model.Model;
+
+import java.io.BufferedReader;
+import java.io.Reader;
+import java.util.Map;
+
 
 /**
  * This is a utility class that extends the AbstractTransformer API provided by the FlexJSON
@@ -264,8 +272,114 @@ public abstract class JSONTransformer<T> extends AbstractTransformer
   protected abstract void write(T object);
 
 
-  // Nested Interfaces ----------------------------------------------------------------------------
+  /**
+   * Reads from a stream a JSON representation of a domain object and deserializes it to a full
+   * Java type. <p>
+   *
+   * The reader stream should point to a beginning of a JSON object that starts with a
+   * {@link JSONHeader} representation. The JSON headers are parsed first, after which the
+   * model object JSON attributes and values are passed to a concrete domain object deserializer
+   * via a call to {@link #deserialize(Version, String, Map)} method.
+   * The concrete domain model implementation should construct the Java instance based on this
+   * JSON data. <p>
+   *
+   * This implementation will automatically reject any JSON representation that does not
+   * match the library name {@link JSONHeader#LIBRARY_NAME} in its header fields.
+   *
+   * @param   reader
+   *            a reference to the stream reader
+   *
+   * @throws  DeserializationException
+   *            if the domain object cannot be resolved from the JSON representation
+   *
+   * @return  initialized domain object instance
+   */
+  protected T read(Reader reader) throws DeserializationException
+  {
+    // Use flex JSON to deserialize representation to a JSON prototype with header fields...
 
+    JSONPrototype prototype;
+
+    try
+    {
+      prototype = new JSONDeserializer<JSONPrototype>()
+          .deserialize(new BufferedReader(reader), JSONPrototype.class);
+    }
+
+    catch (Throwable throwable)
+    {
+      throw new DeserializationException(
+          "JSON representation could not be resolved to a proper prototype from the stream : {0}",
+          throwable, throwable.getMessage()
+      );
+    }
+
+
+    // Reject the JSON if it doesn't belong to this library...
+
+    if (!prototype.isValidLibrary())
+    {
+      throw new DeserializationException(
+          "Ignoring JSON object with library identifier '{0}'.", prototype.libraryName
+      );
+    }
+
+    // Attempt to resolve the JSON schema version value to a Java version type...
+
+    Version schemaVersion;
+
+    try
+    {
+      schemaVersion = new Version(prototype.schemaVersion);
+    }
+
+    catch (IllegalArgumentException exception)
+    {
+      // TODO : log
+
+      schemaVersion = Version.UNKNOWN;
+    }
+
+    // Resolve the domain object model into a Java instance (via concrete subclass impl.)...
+
+    if (prototype.modelPrototype == null)
+    {
+      throw new DeserializationException(
+          "Model object JSON representation did not resolve correctly. " +
+          "Class: '{1}', Schema : {1}, API : {2}",
+          prototype.fullJavaClassName, prototype.schemaVersion, prototype.apiVersion
+      );
+    }
+
+    return deserialize(schemaVersion, prototype.fullJavaClassName, prototype.modelPrototype);
+  }
+
+  /**
+   * Override this method to provide the implementation of how to deserialize a given set of
+   * JSON attribute names and values into a typed Java domain object instance.
+   *
+   * TODO : include API version
+   *
+   * @param schemaVersion
+   *          The schema version advertized in the JSON representation and that should have
+   *          corresponding structure in the given JSON attributes parameter
+   *
+   * @param fullJavaClassName
+   *          The Java class name advertized in the JSON representation that should match the
+   *          the expected domain object implementation class name and to which the JSON
+   *          structure given in JSON attributes parameter should conform to
+   *
+   * @param jsonAttributes
+   *          Map of JSON attribute names and values that were included in the JSON domain
+   *          model representation. The expected attribute names and data types should correspond
+   *          to the given schema version and its concrete JSON schema definition.
+   */
+  protected abstract T deserialize(Version schemaVersion, String fullJavaClassName,
+                                   Map<String, String> jsonAttributes);
+
+
+
+  // Nested Interfaces ----------------------------------------------------------------------------
 
   /**
    * A validator interface that can be used by implementations that want to check the incoming
