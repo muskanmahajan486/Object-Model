@@ -491,7 +491,7 @@ public abstract class JSONTransformer<T> extends AbstractTransformer
       }
 
       return "Model prototype for " + javaFullClassName + ", schema : " + schemaVersion +
-             ", API : " + apiVersion + "(" + libraryName + ")";
+             ", API : " + apiVersion + " (" + libraryName + ")";
     }
   }
 
