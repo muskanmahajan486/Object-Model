@@ -152,7 +152,7 @@ public class UserTransformer extends JSONTransformer<User>
 
     public static final int MINIMUM_USERNAME_LENGTH = 1;
 
-    public static final String DEFAULT_EMAIL_PATTERN = ".*@.*\\..*";
+    public static final String DEFAULT_EMAIL_PATTERN = ".+@.+\\..{2,}+";
 
     private static final Pattern EMAIL_REGEXP = Pattern.compile(DEFAULT_EMAIL_PATTERN);
 
