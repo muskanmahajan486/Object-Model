@@ -20,9 +20,11 @@
  */
 package org.openremote.model.data.json;
 
+import org.openremote.base.Version;
 import org.openremote.model.Model;
 import org.openremote.model.User;
 
+import java.io.Reader;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -107,6 +109,31 @@ public class UserTransformer extends JSONTransformer<User>
     endObject();
   }
 
+  public User read(Reader reader) throws DeserializationException
+  {
+    return super.read(reader);
+  }
+
+  @Override protected User deserialize(Version schemaVersion,
+                                       String classname,
+                                       Map<String, String> jsonProperties)
+      throws DeserializationException
+  {
+    try
+    {
+      return new User(jsonProperties.get("username"), jsonProperties.get("email"));
+    }
+
+    catch (Model.ValidationException exception)
+    {
+      throw new DeserializationException(
+          "Cannot create new User instance, received values are not valid : {0}",
+          exception, exception.getMessage()
+      );
+    }
+  }
+
+
 
   // Protected Methods ----------------------------------------------------------------------------
 
@@ -164,7 +191,7 @@ public class UserTransformer extends JSONTransformer<User>
       if (!m.matches())
       {
         throw new Model.ValidationException(
-            "Email address '{0}' does not match expected pattern 'email@host.domain'.", email
+            "Email address ''{0}'' does not match expected pattern 'email@host.domain'.", email
         );
       }
     }
