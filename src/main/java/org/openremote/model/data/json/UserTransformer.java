@@ -97,7 +97,7 @@ public class UserTransformer extends JSONTransformer<User>
 
     // Extension point for subclasses...
 
-    extendedProperties(user);
+    writeExtendedProperties(user);
 
     if (!data.attributes.isEmpty())
     {
@@ -110,7 +110,7 @@ public class UserTransformer extends JSONTransformer<User>
 
   // Protected Methods ----------------------------------------------------------------------------
 
-  protected void extendedProperties(User user)
+  protected void writeExtendedProperties(User user)
   {
 
   }
