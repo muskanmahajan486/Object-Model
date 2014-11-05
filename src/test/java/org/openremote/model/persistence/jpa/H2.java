@@ -46,7 +46,7 @@ public class H2
   //     offering a more convenient programmatic configuration API. These could (should?)
   //     be migrated to JPA EntityManager API instead.
 
-  
+
 
   // Public Class Members -------------------------------------------------------------------------
 
@@ -106,6 +106,34 @@ public class H2
     return createConfiguration(persistenceMode, mappingFiles, entityClasses, useLegacyBeehiveSchema);
   }
 
+
+
+  /**
+   * Creates a H2 session factory that maps a set of object model entities to a legacy Beehive 3.0
+   * relational model.
+   *
+   * @param persistenceMode
+   *          see {@link PersistenceMode}
+   *
+   * @param mappingFiles
+   *          names of the domain objects' relational entity mapping files under
+   *          /resources/jpa/beehive30 directory,
+   *          see {@link org.openremote.model.persistence.jpa.RelationalTest#getBeehiveResourceDirectoryURI()}
+   *
+   * @param entityClasses
+   *          the relational entity classes
+   *
+   * @return
+   *          Hibernate session factory
+   */
+  public static SessionFactory createLegacyBeehiveConfiguration(PersistenceMode persistenceMode,
+                                                                Set<String> mappingFiles,
+                                                                Set<Class<?>> entityClasses)
+  {
+    boolean useLegacyBeehiveSchema = true;
+
+    return createConfiguration(persistenceMode, mappingFiles, entityClasses, useLegacyBeehiveSchema);
+  }
 
 
   /**
@@ -216,7 +244,7 @@ public class H2
 
       if (persistenceMode == PersistenceMode.ON_DISK)
       {
-        return createSessionFactory("~/Beehive", config);
+        return createSessionFactory("~/BeehiveTest", config);
       }
 
       else
@@ -231,7 +259,7 @@ public class H2
 
       if (persistenceMode == PersistenceMode.ON_DISK)
       {
-        return createSessionFactory("~/AccountManager", config);
+        return createSessionFactory("~/AccountManagerTest", config);
       }
 
       else
@@ -328,7 +356,7 @@ public class H2
 
   private static void addBeehiveFiles(Configuration config, Set<String> files)
   {
-    addFiles(;config, files, RelationalTest.getBeehiveResourceDirectoryURI());
+    addFiles(config, files, RelationalTest.getBeehiveResourceDirectoryURI());
 
   }
 
