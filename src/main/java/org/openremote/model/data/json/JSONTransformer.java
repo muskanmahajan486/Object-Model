@@ -374,8 +374,10 @@ public abstract class JSONTransformer<T> extends AbstractTransformer
    *          model representation. The expected attribute names and data types should correspond
    *          to the given schema version and its concrete JSON schema definition.
    */
-  protected abstract T deserialize(Version schemaVersion, String fullJavaClassName,
-                                   Map<String, String> jsonAttributes);
+  protected abstract T deserialize(Version schemaVersion,
+                                   String fullJavaClassName,
+                                   Map<String, String> jsonAttributes)
+      throws DeserializationException;
 
 
 
