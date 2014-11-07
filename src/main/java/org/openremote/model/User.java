@@ -57,7 +57,6 @@ public class User extends Model
 
   // Class Members --------------------------------------------------------------------------------
 
-
   /**
    * Sets a custom name validator for User instances. This method should only be called once
    * at application initialization time. It will affect all User instances. <p>
@@ -207,7 +206,6 @@ public class User extends Model
 
   // Public Instance Methods ----------------------------------------------------------------------
 
-
   /**
    * Adds a user attribute to this user. If a key value is <tt>null</tt> or empty string then this
    * call will return without changes. Null values are converted to empty strings. All key and
@@ -283,6 +281,15 @@ public class User extends Model
   {
     return JSONHeader.toJSON(this, JSON_SCHEMA_VERSION, jsonTransformer);
   }
+
+
+  // Object Overrides -----------------------------------------------------------------------------
+
+  @Override public String toString()
+  {
+    return username + ", " + email;
+  }
+
 
 }
 
