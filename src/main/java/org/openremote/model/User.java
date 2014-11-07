@@ -186,6 +186,11 @@ public class User extends Model
 
     this.username = (username == null) ? null : username.trim();
 
+    if (username == null || username.equals(""))
+    {
+      throw new ValidationException("Null or empty usernames are never accepted.");
+    }
+
     userNameValidator.validate(username);
 
     if (email != null)
