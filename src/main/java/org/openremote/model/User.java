@@ -21,11 +21,14 @@
 package org.openremote.model;
 
 import org.openremote.base.Version;
+import org.openremote.base.exception.IncorrectImplementationException;
 import org.openremote.model.data.json.JSONHeader;
 import org.openremote.model.data.json.UserTransformer;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * TODO
@@ -160,7 +163,12 @@ public class User extends Model
    */
   protected User(User copy)
   {
-    super(copy.jsonTransformer);
+    super((copy == null) ? null : copy.jsonTransformer);
+
+    if (copy == null)
+    {
+      throw new IncorrectImplementationException("null user copy");
+    }
 
     this.username = copy.username;
     this.email = copy.email;
