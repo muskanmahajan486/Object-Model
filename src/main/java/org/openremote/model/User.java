@@ -128,6 +128,11 @@ public class User extends Model
 
       UserTransformer.getEmailValidator().validate(email);
     }
+
+    @Override public String toString()
+    {
+      return "Default Email Validator: accepts null or format [email]@[host].[domain]";
+    }
   };
 
   /**
