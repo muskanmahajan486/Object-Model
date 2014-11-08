@@ -121,6 +121,11 @@ public class User extends Model
   {
     @Override public void validate(String email) throws ValidationException
     {
+      if (email == null)
+      {
+        return;
+      }
+
       UserTransformer.getEmailValidator().validate(email);
     }
   };
@@ -148,7 +153,7 @@ public class User extends Model
 
   // Constructors ---------------------------------------------------------------------------------
 
-
+  // TODO
   protected User()
   {
     super(new UserTransformer());
@@ -158,7 +163,8 @@ public class User extends Model
   /**
    * Copy constructor.
    *
-   * @param copy    the user instance to copy
+   * @param copy
+   *          the user instance to copy
    */
   protected User(User copy)
   {
@@ -192,14 +198,15 @@ public class User extends Model
 
     userNameValidator.validate(username);
 
-    if (email != null)
-    {
-      email = email.trim();
 
-      emailValidator.validate(email);
+    // Note: null emails are always converted to empty strings -- this avoids having to distinguish
+    // between null and empty string when serializing to JSON, etc.
 
-      this.email = email;
-    }
+    email = (email == null) ? null : email.trim();
+
+    emailValidator.validate(email);
+
+    this.email = (email == null) ? "" : email;
   }
 
 
