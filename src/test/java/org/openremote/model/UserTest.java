@@ -248,6 +248,253 @@ public class UserTest
   }
 
 
+  // Base constructor email validation tests ------------------------------------------------------
+
+  /**
+   * Null email (allowed) test on base constructor using default validator.
+   */
+  @Test public void testBasicConstructorNullEmailDefaultValidator() throws Exception
+  {
+    User u = new User("foo", null);
+
+    // null email is translated to empty string...
+
+    Assert.assertTrue(u.email.equals(""));
+  }
+
+  /**
+   * Empty email (not allowed) test on base constructor using default validator.
+   */
+  @Test(expectedExceptions = User.ValidationException.class)
+
+  public void testBasicConstructorEmptyEmailDefaultValidator() throws Exception
+  {
+    new User("foo", "");
+  }
+
+  /**
+   * Invalid email test on base constructor using default validator.
+   */
+  @Test(expectedExceptions = User.ValidationException.class)
+
+  public void testBasicConstructorInvalidEmailDefaultValidator1() throws Exception
+  {
+    new User("foo", "bar");
+  }
+
+  /**
+   * Invalid email test on base constructor using default validator.
+   */
+  @Test(expectedExceptions = User.ValidationException.class)
+
+  public void testBasicConstructorInvalidEmailDefaultValidator2() throws Exception
+  {
+    new User("foo", "@");
+  }
+
+  /**
+   * Invalid email test on base constructor using default validator.
+   */
+  @Test(expectedExceptions = User.ValidationException.class)
+
+  public void testBasicConstructorInvalidEmailDefaultValidator3() throws Exception
+  {
+    new User("foo", ".fi");
+  }
+
+  /**
+   * Invalid email test on base constructor using default validator.
+   */
+  @Test(expectedExceptions = User.ValidationException.class)
+
+  public void testBasicConstructorInvalidEmailDefaultValidator4() throws Exception
+  {
+    new User("foo", "me@.fi");
+  }
+
+  /**
+   * Invalid email test on base constructor using default validator.
+   */
+  @Test(expectedExceptions = User.ValidationException.class)
+
+  public void testBasicConstructorInvalidEmailDefaultValidator5() throws Exception
+  {
+    new User("foo", "@my.com");
+  }
+
+  /**
+   * Invalid email test on base constructor using default validator.
+   */
+  @Test(expectedExceptions = User.ValidationException.class)
+
+  public void testBasicConstructorInvalidEmailDefaultValidator6() throws Exception
+  {
+    new User("foo", "me@my.a");
+  }
+
+
+  // Base constructor email validation tests with custom validator --------------------------------
+
+  /**
+   * Null email (not allowed by custom validator) string test on base constructor.
+   *
+   * Note null email references are always converted to empty strings -- this avoids having to deal
+   * with distinction of null vs. empty string for example when serializing the object to JSON
+   * presentation.
+   */
+  @Test(expectedExceptions = User.ValidationException.class)
+
+  public void testBasicConstructorNullEmailCustomValidator() throws Exception
+  {
+    User.setEmailValidator(new Model.Validator<String>()
+    {
+      @Override public void validate(String attribute) throws Model.ValidationException
+      {
+        // accept everything except null
+
+        if (attribute == null)
+        {
+          throw new Model.ValidationException("null email not allowed");
+        }
+      }
+    });
+
+    try
+    {
+      User u = new User("foobar", null);
+
+      Assert.assertTrue(u.email.equals(""));
+    }
+
+    finally
+    {
+      User.setEmailValidator(User.defaultEmailValidator);
+    }
+  }
+
+
+  /**
+   * Empty email (allowed with custom validator) string test on base constructor.
+   */
+  @Test public void testBasicConstructorEmptyEmailCustomValidator() throws Exception
+  {
+    User.setEmailValidator(new Model.Validator<String>()
+    {
+      @Override public void validate(String attribute) throws Model.ValidationException
+      {
+        // accept everything except null
+
+        if (attribute == null)
+        {
+          throw new Model.ValidationException("null not allowed");
+        }
+      }
+    });
+
+    try
+    {
+      new User("foobar", "");
+    }
+
+    finally
+    {
+      User.setEmailValidator(User.defaultEmailValidator);
+    }
+  }
+
+
+  /**
+   * Malformed email (allowed with custom validator) string test on base constructor.
+   */
+  @Test public void testBasicConstructorMalformedEmailCustomValidator() throws Exception
+  {
+    User.setEmailValidator(new Model.Validator<String>()
+    {
+      @Override public void validate(String attribute) throws Model.ValidationException
+      {
+        // accept everything except null
+
+        if (attribute == null)
+        {
+          throw new Model.ValidationException("null not allowed");
+        }
+      }
+    });
+
+    try
+    {
+      new User("foobar", "foobar");
+    }
+
+    finally
+    {
+      User.setEmailValidator(User.defaultEmailValidator);
+    }
+  }
+
+
+  /**
+   * Specific email string test on base constructor using custom validator.
+   */
+  @Test public void testBasicConstructorEmailCustomValidator() throws Exception
+  {
+    User.setEmailValidator(new Model.Validator<String>()
+    {
+      @Override public void validate(String attribute) throws Model.ValidationException
+      {
+        if (attribute.endsWith(".fi"))
+        {
+          return;
+        }
+
+        throw new Model.ValidationException("must end with .fi");
+      }
+    });
+
+    try
+    {
+      new User("foobar", "foobar@some.fi");
+    }
+
+    finally
+    {
+      User.setEmailValidator(User.defaultEmailValidator);
+    }
+  }
+
+
+  /**
+   * Specific email string test on base constructor using custom validator.
+   */
+  @Test(expectedExceptions = User.ValidationException.class)
+
+  public void testBasicConstructorInvalidEmailCustomValidator() throws Exception
+  {
+    User.setEmailValidator(new Model.Validator<String>()
+    {
+      @Override public void validate(String attribute) throws Model.ValidationException
+      {
+        if (attribute.endsWith(".fi"))
+        {
+          return;
+        }
+
+        throw new Model.ValidationException("must end with .fi");
+      }
+    });
+
+    try
+    {
+      new User("foobar", "foobar@some.de");
+    }
+
+    finally
+    {
+      User.setEmailValidator(User.defaultEmailValidator);
+    }
+  }
+
+
 
 
 
