@@ -537,11 +537,180 @@ public class UserTest
    */
   @Test (expectedExceptions = IncorrectImplementationException.class)
 
-  public void testNonValidatingSubclassCopy()
+  public void testNonValidatingSubclassCopy() throws Exception
   {
     User u = new NonValidatingSubClass();
 
     new User(u);
+  }
+
+  /**
+   * Test copy constructor on subclass that contains null attributes.
+   */
+  @Test public void testNullAttributeSubClass() throws Exception
+  {
+    User u = new NullAttributeSubClass();
+
+    User user = new User(u);
+
+    Assert.assertTrue(user.userAttributes.isEmpty());
+    Assert.assertTrue(user.username.equals("foo"));
+    Assert.assertTrue(user.email.equals("email@host.domain"));
+  }
+
+
+  // Class get/setUserName/EmailValidator Tests ---------------------------------------------------
+
+  /**
+   * Check the default name validator instance is present.
+   */
+  @Test public void testDefaultNameValidator()
+  {
+    Assert.assertTrue(User.DEFAULT_NAME_VALIDATOR != null);
+    Assert.assertTrue(User.DEFAULT_NAME_VALIDATOR.toString().startsWith("Default Name Validator:"));
+    Assert.assertTrue(User.getNameValidator() == User.DEFAULT_NAME_VALIDATOR);
+  }
+
+  /**
+   * Check the default email validator instance is present.
+   */
+  @Test public void testDefaultEmailValidator()
+  {
+    Assert.assertTrue(User.DEFAULT_EMAIL_VALIDATOR != null);
+    Assert.assertTrue(User.DEFAULT_EMAIL_VALIDATOR.toString().startsWith("Default Email Validator:"));
+    Assert.assertTrue(User.getEmailValidator() == User.DEFAULT_EMAIL_VALIDATOR);
+  }
+
+  /**
+   * Test setting a custom name validator
+   */
+  @Test public void testSetCustomNameValidator() throws Exception
+  {
+    // works with default validator...
+
+    new User("test", null);
+
+    // change the validator...
+
+    try
+    {
+      User.setNameValidator(new Model.Validator<String>()
+      {
+        @Override public void validate(String username) throws Model.ValidationException
+        {
+          if (username == null || username.length() < 8)
+          {
+            throw new Model.ValidationException("error");
+          }
+        }
+      });
+
+      // works with both validators...
+
+      new User("12345678", null);
+
+      try
+      {
+        // Should fail... under four chars...
+
+        new User("test", null);
+
+        Assert.fail("should not get here...");
+      }
+
+      catch (Model.ValidationException expected)
+      {
+        // expected...
+      }
+    }
+
+    finally
+    {
+      User.setNameValidator(User.DEFAULT_NAME_VALIDATOR);
+    }
+  }
+
+  /**
+   * Test setting a null name validator.
+   */
+  @Test public void testSettingNullNameValidator()
+  {
+    // setting null should not change state...
+
+    Assert.assertTrue(User.getNameValidator() == User.DEFAULT_NAME_VALIDATOR);
+    User.setNameValidator(null);
+    Assert.assertTrue(User.getNameValidator() == User.DEFAULT_NAME_VALIDATOR);
+  }
+
+  /**
+   * Test setting a null email validator.
+   */
+  @Test public void testSettingNullEmailValidator()
+  {
+    // setting null should not change state...
+
+    Assert.assertTrue(User.getEmailValidator() == User.DEFAULT_EMAIL_VALIDATOR);
+    User.setEmailValidator(null);
+    Assert.assertTrue(User.getEmailValidator() == User.DEFAULT_EMAIL_VALIDATOR);
+  }
+
+
+  /**
+   * Test setting custom email validator.
+   *
+   * @throws Exception
+   *          if test fails
+   */
+  @Test public void testSetCustomEmailValidator() throws Exception
+  {
+    final Pattern emailRegexp = Pattern.compile(".*\\..*@mycompany.com");
+
+
+    // should pass with default validator...
+
+    new User("name", "foo@bar.com");
+
+    // set new validator....
+
+    try
+    {
+      User.setEmailValidator(new Model.Validator<String>()
+      {
+        @Override public void validate(String email) throws Model.ValidationException
+        {
+          Matcher m = emailRegexp.matcher(email);
+
+          if (!m.matches())
+          {
+            throw new Model.ValidationException("error");
+          }
+        }
+      });
+
+
+      // should accept this...
+
+      new User("test", "firstname.lastname@mycompany.com");
+
+      try
+      {
+        // Should fail...
+
+        new User("name", "foo@bar.com");
+
+        Assert.fail("should not get here...");
+      }
+
+      catch (Model.ValidationException expected)
+      {
+        // expected...
+      }
+    }
+
+    finally
+    {
+      User.setEmailValidator(User.DEFAULT_EMAIL_VALIDATOR);
+    }
   }
 
 
@@ -551,12 +720,24 @@ public class UserTest
 
   private static class NonValidatingSubClass extends User
   {
-    NonValidatingSubClass()
+    NonValidatingSubClass() throws ValidationException
     {
+      super("foo", "email@host.domain");
+
       this.email = "foo";
     }
   }
 
+
+  private static class NullAttributeSubClass extends User
+  {
+    NullAttributeSubClass() throws ValidationException
+    {
+      super("foo", "email@host.domain");
+
+      this.userAttributes = null;
+    }
+  }
 
 }
 
