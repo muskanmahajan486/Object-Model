@@ -150,7 +150,7 @@ public class UserTest
 
     try
     {
-      new User("  ", "email");
+      new User("  ", "email@host.domain");
     }
 
     finally
@@ -177,7 +177,7 @@ public class UserTest
 
     try
     {
-      new User(null, "email");
+      new User(null, "email@host.domain");
     }
 
     finally
@@ -239,7 +239,7 @@ public class UserTest
 
     try
     {
-      new User("bar", "email");
+      new User("bar", "email@host.domain");
     }
 
     finally
