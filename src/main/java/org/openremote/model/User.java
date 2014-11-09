@@ -54,8 +54,33 @@ public class User extends Model
   public static final int USER_ATTRIBUTE_VALUE_LENGTH_CONSTRAINT = 1000;
 
 
+  /**
+   * This implementation delegates to
+   * {@link org.openremote.model.data.json.UserTransformer#getEmailValidator()}
+   */
+  public static final Validator<String> DEFAULT_EMAIL_VALIDATOR = new DefaultEmailValidator();
+
+  /**
+   * This implementation delegates to
+   * {@link org.openremote.model.data.json.UserTransformer#getNameValidator()}
+   */
+  public static final Validator<String> DEFAULT_NAME_VALIDATOR = new NameValidator();
+
+
 
   // Class Members --------------------------------------------------------------------------------
+
+
+  /**
+   * Current name validator in use.
+   */
+  private static Validator<String> userNameValidator = DEFAULT_NAME_VALIDATOR;
+
+  /**
+   * Current email validator in use.
+   */
+  private static Validator<String> emailValidator = DEFAULT_EMAIL_VALIDATOR;
+
 
   /**
    * Sets a custom name validator for User instances. This method should only be called once
@@ -77,21 +102,14 @@ public class User extends Model
   }
 
   /**
-   * This implementation delegates to
-   * {@link org.openremote.model.data.json.UserTransformer#getNameValidator()}
+   * Returns the current user name validator instance.
+   *
+   * @return  user name validator for {@link org.openremote.model.User} instances.
    */
-  protected static Validator<String> defaultNameValidator = new Validator<String>()
+  public static Validator<String> getNameValidator()
   {
-    @Override public void validate(String username) throws ValidationException
-    {
-      UserTransformer.getNameValidator().validate(username);
-    }
-  };
-
-  /**
-   * Current name validator in use.
-   */
-  private static Validator<String> userNameValidator = defaultNameValidator;
+    return userNameValidator;
+  }
 
 
   /**
@@ -114,31 +132,15 @@ public class User extends Model
   }
 
   /**
-   * This implementation delegates to
-   * {@link org.openremote.model.data.json.UserTransformer#getEmailValidator()}
+   * Returns the current email validator instance.
+   *
+   * @return email validator for {@link org.openremote.model.User} instances.
    */
-  protected static Validator<String> defaultEmailValidator = new Validator<String>()
+  public static Validator<String> getEmailValidator()
   {
-    @Override public void validate(String email) throws ValidationException
-    {
-      if (email == null)
-      {
-        return;
-      }
+    return emailValidator;
+  }
 
-      UserTransformer.getEmailValidator().validate(email);
-    }
-
-    @Override public String toString()
-    {
-      return "Default Email Validator: accepts null or format [email]@[host].[domain]";
-    }
-  };
-
-  /**
-   * Current email validator in use.
-   */
-  private static Validator<String> emailValidator = defaultEmailValidator;
 
 
   // Instance Fields ------------------------------------------------------------------------------
@@ -302,6 +304,71 @@ public class User extends Model
     return username + ", " + email;
   }
 
+
+  // Private Instance Methods ---------------------------------------------------------------------
+
+  // TODO
+  private void validate(String username, String email) throws ValidationException
+  {
+    this.username = (username == null) ? null : username.trim();
+
+    if (username == null || username.equals(""))
+    {
+      throw new ValidationException("Null or empty usernames are never accepted.");
+    }
+
+    userNameValidator.validate(username);
+
+
+    // Note: null emails are always converted to empty strings -- this avoids having to distinguish
+    // between null and empty string when serializing to JSON, etc.
+
+    email = (email == null) ? null : email.trim();
+
+    emailValidator.validate(email);
+
+    this.email = (email == null) ? "" : email;
+  }
+
+
+
+  // Nested Classes -------------------------------------------------------------------------------
+
+  /**
+   * This implementation accepts nulls as valid emails (making email field optional). For
+   * the rest, delegates to
+   * {@link org.openremote.model.data.json.UserTransformer#getEmailValidator()}
+   */
+  private static class DefaultEmailValidator implements Validator<String>
+  {
+    @Override public void validate(String email) throws ValidationException
+    {
+      if (email == null)
+      {
+        return;
+      }
+
+      UserTransformer.getEmailValidator().validate(email);
+    }
+
+    @Override public String toString()
+    {
+      return "Default Email Validator: accepts null or format [email]@[host].[domain]";
+    }
+  }
+
+
+  /**
+   * This implementation delegates everything to
+   * {@link org.openremote.model.data.json.UserTransformer#getNameValidator()}
+   */
+  private static class NameValidator implements Validator<String>
+  {
+    @Override public void validate(String username) throws ValidationException
+    {
+      UserTransformer.getNameValidator().validate(username);
+    }
+  }
 
 }
 
