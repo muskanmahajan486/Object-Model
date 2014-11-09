@@ -499,6 +499,64 @@ public class UserTest
   // Copy Constructor Tests -----------------------------------------------------------------------
 
 
+  /**
+   * Basic tests for copy constructor.
+   *
+   * @throws Exception
+   *          if test fails
+   */
+  @Test public void testBasicCopyCtor() throws Exception
+  {
+    User u = new User("foo", "myemail@foo.bar");
+
+    User user = new User(u);
+
+    Assert.assertTrue(user.email.equals("myemail@foo.bar"));
+    Assert.assertTrue(user.username.equals("foo"));
+    Assert.assertTrue(user.userAttributes.isEmpty());
+    Assert.assertTrue(user.accounts.isEmpty());
+
+    // make sure we're creating copies of collections...
+
+    Assert.assertTrue(user.accounts != u.accounts);
+    Assert.assertTrue(user.userAttributes != u.userAttributes);
+  }
+
+  /**
+   * Test null reference on copy constructor.
+   */
+  @Test (expectedExceptions = IncorrectImplementationException.class)
+
+  public void testNullReference()
+  {
+    new User(null);
+  }
+
+  /**
+   * Test copy constructor on subclass that does not validate.
+   */
+  @Test (expectedExceptions = IncorrectImplementationException.class)
+
+  public void testNonValidatingSubclassCopy()
+  {
+    User u = new NonValidatingSubClass();
+
+    new User(u);
+  }
+
+
+
+
+  // Nested Classes -------------------------------------------------------------------------------
+
+  private static class NonValidatingSubClass extends User
+  {
+    NonValidatingSubClass()
+    {
+      this.email = "foo";
+    }
+  }
+
 
 }
 
