@@ -523,6 +523,24 @@ public class UserTest
   }
 
   /**
+   * Test copy constructor with null email handling.
+   *
+   * @throws Exception
+   *          if test fails
+   */
+  @Test public void testBasicCopyNullEmail() throws Exception
+  {
+    User u = new User("foo", null);
+
+    User user = new User(u);
+
+    Assert.assertTrue(user.email.equals(""));
+    Assert.assertTrue(user.username.equals("foo"));
+    Assert.assertTrue(user.userAttributes.isEmpty());
+    Assert.assertTrue(user.accounts.isEmpty());
+  }
+
+  /**
    * Test null reference on copy constructor.
    */
   @Test (expectedExceptions = IncorrectImplementationException.class)
