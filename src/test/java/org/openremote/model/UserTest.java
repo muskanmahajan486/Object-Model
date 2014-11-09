@@ -20,6 +20,7 @@
  */
 package org.openremote.model;
 
+import org.openremote.base.exception.IncorrectImplementationException;
 import org.openremote.model.data.json.JSONHeader;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -154,7 +155,7 @@ public class UserTest
 
     finally
     {
-      User.setNameValidator(User.defaultNameValidator);
+      User.setNameValidator(User.DEFAULT_NAME_VALIDATOR);
     }
   }
 
@@ -181,7 +182,7 @@ public class UserTest
 
     finally
     {
-      User.setNameValidator(User.defaultNameValidator);
+      User.setNameValidator(User.DEFAULT_NAME_VALIDATOR);
     }
   }
 
@@ -211,7 +212,7 @@ public class UserTest
 
     finally
     {
-      User.setNameValidator(User.defaultNameValidator);
+      User.setNameValidator(User.DEFAULT_NAME_VALIDATOR);
     }
   }
 
@@ -243,7 +244,7 @@ public class UserTest
 
     finally
     {
-      User.setNameValidator(User.defaultNameValidator);
+      User.setNameValidator(User.DEFAULT_NAME_VALIDATOR);
     }
   }
 
@@ -368,7 +369,7 @@ public class UserTest
 
     finally
     {
-      User.setEmailValidator(User.defaultEmailValidator);
+      User.setEmailValidator(User.DEFAULT_EMAIL_VALIDATOR);
     }
   }
 
@@ -398,7 +399,7 @@ public class UserTest
 
     finally
     {
-      User.setEmailValidator(User.defaultEmailValidator);
+      User.setEmailValidator(User.DEFAULT_EMAIL_VALIDATOR);
     }
   }
 
@@ -428,7 +429,7 @@ public class UserTest
 
     finally
     {
-      User.setEmailValidator(User.defaultEmailValidator);
+      User.setEmailValidator(User.DEFAULT_EMAIL_VALIDATOR);
     }
   }
 
@@ -458,7 +459,7 @@ public class UserTest
 
     finally
     {
-      User.setEmailValidator(User.defaultEmailValidator);
+      User.setEmailValidator(User.DEFAULT_EMAIL_VALIDATOR);
     }
   }
 
@@ -490,11 +491,12 @@ public class UserTest
 
     finally
     {
-      User.setEmailValidator(User.defaultEmailValidator);
+      User.setEmailValidator(User.DEFAULT_EMAIL_VALIDATOR);
     }
   }
 
 
+  // Copy Constructor Tests -----------------------------------------------------------------------
 
 
 
