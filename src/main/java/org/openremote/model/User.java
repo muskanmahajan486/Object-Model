@@ -330,7 +330,18 @@ public class User extends Model
 
   // Private Instance Methods ---------------------------------------------------------------------
 
-  // TODO
+  /**
+   * Validates the username and email string values for this instance.
+   *
+   * @param username
+   *          username for this class' name validator
+   *
+   * @param email
+   *          email for this class' email validator
+   *
+   * @throws ValidationException
+   *          if values cannot be validated
+   */
   private void validate(String username, String email) throws ValidationException
   {
     this.username = (username == null) ? null : username.trim();
