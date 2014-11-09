@@ -157,6 +157,8 @@ public class User extends Model
    */
   protected Map<String, String> userAttributes = new ConcurrentHashMap<String, String>(0);
 
+  private boolean isNullEmail = false;
+
 
   // Constructors ---------------------------------------------------------------------------------
 
@@ -197,7 +199,7 @@ public class User extends Model
 
     try
     {
-      validate(username, email);
+      validate(username, email, copy.isNullEmail);
     }
 
     catch (ValidationException exception)
@@ -237,7 +239,7 @@ public class User extends Model
   {
     this();
 
-    validate(username, email);
+    validate(username, email, isNullEmail);
   }
 
 
@@ -333,18 +335,19 @@ public class User extends Model
   /**
    * Validates the username and email string values for this instance.
    *
-   * @param username
+   * @param usernameCandidate
    *          username for this class' name validator
    *
-   * @param email
+   * @param emailCandidate
    *          email for this class' email validator
    *
    * @throws ValidationException
    *          if values cannot be validated
    */
-  private void validate(String username, String email) throws ValidationException
+  private void validate(String usernameCandidate, String emailCandidate, boolean isNull)
+      throws ValidationException
   {
-    this.username = (username == null) ? null : username.trim();
+    this.username = (usernameCandidate == null) ? null : usernameCandidate.trim();
 
     if (username == null || username.equals(""))
     {
@@ -357,11 +360,16 @@ public class User extends Model
     // Note: null emails are always converted to empty strings -- this avoids having to distinguish
     // between null and empty string when serializing to JSON, etc.
 
-    email = (email == null) ? null : email.trim();
+    email = (emailCandidate == null) ? null : emailCandidate.trim();
 
-    emailValidator.validate(email);
+    emailValidator.validate((isNull) ? null : email);
 
-    this.email = (email == null) ? "" : email;
+    if (email == null)
+    {
+      this.email = "";
+
+      isNullEmail = true;
+    }
   }
 
 
