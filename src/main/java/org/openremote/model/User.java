@@ -402,6 +402,11 @@ public class User extends Model
     {
       UserTransformer.getNameValidator().validate(username);
     }
+
+    @Override public String toString()
+    {
+      return "Default Name Validator: must be non-null, non-empty string";
+    }
   }
 
 }
