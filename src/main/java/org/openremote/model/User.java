@@ -187,35 +187,58 @@ public class User extends Model
 
     if (copy.userAttributes != null)
     {
+      // shallow copy ok, strings are immutable
+
       this.userAttributes = new ConcurrentHashMap<String, String>(copy.userAttributes);
     }
+
+    // Validate... if we allow subclasses to copy, it's possible they haven't been validated.
+    // Alternatively disallow subclass copies.
+
+    try
+    {
+      validate(username, email);
+    }
+
+    catch (ValidationException exception)
+    {
+      throw new IncorrectImplementationException(
+          "Incompatible User instances for copy : {0}", exception, exception.getMessage()
+      );
+    }
+
+    // TODO : need deep copy of linked accounts, if bidirectional references are maintained
   }
 
 
+  /**
+   * Constructs a user with a given username and email strings. Both username and email must
+   * match the default or configured validation rules. Email may be optional, in which case
+   * a null reference for email address should be used (note that a null email reference will
+   * be converted to an empty string by this implementation).
+   *
+   * @param username
+   *          A unique username matching {@link #DEFAULT_NAME_VALIDATOR default validation rules}
+   *          or {@link #setNameValidator(org.openremote.model.Model.Validator) configured name
+   *          validation rules}.
+   *
+   * @param email
+   *          User email address as string or <tt>null</tt> if no email is required. If an email
+   *          address is provided it must match the {@link #DEFAULT_EMAIL_VALIDATOR default
+   *          email validation rules} or
+   *          {@link #setEmailValidator(org.openremote.model.Model.Validator) configured email
+   *          validation rules}. Note that a <tt>null</tt> reference for email address will be
+   *          converted to an empty string by this implementation.
+   *
+   * @throws  ValidationException
+   *            if username or email values cannot be validated
+   */
   public User(String username, String email) throws ValidationException
   {
     this();
 
-    this.username = (username == null) ? null : username.trim();
-
-    if (username == null || username.equals(""))
-    {
-      throw new ValidationException("Null or empty usernames are never accepted.");
-    }
-
-    userNameValidator.validate(username);
-
-
-    // Note: null emails are always converted to empty strings -- this avoids having to distinguish
-    // between null and empty string when serializing to JSON, etc.
-
-    email = (email == null) ? null : email.trim();
-
-    emailValidator.validate(email);
-
-    this.email = (email == null) ? "" : email;
+    validate(username, email);
   }
-
 
 
   // Public Instance Methods ----------------------------------------------------------------------
