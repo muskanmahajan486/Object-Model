@@ -23,7 +23,9 @@ package org.openremote.model;
 import org.openremote.base.exception.IncorrectImplementationException;
 import org.openremote.model.data.json.JSONHeader;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.StringTokenizer;
@@ -49,7 +51,17 @@ public class UserTest
     Assert.assertTrue(apiVersion != null && !apiVersion.equals(""));
   }
 
+  /**
+   * Reset default validators before and after each test method. Idealy tests should clean up
+   * after themselves and reset previous state, but this does fail reasonably often.
+   */
+  @BeforeMethod @AfterMethod public void resetDefaults()
+  {
+    User.setEmailValidator(User.DEFAULT_EMAIL_VALIDATOR);
+    User.setNameValidator(User.DEFAULT_NAME_VALIDATOR);
+  }
 
+  
   // Base constructor tests -----------------------------------------------------------------------
 
   /**
