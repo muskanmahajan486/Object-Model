@@ -139,7 +139,50 @@ public class UserTest
 
   public void testBasicConstructorEmptyUserNameDefaultValidator5() throws Exception
   {
-    new User("\t", "email");
+    new User("\t", "email@host.domain");
+  }
+
+  /**
+   * Test overlong username on base constructor using default validator.
+   */
+  @Test public void testBasicConstructorOverlongUserNameDefaultValidator()
+  {
+    StringBuilder b = new StringBuilder();
+
+    for (int i = 0; i < Model.DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT; ++i)
+    {
+      b.append('a');
+    }
+
+
+    // at the limit, should work...
+
+    try
+    {
+      new User(b.toString(), "email@host.domain");
+    }
+
+    catch (Model.ValidationException e)
+    {
+      Assert.fail();
+    }
+
+    b.append('b');
+
+
+    // over the limit, should fail...
+
+    try
+    {
+      new User(b.toString(), "email@host.domain");
+
+      Assert.fail("should not get here...");
+    }
+
+    catch (Model.ValidationException e)
+    {
+      // expected...
+    }
   }
 
 
@@ -252,6 +295,66 @@ public class UserTest
     try
     {
       new User("bar", "email@host.domain");
+    }
+
+    finally
+    {
+      User.setNameValidator(User.DEFAULT_NAME_VALIDATOR);
+    }
+  }
+
+  /**
+   * Test overlong username on base constructor using custom validator. Username lenght should
+   * never be allowed to exceed the hard limit dictated by database schema and serialization
+   * schemas, regardless of the validator implementation.
+   */
+  @Test public void testBasicConstructorOverlongUserNameCustomValidator()
+  {
+    User.setNameValidator(new Model.Validator<String>()
+    {
+      @Override public void validate(String attribute) throws Model.ValidationException
+      {
+        // accept everything...
+      }
+    });
+
+    try
+    {
+      StringBuilder b = new StringBuilder();
+
+      for (int i = 0; i < Model.DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT; ++i)
+      {
+        b.append('a');
+      }
+
+      // at the limit, should work...
+
+      try
+      {
+        new User(b.toString(), "email@host.domain");
+      }
+
+      catch (Model.ValidationException e)
+      {
+        Assert.fail();
+      }
+
+      b.append('b');
+
+
+      // over the limit, should fail, regardless of the validator
+
+      try
+      {
+        new User(b.toString(), "email@host.domain");
+
+        Assert.fail("should not get here...");
+      }
+
+      catch (Model.ValidationException e)
+      {
+        // expected...
+      }
     }
 
     finally
