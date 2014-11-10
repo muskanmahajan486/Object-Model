@@ -75,7 +75,7 @@ public class UserTest
 
   public void testBasicConstructorNullUserNameArgDefaultValidator() throws Exception
   {
-    new User(null, "email");
+    new User(null, "email@host.domain");
   }
 
 
@@ -86,7 +86,7 @@ public class UserTest
 
   public void testBasicConstructorEmptyUserNameDefaultValidator() throws Exception
   {
-    new User("", "email");
+    new User("", "email@host.domain");
   }
 
 
@@ -97,7 +97,7 @@ public class UserTest
 
   public void testBasicConstructorEmptyUserNameDefaultValidator2() throws Exception
   {
-    new User("  ", "email");
+    new User("  ", "email@host.domain");
   }
 
   /**
@@ -107,7 +107,7 @@ public class UserTest
 
   public void testBasicConstructorEmptyUserNameDefaultValidator3() throws Exception
   {
-    new User("\r", "email");
+    new User("\r", "email@host.domain");
   }
 
   /**
@@ -117,7 +117,7 @@ public class UserTest
 
   public void testBasicConstructorEmptyUserNameDefaultValidator4() throws Exception
   {
-    new User("\n", "email");
+    new User("\n", "email@host.domain");
   }
 
   /**
