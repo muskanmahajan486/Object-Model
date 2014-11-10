@@ -354,6 +354,13 @@ public class User extends Model
       throw new ValidationException("Null or empty usernames are never accepted.");
     }
 
+    if (username.length() > Model.DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT)
+    {
+      throw new ValidationException(
+          "Username cannot exceed {0} characters.", Model.DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT
+      );
+    }
+
     userNameValidator.validate(username);
 
 
