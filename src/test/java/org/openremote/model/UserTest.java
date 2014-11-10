@@ -61,7 +61,7 @@ public class UserTest
     User.setNameValidator(User.DEFAULT_NAME_VALIDATOR);
   }
 
-  
+
   // Base constructor tests -----------------------------------------------------------------------
 
   /**
@@ -448,6 +448,53 @@ public class UserTest
     new User("foo", "me@my.a");
   }
 
+  /**
+   * Test overlong email on base constructor using custom validator. Email length should
+   * never be allowed to exceed the hard limit dictated by database schema and serialization
+   * schemas, regardless of the validator implementation.
+   */
+  @Test public void testBasicConstructorOverlongEmailDefaultValidator()
+  {
+    StringBuilder b = new StringBuilder();
+    b.append("a@b.");
+
+    int size = b.length();
+
+    for (int i = 0; i < Model.DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT - size; ++i)
+    {
+      b.append('c');
+    }
+
+    // at the limit, should work...
+
+    try
+    {
+      new User("foo", b.toString());
+    }
+
+    catch (Model.ValidationException e)
+    {
+      Assert.fail();
+    }
+
+    b.append('d');
+
+
+    // over the limit, should fail
+
+    try
+    {
+      new User("foo", b.toString());
+
+      Assert.fail("should not get here...");
+    }
+
+    catch (Model.ValidationException e)
+    {
+      // expected...
+    }
+  }
+
 
   // Base constructor email validation tests with custom validator --------------------------------
 
@@ -602,6 +649,67 @@ public class UserTest
     try
     {
       new User("foobar", "foobar@some.de");
+    }
+
+    finally
+    {
+      User.setEmailValidator(User.DEFAULT_EMAIL_VALIDATOR);
+    }
+  }
+
+
+  /**
+   * Test overlong email on base constructor using custom validator. Email length should
+   * never be allowed to exceed the hard limit dictated by database schema and serialization
+   * schemas, regardless of the validator implementation.
+   */
+  @Test public void testBasicConstructorOverlongEmailCustomValidator()
+  {
+    User.setEmailValidator(new Model.Validator<String>()
+    {
+      @Override public void validate(String attribute) throws Model.ValidationException
+      {
+        // accept everything...
+      }
+    });
+
+    try
+    {
+      StringBuilder b = new StringBuilder();
+
+      for (int i = 0; i < Model.DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT; ++i)
+      {
+        b.append('a');
+      }
+
+      // at the limit, should work...
+
+      try
+      {
+        new User("foo", b.toString());
+      }
+
+      catch (Model.ValidationException e)
+      {
+        Assert.fail();
+      }
+
+      b.append('b');
+
+
+      // over the limit, should fail, regardless of the validator
+
+      try
+      {
+        new User("foo", b.toString());
+
+        Assert.fail("should not get here...");
+      }
+
+      catch (Model.ValidationException e)
+      {
+        // expected...
+      }
     }
 
     finally
