@@ -377,6 +377,13 @@ public class User extends Model
 
       isNullEmail = true;
     }
+
+    if (email.length() > Model.DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT)
+    {
+      throw new ValidationException(
+          "Email cannot exceed {0} characters.", Model.DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT
+      );
+    }
   }
 
 
