@@ -28,6 +28,11 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,6 +49,32 @@ public class UserTest
 
   private String apiVersion = "";
 
+  private String userJSON;
+  private String userAttributesJSON;
+
+  /**
+   * Set up tests with loading sample JSON documents to compare to.
+   *
+   * @throws IOException  if setup fails
+   */
+  @BeforeClass public void loadJsonTestFiles() throws IOException
+  {
+    try
+    {
+      userJSON = loadUserJSONFile("user.json");
+      userAttributesJSON = loadUserJSONFile("userAttributes.json");
+    }
+
+    catch (Throwable t)
+    {
+      System.err.println(String.format("%n%n !!! TEST SETUP FAILURE !!! %n%n "));
+
+      t.printStackTrace();
+    }
+  }
+
+
+  // TODO
   @BeforeClass public void getConfiguredAPIVersion()
   {
     apiVersion = System.getProperty("openremote.project.api.version");
@@ -798,6 +829,7 @@ public class UserTest
     Assert.assertTrue(user.username.equals("foo"));
     Assert.assertTrue(user.email.equals("email@host.domain"));
   }
+
 
 
   // Class get/setUserName/EmailValidator Tests ---------------------------------------------------
