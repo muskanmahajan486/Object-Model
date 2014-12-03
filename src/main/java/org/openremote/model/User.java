@@ -157,7 +157,7 @@ public class User extends Model
    */
   protected Map<String, String> userAttributes = new ConcurrentHashMap<String, String>(0);
 
-  private boolean isNullEmail = false;
+  private transient boolean isNullEmail = false;
 
 
   // Constructors ---------------------------------------------------------------------------------
