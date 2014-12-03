@@ -20,22 +20,22 @@
  */
 package org.openremote.model;
 
-import org.openremote.base.exception.IncorrectImplementationException;
-import org.openremote.model.data.json.JSONHeader;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.openremote.base.exception.IncorrectImplementationException;
+
 
 /**
  * Unit tests for {@link org.openremote.model.User} class.
@@ -51,6 +51,7 @@ public class UserTest
 
   private String userJSON;
   private String userAttributesJSON;
+  private String userEscapeJSON;
 
   /**
    * Set up tests with loading sample JSON documents to compare to.
@@ -62,7 +63,8 @@ public class UserTest
     try
     {
       userJSON = loadUserJSONFile("user.json");
-      userAttributesJSON = loadUserJSONFile("userAttributes.json");
+      userAttributesJSON = loadUserJSONFile("user-attributes.json");
+      userEscapeJSON = loadUserJSONFile("user-escaping.json");
     }
 
     catch (Throwable t)
@@ -844,6 +846,7 @@ public class UserTest
     Assert.assertTrue(User.getNameValidator() == User.DEFAULT_NAME_VALIDATOR);
   }
 
+
   /**
    * Check the default email validator instance is present.
    */
@@ -853,6 +856,7 @@ public class UserTest
     Assert.assertTrue(User.DEFAULT_EMAIL_VALIDATOR.toString().startsWith("Default Email Validator:"));
     Assert.assertTrue(User.getEmailValidator() == User.DEFAULT_EMAIL_VALIDATOR);
   }
+
 
   /**
    * Test setting a custom name validator
@@ -987,6 +991,101 @@ public class UserTest
   }
 
 
+
+  // ToJSONString Tests ---------------------------------------------------------------------------
+
+
+  /**
+   * Basic object to JSON data exchange format.
+   */
+  @Test public void testToJSONString() throws Exception
+  {
+    User user = new User("username", "email@somewhere.com");
+
+    Assert.assertTrue(
+        userJSON.equals(user.toJSONString()),
+        userJSON + String.format("%n%n") + user.toJSONString()
+    );
+  }
+
+
+  /**
+   * Object to JSON data exchange format with special characters that should get escaped:
+   * double quotes inside the string escaped to \u0022, <, &, > FlexJSON escapes these as
+   * \u003c, \u0026 and \u003e respectively. A linefeed control character in middle of string
+   * is escaped as \n in the JSON.
+   */
+  @Test public void testToJSONStringEscaping() throws Exception
+  {
+    User user = new User("a\"a", "<a&b>@somewhere.com");
+
+    Assert.assertTrue(
+        userEscapeJSON.equals(user.toJSONString()),
+        userEscapeJSON + String.format("%n%n") + user.toJSONString()
+    );
+  }
+
+
+  /**
+   * We trim whitespace around variables so they don't show up on JSON format either.
+   */
+  @Test public void testToJSONStringValueTrimming() throws Exception
+  {
+    User user = new User("\t\tfoo\n", " email@host.domain ");
+    user.addAttribute("\t\tcredentials", "\n\nbar\n\n");
+
+    Assert.assertTrue(
+        userAttributesJSON.equals(user.toJSONString()),
+        userAttributesJSON + String.format("%n%n") + user.toJSONString()
+    );
+  }
+
+
+  @Test public void testJSONUserAttributes() throws Exception
+  {
+    User user = new User("foo", "email@host.domain");
+    user.addAttribute("credentials", "bar");
+
+    Assert.assertTrue(
+        userAttributesJSON.equals(user.toJSONString()),
+        userAttributesJSON + String.format("%n%n") + user.toJSONString()
+    );
+  }
+
+
+  // Helper Methods -------------------------------------------------------------------------------
+
+
+  private String loadUserJSONFile(String name) throws IOException
+  {
+    File testResourceDirs = new File(
+        System.getProperty("openremote.project.resources.dir"), "test"
+    );
+
+    File testUserRegistrationDir = new File(testResourceDirs, "user");
+    File userRegistrationJSONFile = new File(testUserRegistrationDir, name);
+
+    FileInputStream io = new FileInputStream(userRegistrationJSONFile);
+    InputStreamReader in = new InputStreamReader(io, Model.UTF8);
+    BufferedReader reader = new BufferedReader(in);
+
+    StringBuilder builder = new StringBuilder();
+
+    while (true)
+    {
+      String line = reader.readLine();
+
+      if (line == null)
+      {
+        break;
+      }
+
+      builder.append(line);
+      builder.append(String.format("%n"));
+    }
+
+    return builder.toString().trim();
+  }
 
 
   // Nested Classes -------------------------------------------------------------------------------
