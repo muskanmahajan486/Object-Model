@@ -1,0 +1,13 @@
+{
+    "libraryName": "OpenRemote Object Model",
+    "javaFullClassName": "org.openremote.model.User",
+    "schemaVersion": "2.0.0",
+    "apiVersion": "0.2",
+    "model": {
+        "username": "foo",
+        "email": "email@host.domain",
+        "userAttributes": {
+            "credentials": "bar"
+        }
+    }
+}
