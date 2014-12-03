@@ -818,6 +818,20 @@ public class UserTest
     new User(u);
   }
 
+
+  /**
+   * Test copy constructor on subclass that does not validate (overlong name).
+   */
+  @Test (expectedExceptions = IncorrectImplementationException.class)
+
+  public void testNonValidatingSubclassCopy2() throws Exception
+  {
+    User u = new OverlongUserSubClass();
+
+    new User(u);
+  }
+
+
   /**
    * Test copy constructor on subclass that contains null attributes.
    */
@@ -1111,5 +1125,21 @@ public class UserTest
     }
   }
 
+  private static class OverlongUserSubClass extends User
+  {
+    OverlongUserSubClass() throws ValidationException
+    {
+      super("moo", "email@host.domain");
+
+      StringBuilder b = new StringBuilder();
+
+      for (int i = 0; i <= Model.DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT; ++i)
+      {
+        b.append('a');
+      }
+
+      this.username = b.toString();
+    }
+  }
 }
 
