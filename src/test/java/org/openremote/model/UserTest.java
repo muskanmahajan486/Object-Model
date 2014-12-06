@@ -1056,6 +1056,11 @@ public class UserTest extends OpenRemoteTest
   }
 
 
+  /**
+   * Test JSON serialization when nested userAttributes object is included
+   *
+   * @throws Exception if test fails  
+   */
   @Test public void testJSONUserAttributes() throws Exception
   {
     User user = new User("foo", "email@host.domain");
