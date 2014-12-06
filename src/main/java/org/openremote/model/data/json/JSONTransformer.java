@@ -256,6 +256,10 @@ public abstract class JSONTransformer<T> extends AbstractTransformer
     JSONContext ctx = getContext();
 
     ctx.writeCloseObject();
+
+    // transformer is stateful (unfortunately) so make sure we reset state at the end of object...
+
+    firstProperty = true;
   }
 
   /**
