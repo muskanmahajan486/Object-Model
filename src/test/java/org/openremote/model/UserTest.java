@@ -20,11 +20,9 @@
  */
 package org.openremote.model;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,6 +33,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import org.openremote.base.exception.IncorrectImplementationException;
+import org.openremote.model.testengine.OpenRemoteTest;
 
 
 /**
@@ -42,7 +41,7 @@ import org.openremote.base.exception.IncorrectImplementationException;
  *
  * @author <a href = "mailto:juha@openremote.org">Juha Lindfors</a>
  */
-public class UserTest
+public class UserTest extends OpenRemoteTest
 {
 
   // Test Lifecycle -------------------------------------------------------------------------------
@@ -52,6 +51,7 @@ public class UserTest
   private String userJSON;
   private String userAttributesJSON;
   private String userEscapeJSON;
+  private String userCharsetJSON;
 
   /**
    * Set up tests with loading sample JSON documents to compare to.
@@ -62,9 +62,10 @@ public class UserTest
   {
     try
     {
-      userJSON = loadUserJSONFile("user.json");
-      userAttributesJSON = loadUserJSONFile("user-attributes.json");
-      userEscapeJSON = loadUserJSONFile("user-escaping.json");
+      userJSON = loadResourceTextFile(new URI("user/user.json"));
+      userAttributesJSON = loadResourceTextFile(new URI("user/user-attributes.json"));
+      userEscapeJSON = loadResourceTextFile(new URI("user/user-escaping.json"));
+      userCharsetJSON = loadResourceTextFile(new URI("user/user-charset.json"));
     }
 
     catch (Throwable t)
@@ -1067,39 +1068,21 @@ public class UserTest
   }
 
 
-  // Helper Methods -------------------------------------------------------------------------------
-
-
-  private String loadUserJSONFile(String name) throws IOException
+  /**
+   * Make sure we are doing correct charset conversion when serializing to JSON.
+   *
+   * @throws Exception if test fails
+   */
+  @Test public void testJSONUserCharset() throws Exception
   {
-    File testResourceDirs = new File(
-        System.getProperty("openremote.project.resources.dir"), "test"
+    User user = new User("了IıİißÇçöâåäøö", "email@host.domain");
+
+    Assert.assertTrue(
+        userCharsetJSON.trim().equalsIgnoreCase(user.toJSONString().trim()),
+        userCharsetJSON + String.format("%n%n") + user.toJSONString()
     );
-
-    File testUserRegistrationDir = new File(testResourceDirs, "user");
-    File userRegistrationJSONFile = new File(testUserRegistrationDir, name);
-
-    FileInputStream io = new FileInputStream(userRegistrationJSONFile);
-    InputStreamReader in = new InputStreamReader(io, Model.UTF8);
-    BufferedReader reader = new BufferedReader(in);
-
-    StringBuilder builder = new StringBuilder();
-
-    while (true)
-    {
-      String line = reader.readLine();
-
-      if (line == null)
-      {
-        break;
-      }
-
-      builder.append(line);
-      builder.append(String.format("%n"));
-    }
-
-    return builder.toString().trim();
   }
+
 
 
   // Nested Classes -------------------------------------------------------------------------------
