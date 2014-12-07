@@ -20,40 +20,141 @@
  */
 package org.openremote.model.data.json;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
+import java.net.URI;
+
 import org.openremote.base.Version;
-import org.openremote.base.exception.IncorrectImplementationException;
-import org.openremote.model.Model;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.util.Map;
+import org.openremote.base.exception.IncorrectImplementationException;
+import org.openremote.model.Model;
+import org.openremote.model.testengine.OpenRemoteTest;
 
 /**
  * Unit tests for {@link JSONTransformer} class.
  *
  * @author <a href="mailto:juha@openremote.org">Juha Lindfors</a>
  */
-public class JSONTransformerTest
+public class JSONTransformerTest extends OpenRemoteTest
 {
+
+  // Test Lifecycle -------------------------------------------------------------------------------
+
+  private String basicJSON;
+  private String noSchemaJSON;
+  private String incorrectLibJSON;
+
+  /**
+   * Set up tests with loading sample JSON documents to compare to.
+   */
+  @BeforeClass public void loadJsonTestFiles()
+  {
+    try
+    {
+      basicJSON = loadResourceTextFile(new URI("json-transformer/basic-model.json"));
+      noSchemaJSON = loadResourceTextFile(new URI("json-transformer/no-schema.json"));
+      incorrectLibJSON = loadResourceTextFile(new URI("json-transformer/incorrect-lib.json"));
+    }
+
+    catch (Throwable t)
+    {
+      System.err.println(String.format("%n%n !!! TEST SETUP FAILURE !!! %n%n "));
+
+      t.printStackTrace();
+    }
+  }
+
+
+  // Read/Deserialize Tests -----------------------------------------------------------------------
+
+
+  /**
+   * Tests a basic non-defined model read to deserialize.
+   *
+   * @throws Exception  if test fails
+   */
+  @Test public void testRead() throws Exception
+  {
+    Deserializer deserializer = new Deserializer()
+    {
+      @Override public void deserialize(JSONTransformer.ModelPrototype prototype)
+      {
+        Assert.assertTrue(prototype.containsSchema(new Version(0, 0, 0)));
+
+        Assert.assertTrue(prototype.getModel().hasAttributes());
+        Assert.assertTrue(prototype.getModel().containsAttribute("name", "value"));
+        Assert.assertTrue(!prototype.getModel().hasObjects());
+      }
+    };
+
+    MyModelTransformer mmt = new MyModelTransformer(deserializer);
+
+    ByteArrayInputStream bain = new ByteArrayInputStream(basicJSON.getBytes(DEFAULT_CHARSET));
+
+    mmt.read(new InputStreamReader(bain));
+  }
+
+  /**
+   * Tests model read behavior when incoming JSON document is missing a schema version header.
+   *
+   * @throws Exception  if test fails
+   */
+  @Test public void testReadNoSchema() throws Exception
+  {
+    Deserializer deserializer = new Deserializer()
+    {
+      @Override public void deserialize(JSONTransformer.ModelPrototype prototype)
+      {
+        Assert.assertTrue(!prototype.containsSchema(new Version(0, 0, 0)));
+        Assert.assertTrue(prototype.containsSchema(Version.UNKNOWN));
+
+        Assert.assertTrue(prototype.getModel().hasAttributes());
+        Assert.assertTrue(prototype.getModel().containsAttribute("name", "value"));
+        Assert.assertTrue(!prototype.getModel().hasObjects());
+      }
+    };
+
+    MyModelTransformer mmt = new MyModelTransformer(deserializer);
+
+    ByteArrayInputStream bain = new ByteArrayInputStream(noSchemaJSON.getBytes(DEFAULT_CHARSET));
+
+    mmt.read(new InputStreamReader(bain));
+  }
+
+
+  /**
+   * Tests read behavior when incoming JSON document is not part of Object Model lib.
+   *
+   * @throws Exception    if test fails
+   */
+  @Test (expectedExceptions = JSONTransformer.DeserializationException.class)
+
+  public void testReadIncorrectLib() throws Exception
+  {
+    MyModelTransformer mmt = new MyModelTransformer();
+
+    ByteArrayInputStream bain = new ByteArrayInputStream(incorrectLibJSON.getBytes(DEFAULT_CHARSET));
+
+    mmt.read(new InputStreamReader(bain));
+  }
+
+
+  // Transform Tests ------------------------------------------------------------------------------
+
 
   /**
    * Test the error handling in case of conflicting types.
    */
-  @Test public void testInvalidType()
+  @Test (expectedExceptions = IncorrectImplementationException.class)
+
+  public void testInvalidType()
   {
     TestTransformer tt = new TestTransformer();
 
-    try
-    {
-      tt.transform(new Integer(10));
-
-      Assert.fail("should not get here...");
-    }
-
-    catch (IncorrectImplementationException e)
-    {
-      // expected...
-    }
+    tt.transform(new Integer(10));
   }
 
 
@@ -177,11 +278,58 @@ public class JSONTransformerTest
 
     }
 
-    @Override public String deserialize(Version schemaVersion, String className,
-                                        Map<String, String> jsonProperties)
+    @Override public String deserialize(ModelPrototype prototype)
     {
       throw new IncorrectImplementationException("Not implemented.");
     }
+  }
+
+
+  private static class MyModelTransformer extends JSONTransformer<MyModel>
+  {
+    private Deserializer deserializer;
+
+    private MyModelTransformer()
+    {
+      super(MyModel.class);
+
+      this.deserializer = new Deserializer() {
+
+        @Override public void deserialize(ModelPrototype prototype)
+        {
+
+        }
+      };
+    }
+
+    private MyModelTransformer(Deserializer method)
+    {
+      super(MyModel.class);
+
+      this.deserializer = method;
+    }
+
+    @Override public void write(MyModel mm)
+    {
+      throw new IncorrectImplementationException("Not implemented.");
+    }
+
+    @Override public MyModel deserialize(ModelPrototype prototype)
+    {
+      deserializer.deserialize(prototype);
+
+      return new MyModel();
+    }
+  }
+
+  private static interface Deserializer
+  {
+    void deserialize(JSONTransformer.ModelPrototype prototype);
+  }
+
+  private static class MyModel
+  {
+
   }
 }
 
