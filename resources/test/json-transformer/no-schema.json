@@ -1,0 +1,9 @@
+{
+    "libraryName": "OpenRemote Object Model",
+    "javaFullClassName": "MyModel",
+    "apiVersion": "0.0",
+
+    "model" : {
+        "name": "value"
+    }
+}
