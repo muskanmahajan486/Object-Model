@@ -407,22 +407,57 @@ public abstract class JSONTransformer<T> extends AbstractTransformer
   // Nested Classes -------------------------------------------------------------------------------
 
   /**
-   * A deserialization data container used by FlexJSON deserializer to create a JSON prototype
-   * parsing the expected JSON data structure. This container still includes header fields such
-   * as library name and schema version that can be used to determine how to deserialize and
-   * construct the model objects contained within.
+   * A deserialization data container used by FlexJSON deserializer. The deserializer creates a
+   * model prototype by parsing the expected JSON document schema. This container still includes
+   * JSON header fields such as library name and schema version that can be used to determine how
+   * to deserialize and construct the model objects contained within. <p>
+   *
+   * This prototype instance contains the JSON document header fields (for example,
+   * schema version, generating implementation API version, etc.) that can be used to attempt
+   * to deserialize the JSON structure into a Java instance. The JSON structure that represents
+   * the model object (without headers) can be retrieved via a call to {@link #getModel()} method.
    */
-  private static class JSONPrototype
+  public static class ModelPrototype
   {
+
+    // Constants ----------------------------------------------------------------------------------
+
+    /**
+     * Class name value used if none is defined in the incoming JSON document (which is an error
+     * for this mandatory header propery).
+     */
+    public static final String UNDEFINED_CLASS = "<undefined>";
+
 
     // Instance Fields ----------------------------------------------------------------------------
 
-    private Map<String, String> modelPrototype;
+    /**
+     * JSON schema version this prototype model corresponds to.
+     */
+    private Version schema = Version.UNKNOWN;
 
-    private String schemaVersion;
-    private String apiVersion;
+    /**
+     * Implementation API version that generated the JSON document this prototype represents.
+     */
+    private APIVersion api;   // TODO
+
+    /**
+     * Library identifier for a collection of JSON schemas that represent this object model,
+     * see {@link JSONHeader#LIBRARY_NAME}.
+     *
+     * @see #isValidLibrary()
+     */
     private String libraryName;
-    private String javaFullClassName;
+
+    /**
+     * Class name this prototype structure represents.
+     */
+    private String javaFullClassName = UNDEFINED_CLASS;
+
+    /**
+     * JSON structure of the model object.
+     */
+    private ModelObject prototype = new ModelObject("");
 
 
     // Constructors -------------------------------------------------------------------------------
@@ -430,13 +465,111 @@ public abstract class JSONTransformer<T> extends AbstractTransformer
     /**
      * A no-args constructor required by the FlexJSON deserialization framework.
      */
-    private JSONPrototype()
+    private ModelPrototype()
     {
 
     }
 
 
-    // Instance Methods ---------------------------------------------------------------------------
+    // Public Instance Methods --------------------------------------------------------------------
+
+    /**
+     * Indicates if this prototype corresponds to the given schema version.
+     *
+     * @param schema
+     *          schema version to match with this prototype's schema
+     *
+     * @return
+     *          true if the schema versions are equal
+     */
+    public boolean containsSchema(Version schema)
+    {
+      return this.schema.equals(schema);
+    }
+
+
+    /**
+     * Returns the classname of the expected model implementation.
+     *
+     * @return
+     *          The fully qualified class name of the model this JSON document and schema
+     *          represents.
+     */
+    public String getModelClass()
+    {
+      return javaFullClassName;
+    }
+
+
+    /**
+     * Returns a JSON representation of the included model object.
+     *
+     * @return
+     *          a JSON structure that represents the 'model' object of this OpenRemote Object
+     *          Model JSON document.
+     */
+    public ModelObject getModel()
+    {
+      return prototype;
+    }
+
+
+
+    // Object Overrides ---------------------------------------------------------------------------
+
+
+    @Override public String toString()
+    {
+      if (prototype == null)
+      {
+        return "Model prototype : (null)";
+      }
+
+      return "Model prototype for " + javaFullClassName + ", schema : " + schema +
+             ", API : " + apiVersion + " (" + libraryName + ")";
+    }
+
+
+    // Private Instance Methods -------------------------------------------------------------------
+
+    private ModelObject constructModel(String name, Map<String, Object> structure)
+    {
+      // TODO :
+      //
+      //      The FlexJSON does little to document the structure it returns from its deserializer,
+      //      using a very generic String, Object map only. In order to make it slightly easier
+      //      and less error prone for subclasses to implement deserialization logic, attempt
+      //      to convert the late-bound types to compile-time types for known JSON structures.
+      //
+      //      Currently implements only JSON objects (HashMap to ModelObject conversion) and
+      //      basic String name,value properties. Other JSON types (arrays, booleans, integers,
+      //      etc) still need to be added to be complete.
+
+
+      ModelObject json = new ModelObject(name);
+
+      for (String valueName : structure.keySet())
+      {
+        Object value = structure.get(valueName);
+
+        if (value instanceof Map)
+        {
+          Map<String, Object> objectStructure = (Map)value;
+
+          ModelObject nested = constructModel(valueName, objectStructure);
+
+          json.objects.put(valueName, nested);
+        }
+
+        else if (value instanceof String)
+        {
+          json.attributes.put(valueName, (String) value);
+        }
+
+      }
+
+      return json;
+    }
 
     /**
      * Checks the given library name in the header fields of this JSON representation against
@@ -449,14 +582,25 @@ public abstract class JSONTransformer<T> extends AbstractTransformer
       return libraryName != null && libraryName.equalsIgnoreCase(JSONHeader.LIBRARY_NAME);
     }
 
+
+    // FlexJSON Setters ---------------------------------------------------------------------------
+
+
+    // These fields are still required by the FlexJSON deserializer (for unknown reasons)
+    // despite the fact that corresponding setters have been defined (and that do not assign
+    // values to these types). Therefore they need to be present, even they are unused.
+
+    private String schemaVersion;
+    private Map<String, Object> model;
+    private String apiVersion;
+
+
     /**
      * Private setter required by the FlexJSON framework to deserialize a JSONPrototype instance.
      */
-    private void setModel(Map<String, String> model)
+    private void setModel(Map<String, Object> json)
     {
-      // TODO : note on type safety
-
-      this.modelPrototype = model;
+      prototype = constructModel("model", json);
     }
 
     /**
@@ -464,7 +608,16 @@ public abstract class JSONTransformer<T> extends AbstractTransformer
      */
     private void setSchemaVersion(String schema)
     {
-      this.schemaVersion = schema;
+      try
+      {
+        this.schema = new Version(schema);
+      }
+
+      catch (IllegalArgumentException exception)
+      {
+        // TODO : log
+        System.err.println(exception.getMessage());
+      }
     }
 
     /**
@@ -472,7 +625,7 @@ public abstract class JSONTransformer<T> extends AbstractTransformer
      */
     private void setApiVersion(String api)
     {
-      this.apiVersion = api;
+      // this.api = new APIVersion()  TODO
     }
 
     /**
@@ -526,7 +679,7 @@ public abstract class JSONTransformer<T> extends AbstractTransformer
    * @see #hasObject(String)
    * @see #getObject(String)
    * @see #hasAttribute(String, String)
-   * @see #getAttribute(String) 
+   * @see #getAttribute(String)
    */
   public static class ModelObject
   {
