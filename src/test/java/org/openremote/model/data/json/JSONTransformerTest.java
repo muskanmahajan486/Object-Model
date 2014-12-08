@@ -46,6 +46,7 @@ public class JSONTransformerTest extends OpenRemoteTest
   private String basicJSON;
   private String noSchemaJSON;
   private String incorrectLibJSON;
+  private String nestedJSON;
 
   /**
    * Set up tests with loading sample JSON documents to compare to.
@@ -57,6 +58,7 @@ public class JSONTransformerTest extends OpenRemoteTest
       basicJSON = loadResourceTextFile(new URI("json-transformer/basic-model.json"));
       noSchemaJSON = loadResourceTextFile(new URI("json-transformer/no-schema.json"));
       incorrectLibJSON = loadResourceTextFile(new URI("json-transformer/incorrect-lib.json"));
+      nestedJSON = loadResourceTextFile(new URI("json-transformer/nested.json"));
     }
 
     catch (Throwable t)
@@ -84,6 +86,8 @@ public class JSONTransformerTest extends OpenRemoteTest
       {
         Assert.assertTrue(prototype.containsSchema(new Version(0, 0, 0)));
 
+        Assert.assertTrue(prototype.getModelClass().equals("MyModel"));
+
         Assert.assertTrue(prototype.getModel().hasAttributes());
         Assert.assertTrue(prototype.getModel().containsAttribute("name", "value"));
         Assert.assertTrue(!prototype.getModel().hasObjects());
@@ -96,6 +100,42 @@ public class JSONTransformerTest extends OpenRemoteTest
 
     mmt.read(new InputStreamReader(bain));
   }
+
+
+  /**
+   * Test basic model with nested object.
+   *
+   * @throws Exception  if test fails
+   */
+  @Test public void testReadWithNestedObject() throws Exception
+  {
+    Deserializer deserializer = new Deserializer()
+    {
+      @Override public void deserialize(JSONTransformer.ModelPrototype prototype)
+      {
+        Assert.assertTrue(prototype.containsSchema(new Version(1, 2, 3)));
+
+        Assert.assertTrue(prototype.getModelClass().equals("org.openremote.test.MyModel"));
+
+        Assert.assertTrue(prototype.getModel().hasAttributes());
+        Assert.assertTrue(prototype.getModel().containsAttribute("name", "value"));
+        Assert.assertTrue(prototype.getModel().hasObjects());
+        Assert.assertTrue(prototype.getModel().hasObject("object"));
+
+        JSONTransformer.ModelObject o = prototype.getModel().getObject("object");
+
+        Assert.assertTrue(o.containsAttribute("foo", "bar"));
+        Assert.assertTrue(!o.hasObjects());
+      }
+    };
+
+    MyModelTransformer mmt = new MyModelTransformer(deserializer);
+
+    ByteArrayInputStream bain = new ByteArrayInputStream(nestedJSON.getBytes(DEFAULT_CHARSET));
+
+    mmt.read(new InputStreamReader(bain));
+  }
+
 
   /**
    * Tests model read behavior when incoming JSON document is missing a schema version header.
@@ -110,6 +150,8 @@ public class JSONTransformerTest extends OpenRemoteTest
       {
         Assert.assertTrue(!prototype.containsSchema(new Version(0, 0, 0)));
         Assert.assertTrue(prototype.containsSchema(Version.UNKNOWN));
+
+        Assert.assertTrue(prototype.getModelClass().equals("MyModel"));
 
         Assert.assertTrue(prototype.getModel().hasAttributes());
         Assert.assertTrue(prototype.getModel().containsAttribute("name", "value"));
