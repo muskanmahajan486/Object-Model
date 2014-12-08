@@ -89,7 +89,7 @@ public class JSONTransformerTest extends OpenRemoteTest
         Assert.assertTrue(prototype.getModelClass().equals("MyModel"));
 
         Assert.assertTrue(prototype.getModel().hasAttributes());
-        Assert.assertTrue(prototype.getModel().containsAttribute("name", "value"));
+        Assert.assertTrue(prototype.getModel().hasAttribute("name", "value"));
         Assert.assertTrue(!prototype.getModel().hasObjects());
       }
     };
@@ -118,13 +118,13 @@ public class JSONTransformerTest extends OpenRemoteTest
         Assert.assertTrue(prototype.getModelClass().equals("org.openremote.test.MyModel"));
 
         Assert.assertTrue(prototype.getModel().hasAttributes());
-        Assert.assertTrue(prototype.getModel().containsAttribute("name", "value"));
+        Assert.assertTrue(prototype.getModel().hasAttribute("name", "value"));
         Assert.assertTrue(prototype.getModel().hasObjects());
         Assert.assertTrue(prototype.getModel().hasObject("object"));
 
         JSONTransformer.ModelObject o = prototype.getModel().getObject("object");
 
-        Assert.assertTrue(o.containsAttribute("foo", "bar"));
+        Assert.assertTrue(o.hasAttribute("foo", "bar"));
         Assert.assertTrue(!o.hasObjects());
       }
     };
@@ -154,7 +154,7 @@ public class JSONTransformerTest extends OpenRemoteTest
         Assert.assertTrue(prototype.getModelClass().equals("MyModel"));
 
         Assert.assertTrue(prototype.getModel().hasAttributes());
-        Assert.assertTrue(prototype.getModel().containsAttribute("name", "value"));
+        Assert.assertTrue(prototype.getModel().hasAttribute("name", "value"));
         Assert.assertTrue(!prototype.getModel().hasObjects());
       }
     };
