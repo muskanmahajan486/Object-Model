@@ -287,7 +287,7 @@ public abstract class JSONTransformer<T> extends AbstractTransformer
    * The reader stream should point to a beginning of a JSON object that starts with a
    * {@link JSONHeader} representation. The JSON headers are parsed first, after which the
    * model object JSON attributes and values are passed to a concrete domain object deserializer
-   * via a call to {@link #deserialize(Version, String, Map)} method.
+   * via a call to {@link #deserialize(ModelPrototype)} method.
    * The concrete domain model implementation should construct the Java instance based on this
    * JSON data. <p>
    *
@@ -306,12 +306,14 @@ public abstract class JSONTransformer<T> extends AbstractTransformer
   {
     // Use flex JSON to deserialize representation to a JSON prototype with header fields...
 
-    JSONPrototype prototype;
+    ModelPrototype prototype;
 
     try
     {
-      prototype = new JSONDeserializer<JSONPrototype>()
-          .deserialize(new BufferedReader(reader), JSONPrototype.class);
+      prototype = new JSONDeserializer<ModelPrototype>()
+          .deserialize(new BufferedReader(reader), ModelPrototype.class);
+
+      // TODO : log debug  "Deserialized " + prototype
     }
 
     catch (Throwable throwable)
@@ -332,34 +334,20 @@ public abstract class JSONTransformer<T> extends AbstractTransformer
       );
     }
 
-    // Attempt to resolve the JSON schema version value to a Java version type...
+    // Reject the JSON if the model didn't resolve to any attributes or nested objects...
 
-    Version schemaVersion;
-
-    try
-    {
-      schemaVersion = new Version(prototype.schemaVersion);
-    }
-
-    catch (IllegalArgumentException exception)
-    {
-      // TODO : log
-
-      schemaVersion = Version.UNKNOWN;
-    }
-
-    // Resolve the domain object model into a Java instance (via concrete subclass impl.)...
-
-    if (prototype.modelPrototype == null)
+    if (!prototype.getModel().hasAttributes() && !prototype.getModel().hasObjects())
     {
       throw new DeserializationException(
           "Model object JSON representation did not resolve correctly. " +
-          "Class: '{1}', Schema : {1}, API : {2}",
+          "Class: ''{0}'', Schema : {1}, API : {2}",
           prototype.javaFullClassName, prototype.schemaVersion, prototype.apiVersion
       );
     }
 
-    return deserialize(schemaVersion, prototype.javaFullClassName, prototype.modelPrototype);
+    // Resolve the domain object model into a Java instance (via concrete subclass impl.)...
+
+    return deserialize(prototype);
   }
 
   /**
@@ -368,24 +356,12 @@ public abstract class JSONTransformer<T> extends AbstractTransformer
    *
    * TODO : include API version
    *
-   * @param schemaVersion
-   *          The schema version advertized in the JSON representation and that should have
-   *          corresponding structure in the given JSON attributes parameter
-   *
-   * @param fullJavaClassName
-   *          The Java class name advertized in the JSON representation that should match the
-   *          the expected domain object implementation class name and to which the JSON
-   *          structure given in JSON attributes parameter should conform to
-   *
-   * @param jsonAttributes
-   *          Map of JSON attribute names and values that were included in the JSON domain
-   *          model representation. The expected attribute names and data types should correspond
-   *          to the given schema version and its concrete JSON schema definition.
+   * @param prototype
+   *          A model prototype that represents the structures parsed from the JSON document
+   *          instance. This prototype should be used to construct the deserialized Java
+   *          instance the JSON represented.
    */
-  protected abstract T deserialize(Version schemaVersion,
-                                   String fullJavaClassName,
-                                   Map<String, String> jsonAttributes)
-      throws DeserializationException;
+  protected abstract T deserialize(ModelPrototype prototype) throws DeserializationException;
 
 
 
