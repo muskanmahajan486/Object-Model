@@ -805,23 +805,65 @@ public abstract class JSONTransformer<T> extends AbstractTransformer
   }
 
 
+  /**
+   * Exception type that indicates errors in the deserialization process when attempting
+   * to convert document instances into Java models.
+   */
   public static class DeserializationException extends OpenRemoteException
   {
+    /**
+     * Constructs a new exception with a given message.
+     *
+     * @param msg
+     *              exception message
+     */
     public DeserializationException(String msg)
     {
       super(msg);
     }
 
+    /**
+     * Constructs a new exception message with a given message and message parameters.
+     *
+     * @param msg
+     *                exception message formatted according to description in
+     *                {@link OpenRemoteException}
+     *
+     * @param params
+     *                message parameters
+     */
     public DeserializationException(String msg, Object... params)
     {
       super(msg, params);
     }
 
+    /**
+     * Constructs a new exception message with a given root cause.
+     *
+     * @param msg
+     *              exception message
+     *
+     * @param rootCause
+     *              original exception that caused this error
+     */
     public DeserializationException(String msg, Throwable rootCause)
     {
       super(msg, rootCause);
     }
 
+    /**
+     * Constructs a new exception message with a given root cause and message parameters.
+     *
+     * @param msg
+     *            exception message formatted according to description in
+     *            {@link OpenRemoteException}
+     *
+     * @param rootCause
+     *            original exception that caused this error
+     *
+     * @param params
+     *            message parameters
+     */
     public DeserializationException(String msg, Throwable rootCause, Object... params)
     {
       super(msg, rootCause, params);
