@@ -31,24 +31,44 @@ import org.openremote.model.User;
 
 
 /**
- * TODO
+ * Implementation of the Transformer interface for the FlexJSON library that handles
+ * serialization and deserialization of the {@link org.openremote.model.User} instances.
  *
  * @author <a href = "mailto:juha@openremote.org">Juha Lindfors</a>
  */
 public class UserTransformer extends JSONTransformer<User>
 {
 
+  // Class Members --------------------------------------------------------------------------------
 
+  /**
+   * Returns current validator used for validating user names in {@link org.openremote.model.User}
+   * instances.
+   *
+   * @return
+   *          current user name validator instance
+   */
   public static JSONValidator<String> getNameValidator()
   {
     return defaultUserNameValidator;
   }
 
+  /**
+   * Returns current validator used for validating user email addressed in
+   * {@link org.openremote.model.User} instances.
+   *
+   * @return
+   *          current email validator instance
+   */
   public static JSONValidator<String> getEmailValidator()
   {
     return defaultEmailValidator;
   }
 
+
+  /**
+   * Reference to the default username validator used by this instance.
+   */
   protected static JSONValidator<String> defaultUserNameValidator = new JSONValidator<String>()
   {
     @Override public void validate(String username) throws Model.ValidationException
@@ -57,6 +77,9 @@ public class UserTransformer extends JSONTransformer<User>
     }
   };
 
+  /**
+   * Reference to the default email validator used by this instance.
+   */
   protected static JSONValidator<String> defaultEmailValidator = new JSONValidator<String>()
   {
     @Override public void validate(String email) throws Model.ValidationException
@@ -65,6 +88,9 @@ public class UserTransformer extends JSONTransformer<User>
     }
   };
 
+  /**
+   * Delegate default validations to this nested implementation.
+   */
   private static UserTransformer.AttributeValidator defaultValidator =
         new UserTransformer.AttributeValidator();
 
