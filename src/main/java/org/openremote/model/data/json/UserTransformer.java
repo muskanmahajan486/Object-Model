@@ -105,6 +105,7 @@ public class UserTransformer extends JSONTransformer<User>
     super(User.class);
   }
 
+
   // JSONTransformer Overrides --------------------------------------------------------------------
 
   /**
@@ -141,11 +142,27 @@ public class UserTransformer extends JSONTransformer<User>
     return super.read(reader);
   }
 
+  /**
+   * Recreates an {@link org.openremote.model.User} instance from a deserialized JSON model
+   * prototype.
+   *
+   * @see   ModelPrototype
+   *
+   * @param prototype
+   *          A model prototype that represents the structures parsed from the JSON document
+   *          representing an user instance.
+   *
+   * @return  A corresponding Java User instance
+   *
+   * @throws  DeserializationException if deserialization fails
+   */
   @Override protected User deserialize(ModelPrototype prototype) throws DeserializationException
   {
     try
     {
       ModelObject model = prototype.getModel();
+
+      // User model will deal with validating the incoming data...
 
       User user = new User(model.getAttribute("username"), model.getAttribute("email"));
 
