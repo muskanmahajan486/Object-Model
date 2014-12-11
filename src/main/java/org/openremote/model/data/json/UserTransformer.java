@@ -20,14 +20,15 @@
  */
 package org.openremote.model.data.json;
 
-import org.openremote.base.Version;
-import org.openremote.model.Model;
-import org.openremote.model.User;
-
 import java.io.Reader;
+import java.util.Enumeration;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.openremote.model.Model;
+import org.openremote.model.User;
+
 
 /**
  * TODO
@@ -114,14 +115,29 @@ public class UserTransformer extends JSONTransformer<User>
     return super.read(reader);
   }
 
-  @Override protected User deserialize(Version schemaVersion,
-                                       String classname,
-                                       Map<String, String> jsonProperties)
-      throws DeserializationException
+  @Override protected User deserialize(ModelPrototype prototype) throws DeserializationException
   {
     try
     {
-      return new User(jsonProperties.get("username"), jsonProperties.get("email"));
+      ModelObject model = prototype.getModel();
+
+      User user = new User(model.getAttribute("username"), model.getAttribute("email"));
+
+      ModelObject attributes = model.getObject("userAttributes");
+
+      if (attributes != null)
+      {
+        Enumeration<ModelObject.Attribute> enumeration = attributes.getAttributes();
+
+        while (enumeration.hasMoreElements())
+        {
+          ModelObject.Attribute attr = enumeration.nextElement();
+
+          user.addAttribute(attr.getName(), attr.getValue());
+        }
+      }
+
+      return user;
     }
 
     catch (Model.ValidationException exception)
