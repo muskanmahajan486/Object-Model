@@ -20,9 +20,7 @@
  */
 package org.openremote.model;
 
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,10 +53,8 @@ public class UserTest extends OpenRemoteTest
 
   /**
    * Set up tests with loading sample JSON documents to compare to.
-   *
-   * @throws IOException  if setup fails
    */
-  @BeforeClass public void loadJsonTestFiles() throws IOException
+  @BeforeClass public void loadJsonTestFiles()
   {
     try
     {
@@ -1059,7 +1055,7 @@ public class UserTest extends OpenRemoteTest
   /**
    * Test JSON serialization when nested userAttributes object is included
    *
-   * @throws Exception if test fails  
+   * @throws Exception if test fails
    */
   @Test public void testJSONUserAttributes() throws Exception
   {
