@@ -22,9 +22,8 @@ package org.openremote.model.data.json;
 
 import java.io.BufferedReader;
 import java.io.Reader;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import flexjson.JSONContext;
 import flexjson.JSONDeserializer;
@@ -34,7 +33,6 @@ import flexjson.transformer.AbstractTransformer;
 import org.openremote.base.APIVersion;
 import org.openremote.base.Version;
 import org.openremote.base.exception.IncorrectImplementationException;
-import org.openremote.base.exception.OpenRemoteException;
 import org.openremote.model.Model;
 
 
@@ -354,8 +352,6 @@ public abstract class JSONTransformer<T> extends AbstractTransformer
    * Override this method to provide the implementation of how to deserialize a given set of
    * JSON attribute names and values into a typed Java domain object instance.
    *
-   * TODO : include API version
-   *
    * @param prototype
    *          A model prototype that represents the structures parsed from the JSON document
    *          instance. This prototype should be used to construct the deserialized Java
@@ -622,228 +618,5 @@ public abstract class JSONTransformer<T> extends AbstractTransformer
   }
 
 
-  /**
-   * An instance of this class represents JSON objects contained within the OpenRemote Object
-   * Model JSON schema. A template OpenRemote Object Model JSON document contains a named object
-   * 'model' as a nested JSON object which an instance of this class represents. Furthermore,
-   * any additional nested JSON objects within the 'model' instance are represented by the
-   * instances of this class.  <p>
-   *
-   * An OpenRemote Object Model JSON document template follows the pattern below:
-   *
-   * <pre>
-   * {
-   *   "libraryName": "OpenRemote Object Model",
-   *   "javaFullClassName": "org.openremote.model.[classname]",
-   *   "schemaVersion": "[schema version this JSON document corresponds to]",
-   *   "apiVersion": "[API version of the class that generated this JSON document]",
-   *
-   *   "model":
-   *   {
-   *     [model content that maps to the class name specified in the header]
-   *   }
-   * }
-   * </pre>
-   *
-   * This object represents the object named 'model' in this schema (or other JSON objects
-   * within the 'model' object). Therefore the root 'model' instance contains the full
-   * model object description without the header fields (library name, schema version, etc.). <p>
-   *
-   * This class provides method to access the named attributes (JSON name, value pairs that are
-   * not nested JSON objects) and named JSON objects within this model's JSON structure.
-   *
-   * @see #hasObject(String)
-   * @see #getObject(String)
-   * @see #hasAttribute(String, String)
-   * @see #getAttribute(String)
-   */
-  public static class ModelObject
-  {
-
-    // Instance Fields ----------------------------------------------------------------------------
-
-    // TODO
-    private Map<String, String> attributes = new HashMap<String, String>(1);
-
-    /**
-     * Map of named model JSON objects nested within the root 'model' object.
-     */
-    private Map<String, ModelObject> objects = new HashMap<String, ModelObject>(1);
-
-    /**
-     * The JSON object name this instance represents.
-     */
-    private String name = "";
-
-
-    // Constructors -------------------------------------------------------------------------------
-
-    private ModelObject(String name)
-    {
-      this.name = name;
-    }
-
-
-    // Public Instance Methods --------------------------------------------------------------------
-
-    /**
-     * Indicates if this object instance contains any attributes (JSON name, value pairs that
-     * are not object types).
-     *
-     * @see #hasObjects()
-     *
-     * @return
-     *          true if this instance has named attributes, false otherwise
-     */
-    public boolean hasAttributes()
-    {
-      return !attributes.isEmpty();
-    }
-
-    /**
-     * Indicates if this object instance contains a named attribute with a given value.
-     *
-     * @see #hasObject(String)
-     *
-     * @param name
-     *              name of the attribute
-     *
-     * @param value
-     *              expected value of the attribute
-     *
-     * @return
-     *          true if this instance has a named attribute with the given value, false otherwise
-     */
-    public boolean hasAttribute(String name, String value)
-    {
-      return attributes.keySet().contains(name) && attributes.get(name).equals(value);
-    }
-
-    /**
-     * TODO
-     *
-     * @param name
-     * @return
-     */
-    public String getAttribute(String name)
-    {
-      return attributes.get(name);
-    }
-
-    /**
-     * Indicates if this object instance contains any nested JSON objects.
-     *
-     * @return
-     *          true if there are nested JSON objects within this instance, false otherwise
-     */
-    public boolean hasObjects()
-    {
-      return !objects.isEmpty();
-    }
-
-    /**
-     * Indicates if a given named JSON object is contained within this instance.
-     *
-     * @param name
-     *              JSON object name to check
-     *
-     * @return
-     *              true if a JSON object with the given name exists within this instance's
-     *              structure, false otherwise
-     */
-    public boolean hasObject(String name)
-    {
-      return objects.keySet().contains(name);
-    }
-
-    /**
-     * Returns an object within the model object JSON representation with the given name.
-     *
-     * @param name
-     *              JSON object name within this instance's JSON structure
-     *
-     * @return
-     *              a model object instance representing the nested JSON object
-     */
-    public ModelObject getObject(String name)
-    {
-      return objects.get(name);
-    }
-
-
-    // Object Overrides ---------------------------------------------------------------------------
-
-    @Override public String toString()
-    {
-      return "Name: " + name + ", Attributes: " + attributes.toString() +
-             ", Objects: " + objects.toString();
-    }
-  }
-
-
-  /**
-   * Exception type that indicates errors in the deserialization process when attempting
-   * to convert document instances into Java models.
-   */
-  public static class DeserializationException extends OpenRemoteException
-  {
-    /**
-     * Constructs a new exception with a given message.
-     *
-     * @param msg
-     *              exception message
-     */
-    public DeserializationException(String msg)
-    {
-      super(msg);
-    }
-
-    /**
-     * Constructs a new exception message with a given message and message parameters.
-     *
-     * @param msg
-     *                exception message formatted according to description in
-     *                {@link OpenRemoteException}
-     *
-     * @param params
-     *                message parameters
-     */
-    public DeserializationException(String msg, Object... params)
-    {
-      super(msg, params);
-    }
-
-    /**
-     * Constructs a new exception message with a given root cause.
-     *
-     * @param msg
-     *              exception message
-     *
-     * @param rootCause
-     *              original exception that caused this error
-     */
-    public DeserializationException(String msg, Throwable rootCause)
-    {
-      super(msg, rootCause);
-    }
-
-    /**
-     * Constructs a new exception message with a given root cause and message parameters.
-     *
-     * @param msg
-     *            exception message formatted according to description in
-     *            {@link OpenRemoteException}
-     *
-     * @param rootCause
-     *            original exception that caused this error
-     *
-     * @param params
-     *            message parameters
-     */
-    public DeserializationException(String msg, Throwable rootCause, Object... params)
-    {
-      super(msg, rootCause, params);
-    }
-  }
 }
 
