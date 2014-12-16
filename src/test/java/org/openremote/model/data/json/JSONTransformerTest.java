@@ -1,9 +1,5 @@
 /*
- * OpenRemote, the Home of the Digital Home.
- * Copyright 2008-2014, OpenRemote Inc.
- *
- * See the contributors.txt file in the distribution for a
- * full listing of individual contributors.
+ * Copyright 2013-2015, Juha Lindfors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -23,6 +19,8 @@ package org.openremote.model.data.json;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.openremote.base.Version;
 import org.testng.Assert;
@@ -36,7 +34,7 @@ import org.openremote.model.testengine.OpenRemoteTest;
 /**
  * Unit tests for {@link JSONTransformer} class.
  *
- * @author <a href="mailto:juha@openremote.org">Juha Lindfors</a>
+ * @author Juha Lindfors
  */
 public class JSONTransformerTest extends OpenRemoteTest
 {
@@ -47,6 +45,13 @@ public class JSONTransformerTest extends OpenRemoteTest
   private String noSchemaJSON;
   private String incorrectLibJSON;
   private String nestedJSON;
+  private String booleanJSON;
+  private String stringArrayJSON;
+  private String numberJSON;
+  private String numberArrayJSON;
+  private String booleanArrayJSON;
+  private String whitespaceStringArrayJSON;
+
 
   /**
    * Set up tests with loading sample JSON documents to compare to.
@@ -59,6 +64,12 @@ public class JSONTransformerTest extends OpenRemoteTest
       noSchemaJSON = loadResourceTextFile(new URI("json-transformer/no-schema.json"));
       incorrectLibJSON = loadResourceTextFile(new URI("json-transformer/incorrect-lib.json"));
       nestedJSON = loadResourceTextFile(new URI("json-transformer/nested.json"));
+      booleanJSON = loadResourceTextFile(new URI("json-transformer/boolean.json"));
+      stringArrayJSON = loadResourceTextFile(new URI("json-transformer/string-array.json"));
+      numberJSON = loadResourceTextFile(new URI("json-transformer/number.json"));
+      numberArrayJSON = loadResourceTextFile(new URI("json-transformer/number-array.json"));
+      booleanArrayJSON = loadResourceTextFile(new URI("json-transformer/boolean-array.json"));
+      whitespaceStringArrayJSON = loadResourceTextFile(new URI("json-transformer/string-whitespace-array.json"));
     }
 
     catch (Throwable t)
@@ -82,15 +93,15 @@ public class JSONTransformerTest extends OpenRemoteTest
   {
     Deserializer deserializer = new Deserializer()
     {
-      @Override public void deserialize(JSONTransformer.ModelPrototype prototype)
+      @Override public void deserialize(JSONModel model)
       {
-        Assert.assertTrue(prototype.containsSchema(new Version(0, 0, 0)));
+        Assert.assertTrue(model.containsSchema(new Version(0, 0, 0)));
 
-        Assert.assertTrue(prototype.getModelClass().equals("MyModel"));
+        Assert.assertTrue(model.getModelClass().equals("MyModel"));
 
-        Assert.assertTrue(prototype.getModel().hasAttributes());
-        Assert.assertTrue(prototype.getModel().hasAttribute("name", "value"));
-        Assert.assertTrue(!prototype.getModel().hasObjects());
+        Assert.assertTrue(model.getModel().hasAttributes());
+        Assert.assertTrue(model.getModel().hasAttribute("name", "value"));
+        Assert.assertTrue(!model.getModel().hasObjects());
       }
     };
 
@@ -111,18 +122,18 @@ public class JSONTransformerTest extends OpenRemoteTest
   {
     Deserializer deserializer = new Deserializer()
     {
-      @Override public void deserialize(JSONTransformer.ModelPrototype prototype)
+      @Override public void deserialize(JSONModel model)
       {
-        Assert.assertTrue(prototype.containsSchema(new Version(1, 2, 3)));
+        Assert.assertTrue(model.containsSchema(new Version(1, 2, 3)));
 
-        Assert.assertTrue(prototype.getModelClass().equals("org.openremote.test.MyModel"));
+        Assert.assertTrue(model.getModelClass().equals("org.openremote.test.MyModel"));
 
-        Assert.assertTrue(prototype.getModel().hasAttributes());
-        Assert.assertTrue(prototype.getModel().hasAttribute("name", "value"));
-        Assert.assertTrue(prototype.getModel().hasObjects());
-        Assert.assertTrue(prototype.getModel().hasObject("object"));
+        Assert.assertTrue(model.getModel().hasAttributes());
+        Assert.assertTrue(model.getModel().hasAttribute("name", "value"));
+        Assert.assertTrue(model.getModel().hasObjects());
+        Assert.assertTrue(model.getModel().hasObject("object"));
 
-        JSONTransformer.ModelObject o = prototype.getModel().getObject("object");
+        ModelObject o = model.getModel().getObject("object");
 
         Assert.assertTrue(o.hasAttribute("foo", "bar"));
         Assert.assertTrue(!o.hasObjects());
@@ -146,16 +157,16 @@ public class JSONTransformerTest extends OpenRemoteTest
   {
     Deserializer deserializer = new Deserializer()
     {
-      @Override public void deserialize(JSONTransformer.ModelPrototype prototype)
+      @Override public void deserialize(JSONModel model)
       {
-        Assert.assertTrue(!prototype.containsSchema(new Version(0, 0, 0)));
-        Assert.assertTrue(prototype.containsSchema(Version.UNKNOWN));
+        Assert.assertTrue(!model.containsSchema(new Version(0, 0, 0)));
+        Assert.assertTrue(model.containsSchema(Version.UNKNOWN));
 
-        Assert.assertTrue(prototype.getModelClass().equals("MyModel"));
+        Assert.assertTrue(model.getModelClass().equals("MyModel"));
 
-        Assert.assertTrue(prototype.getModel().hasAttributes());
-        Assert.assertTrue(prototype.getModel().hasAttribute("name", "value"));
-        Assert.assertTrue(!prototype.getModel().hasObjects());
+        Assert.assertTrue(model.getModel().hasAttributes());
+        Assert.assertTrue(model.getModel().hasAttribute("name", "value"));
+        Assert.assertTrue(!model.getModel().hasObjects());
       }
     };
 
@@ -172,7 +183,7 @@ public class JSONTransformerTest extends OpenRemoteTest
    *
    * @throws Exception    if test fails
    */
-  @Test (expectedExceptions = JSONTransformer.DeserializationException.class)
+  @Test (expectedExceptions = DeserializationException.class)
 
   public void testReadIncorrectLib() throws Exception
   {
@@ -320,7 +331,7 @@ public class JSONTransformerTest extends OpenRemoteTest
 
     }
 
-    @Override public String deserialize(ModelPrototype prototype)
+    @Override public String deserialize(JSONModel model)
     {
       throw new IncorrectImplementationException("Not implemented.");
     }
@@ -337,7 +348,7 @@ public class JSONTransformerTest extends OpenRemoteTest
 
       this.deserializer = new Deserializer() {
 
-        @Override public void deserialize(ModelPrototype prototype)
+        @Override public void deserialize(JSONModel model)
         {
 
         }
@@ -356,9 +367,9 @@ public class JSONTransformerTest extends OpenRemoteTest
       throw new IncorrectImplementationException("Not implemented.");
     }
 
-    @Override public MyModel deserialize(ModelPrototype prototype)
+    @Override public MyModel deserialize(JSONModel model)
     {
-      deserializer.deserialize(prototype);
+      deserializer.deserialize(model);
 
       return new MyModel();
     }
@@ -366,7 +377,7 @@ public class JSONTransformerTest extends OpenRemoteTest
 
   private static interface Deserializer
   {
-    void deserialize(JSONTransformer.ModelPrototype prototype);
+    void deserialize(JSONModel model);
   }
 
   private static class MyModel

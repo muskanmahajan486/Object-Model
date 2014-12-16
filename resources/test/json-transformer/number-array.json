@@ -1,0 +1,11 @@
+{
+    "libraryName": "OpenRemote Object Model",
+    "javaFullClassName": "org.openremote.test.MyModel",
+    "schemaVersion": "1.2.3",
+    "apiVersion": "5.0",
+
+    "model" : {
+        "name": [-1, -2.3, 4, 5.0, .6, 9.18E+09],
+        "boolean": true
+    }
+}
