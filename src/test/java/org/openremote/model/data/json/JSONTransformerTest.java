@@ -195,6 +195,263 @@ public class JSONTransformerTest extends OpenRemoteTest
   }
 
 
+  /**
+   * Deserialization test with boolean primitives.
+   *
+   * @throws Exception  if test fails
+   */
+  @Test public void testReadBoolean() throws Exception
+  {
+    Deserializer deserializer = new Deserializer()
+    {
+      @Override public void deserialize(JSONModel model)
+      {
+        Assert.assertTrue(model.containsSchema(new Version(1, 2, 3)));
+
+        Assert.assertTrue(model.getModelClass().equals("org.openremote.test.MyModel"));
+
+        Assert.assertTrue(model.getModel().hasAttributes());
+        Assert.assertTrue(model.getModel().hasAttribute("boolean", "true"));
+        Assert.assertTrue(model.getModel().hasAttribute("boolean", true));
+
+        Assert.assertTrue(model.getModel().hasAttribute("name", "value"));
+        Assert.assertTrue(!model.getModel().hasObjects());
+      }
+    };
+
+    MyModelTransformer mmt = new MyModelTransformer(deserializer);
+
+    ByteArrayInputStream bain = new ByteArrayInputStream(booleanJSON.getBytes(Model.UTF8));
+
+    mmt.read(new InputStreamReader(bain));
+  }
+
+
+  /**
+   * Deserialization test with number primitives.
+   *
+   * @throws Exception  if test fails
+   */
+  @Test public void testReadNumber() throws Exception
+  {
+    Deserializer deserializer = new Deserializer()
+    {
+      @Override public void deserialize(JSONModel model)
+      {
+        Assert.assertTrue(model.containsSchema(new Version(1, 2, 3)));
+
+        Assert.assertTrue(model.getModelClass().equals("org.openremote.test.MyModel"));
+
+        Assert.assertTrue(model.getModel().hasAttributes());
+
+        Assert.assertTrue(model.getModel().hasAttribute("1st number", "1"));
+        Assert.assertTrue(model.getModel().hasAttribute("1st number", 1));
+
+        Assert.assertTrue(model.getModel().hasAttribute("2nd number", "2.0"));
+        Assert.assertTrue(model.getModel().hasAttribute("2nd number", 2.0));
+
+        Assert.assertTrue(model.getModel().hasAttribute("3rd number", "340.0"));
+        Assert.assertTrue(model.getModel().hasAttribute("3rd number", 340.0));
+
+        Assert.assertTrue(model.getModel().hasAttribute("4th number", "0.5"));
+        Assert.assertTrue(model.getModel().hasAttribute("4th number", .5));
+
+        Assert.assertTrue(model.getModel().hasAttribute("5th number", "-0.6"));
+        Assert.assertTrue(model.getModel().hasAttribute("5th number", -0.6));
+
+        Assert.assertTrue(model.getModel().hasAttribute("6th number", "-0.78"));
+        Assert.assertTrue(model.getModel().hasAttribute("6th number", -7.8E-1));
+
+        Assert.assertTrue(!model.getModel().hasObjects());
+      }
+    };
+
+    MyModelTransformer mmt = new MyModelTransformer(deserializer);
+
+    ByteArrayInputStream bain = new ByteArrayInputStream(numberJSON.getBytes(Model.UTF8));
+
+    mmt.read(new InputStreamReader(bain));
+  }
+
+
+
+  /**
+   * Deserialization test with string array.
+   *
+   * @throws Exception  if test fails
+   */
+  @Test public void testReadStringArray() throws Exception
+  {
+    Deserializer deserializer = new Deserializer()
+    {
+      @Override public void deserialize(JSONModel json)
+      {
+        Assert.assertTrue(json.containsSchema(new Version(1, 2, 3)));
+
+        Assert.assertTrue(json.getModelClass().equals("org.openremote.test.MyModel"));
+
+        ModelObject model = json.getModel();
+
+        Assert.assertTrue(model.hasAttributes());
+
+        Assert.assertTrue(model.hasAttribute("name", "[a, b, c]"));
+
+        List<String> testList = new ArrayList<String>();
+        testList.add("a");
+        testList.add("b");
+        testList.add("c");
+
+        Assert.assertTrue(model.hasAttribute("name", testList));
+
+        testList.add("d");
+
+        Assert.assertTrue(!model.hasAttribute("name", testList));
+
+        List<Long> numbers = new ArrayList<Long>();
+
+        Assert.assertTrue(!model.hasAttribute("name", numbers));
+
+        Assert.assertTrue(!model.hasObjects());
+      }
+    };
+
+    MyModelTransformer mmt = new MyModelTransformer(deserializer);
+
+    ByteArrayInputStream bain = new ByteArrayInputStream(stringArrayJSON.getBytes(Model.UTF8));
+
+    mmt.read(new InputStreamReader(bain));
+  }
+
+  /**
+   * Deserialization test with string array that contains whitespace. Make sure they're preserved.
+   *
+   * @throws Exception  if test fails
+   */
+  @Test public void testReadWhitespaceStringArray() throws Exception
+  {
+    Deserializer deserializer = new Deserializer()
+    {
+      @Override public void deserialize(JSONModel json)
+      {
+        ModelObject model = json.getModel();
+
+        Assert.assertTrue(model.hasAttributes());
+
+        Assert.assertTrue(model.hasAttribute("name", "[test, foobar ]"));
+
+        List<String> testList = new ArrayList<String>();
+        testList.add(" test ");
+        testList.add(" foo  \nbar ");
+
+        Assert.assertTrue(model.hasAttribute("name", testList));
+
+        Assert.assertTrue(!model.hasObjects());
+      }
+    };
+
+    MyModelTransformer mmt = new MyModelTransformer(deserializer);
+
+    ByteArrayInputStream bain = new ByteArrayInputStream(whitespaceStringArrayJSON.getBytes(Model.UTF8));
+
+    mmt.read(new InputStreamReader(bain));
+  }
+
+
+  /**
+   * Deserialization test with number array.
+   *
+   * @throws Exception  if test fails
+   */
+  @Test public void testReadNumberArray() throws Exception
+  {
+    Deserializer deserializer = new Deserializer()
+    {
+      @Override public void deserialize(JSONModel json)
+      {
+        ModelObject model = json.getModel();
+
+        Assert.assertTrue(model.hasAttributes());
+
+        // note the scientific exponent notation gets truncated by
+        // Long.parseLong(String) -> Long.toString() conversion so not
+        // exact match to JSON document: 9.18E+09 -> 9.18E9
+
+        Assert.assertTrue(model.hasAttribute("name", "[-1, -2.3, 4, 5.0, 0.6, 9.18E9]"));
+
+        List<Number> testList = new ArrayList<Number>();
+        testList.add(-1L);    // Note FlexJSON converts all integers to Long types
+        testList.add(-2.3);
+        testList.add(4L);     // Note FlexJSON converts all integers to Long types
+        testList.add(5.0);
+        testList.add(.6);
+        testList.add(9.18E+09);
+
+        Assert.assertTrue(model.hasAttribute("name", testList));
+
+        testList.add(8E2);
+
+        Assert.assertTrue(!model.hasAttribute("name", testList));
+
+        List<Long> numbers = new ArrayList<Long>();
+
+        Assert.assertTrue(!model.hasAttribute("name", numbers));
+
+        Assert.assertTrue(!model.hasObjects());
+      }
+    };
+
+    MyModelTransformer mmt = new MyModelTransformer(deserializer);
+
+    ByteArrayInputStream bain = new ByteArrayInputStream(numberArrayJSON.getBytes(Model.UTF8));
+
+    mmt.read(new InputStreamReader(bain));
+  }
+
+  /**
+   * Deserialization test with boolean array.
+   *
+   * @throws Exception  if test fails
+   */
+  @Test public void testReadBooleanArray() throws Exception
+  {
+    Deserializer deserializer = new Deserializer()
+    {
+      @Override public void deserialize(JSONModel json)
+      {
+        ModelObject model = json.getModel();
+
+        Assert.assertTrue(model.hasAttributes());
+        Assert.assertTrue(model.hasAttribute("name", " [true, false,true]"));
+
+        List<Boolean> testList = new ArrayList<Boolean>();
+        testList.add(true);
+        testList.add(false);
+        testList.add(true);
+
+        Assert.assertTrue(model.hasAttribute("name", testList));
+
+        testList.add(false);
+
+        Assert.assertTrue(!model.hasAttribute("name", testList));
+
+        List<Long> numbers = new ArrayList<Long>();
+
+        Assert.assertTrue(!model.hasAttribute("name", numbers));
+
+        Assert.assertTrue(!model.hasObjects());
+      }
+    };
+
+    MyModelTransformer mmt = new MyModelTransformer(deserializer);
+
+    ByteArrayInputStream bain = new ByteArrayInputStream(booleanArrayJSON.getBytes(Model.UTF8));
+
+    mmt.read(new InputStreamReader(bain));
+  }
+
+
+
+
   // Transform Tests ------------------------------------------------------------------------------
 
 
