@@ -1,9 +1,5 @@
 /*
- * OpenRemote, the Home of the Digital Home.
- * Copyright 2008-2014, OpenRemote Inc.
- *
- * See the contributors.txt file in the distribution for a
- * full listing of individual contributors.
+ * Copyright 2013-2015, Juha Lindfors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -20,6 +16,8 @@
  */
 package org.openremote.model.data.json;
 
+import java.util.AbstractList;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -66,7 +64,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @see #hasAttribute(String, String)
  * @see #getAttribute(String)
  *
- * @author <a href = "mailto:juha@openremote.org">Juha Lindfors</a>
+ * @author Juha Lindfors
  */
 public class ModelObject
 {
@@ -74,7 +72,7 @@ public class ModelObject
   // IMPLEMENTATION NOTE:
   //
   //   - This implementation is intended as a convenience type interface between the fairly
-  //     generic model offered by FlexJSON framework and the Java model transformer implementations
+  //     generic model offered by FlexJSON model transformer implementations
   //     used to serialize and deserialize JSON document notation. It's not intended
   //     as a full JSON model representation, and is only implemented to the extent as required
   //     by current OR object model schemas.
@@ -84,7 +82,7 @@ public class ModelObject
   // Instance Fields ----------------------------------------------------------------------------
 
   /**
-   * List of JSON 'attributes' in a OpenRemote model JSON representation. An attribute represents
+   * List of JSON 'attributes' in an OpenRemote model JSON representation. An attribute represents
    * a string, number or boolean value. Any non-object value in JSON representation.
    *
    * @see #objects
