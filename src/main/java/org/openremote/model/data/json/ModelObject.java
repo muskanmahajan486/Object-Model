@@ -16,6 +16,8 @@
  */
 package org.openremote.model.data.json;
 
+import org.openremote.base.exception.IncorrectImplementationException;
+
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -83,7 +85,9 @@ public class ModelObject
 
   /**
    * List of JSON 'attributes' in an OpenRemote model JSON representation. An attribute represents
-   * a string, number or boolean value. Any non-object value in JSON representation.
+   * a string, number or boolean value. Any non-object value in JSON representation. <p>
+   *
+   * Note: using concrete map type to get access to read-only elements() enumeration.
    *
    * @see #objects
    */
@@ -93,7 +97,7 @@ public class ModelObject
   /**
    * Map of named model JSON objects nested within the root 'model' object.
    */
-  private Map<String, ModelObject> objects = new HashMap<String, ModelObject>(1);
+  private Map<String, ModelObject> objects = new ConcurrentHashMap<String, ModelObject>(1);
 
   /**
    * The JSON object name this instance represents.
@@ -119,7 +123,7 @@ public class ModelObject
 
   /**
    * Indicates if this object instance contains any attributes (JSON name, value pairs that
-   * are not object types).
+   * are not object types, i.e. string, boolean or number).
    *
    * @see #hasObjects()
    *
@@ -132,7 +136,10 @@ public class ModelObject
   }
 
   /**
-   * Indicates if this object instance contains a named attribute with a given value.
+   * Indicates if this object instance contains a named attribute with a given value. This
+   * implementation compares string values, or boolean and number values using their string
+   * conversions. Array value string representations start and end with square brackets [] and
+   * individual elements are comma separated.
    *
    * @see #hasObject(String)
    *
@@ -147,17 +154,126 @@ public class ModelObject
    */
   public boolean hasAttribute(String name, String value)
   {
-    return attributes.keySet().contains(name) && attributes.get(name).getValue().equals(value);
+    if (attributes.keySet().contains(name) && attributes.get(name).isArray())
+    {
+      // compare array type string representations by stripping whitespaces, this makes the
+      // API usage a bit more flexible without whitespace mismatches...
+
+      final String whitespace = "\\s";
+
+      return attributes.keySet().contains(name) &&
+             attributes.get(name).getValue().replaceAll(whitespace, "")
+                 .equals(value.trim().replaceAll(whitespace, ""));
+    }
+
+    return attributes.keySet().contains(name) &&
+           attributes.get(name).getValue().equals(value);
+  }
+
+  /**
+   * Indicates if this object instance contains a named attribute with a boolean value.
+   *
+   * @see #hasAttribute(String, String)
+   *
+   * @param name
+   *              name of the attribute
+   *
+   * @param value
+   *              expected value of the attribute
+   *
+   * @return
+   *          true if this instance has a named attribute with the given boolean value,
+   *          false otherwise
+   */
+  public boolean hasAttribute(String name, boolean value)
+  {
+    Attribute attr = attributes.get(name);
+
+    if (attr != null && attr instanceof BooleanAttribute)
+    {
+      // safe cast given the check above...
+
+      return ((BooleanAttribute)attr).getBoolean() == value;
+    }
+
+    else
+    {
+      return false;
+    }
+  }
+
+  /**
+   * Indicates if this object instance contains a named attribute with a number value.
+   *
+   * @see #hasAttribute(String, String)
+   *
+   * @param name
+   *              name of the attribute
+   *
+   * @param value
+   *              expected value of the attribute
+   *
+   * @return
+   *          true if this instance has a named attribute with the given number value,
+   *          false otherwise
+   */
+  public boolean hasAttribute(String name, Number value)
+  {
+    Attribute attr = attributes.get(name);
+
+    if (attr != null && attr instanceof NumberAttribute)
+    {
+      // safe cast given the check above...
+
+      return new Double( ((NumberAttribute)attr).getNumber().doubleValue())
+          .compareTo(value.doubleValue()) == 0;
+    }
+
+    else
+    {
+      return false;
+    }
+  }
+
+
+  /**
+   * Indicates if this object instance contains a named attribute with an array value.
+   *
+   * @see #hasAttribute(String, String)
+   *
+   * @param name
+   *              name of the attribute
+   *
+   * @param value
+   *              expected value of the attribute
+   *
+   * @return
+   *          true if this instance has a named attribute with the given number value,
+   *          false otherwise
+   */
+  public <T> boolean hasAttribute(String name, List<T> value)
+  {
+    Attribute attr = attributes.get(name);
+
+    if (attr == null || !attr.isArray)
+    {
+      return false;
+    }
+
+    ArrayAttribute array = (ArrayAttribute)attr;
+
+    return array.compare(value);
   }
 
   /**
    * Returns a string representation of this model object's attribute. JSON numbers and boolean
-   * types are converted to Java strings.
+   * types are converted to Java strings. Arrays are converted to string beginning and ending
+   * with square brackets [] and with each array element separated with a comma and space character.
    *
    * @param name
    *            name of the attribute
    *
-   * @return    string value of the given attribute
+   * @return    string value of the given attribute, or null if attribute is not present
    */
   public String getAttribute(String name)
   {

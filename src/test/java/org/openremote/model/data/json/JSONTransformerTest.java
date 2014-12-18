@@ -252,31 +252,37 @@ public class JSONTransformerTest extends OpenRemoteTest
         Assert.assertTrue(!model.getModel().hasAttribute("1st number", "2"));
         Assert.assertTrue(model.getModel().hasAttribute("1st number", 1));
         Assert.assertTrue(!model.getModel().hasAttribute("1st number", 2));
+        Assert.assertTrue(model.getModel().getNumberAttribute("1st number").intValue() == 1);
 
         Assert.assertTrue(model.getModel().hasAttribute("2nd number", "2.0"));
         Assert.assertTrue(!model.getModel().hasAttribute("2nd number", "-2.0"));
         Assert.assertTrue(model.getModel().hasAttribute("2nd number", 2.0));
         Assert.assertTrue(!model.getModel().hasAttribute("2nd number", 3.0));
+        Assert.assertTrue(model.getModel().getNumberAttribute("2nd number").doubleValue() == 2.0);
 
         Assert.assertTrue(model.getModel().hasAttribute("3rd number", "340.0"));
         Assert.assertTrue(!model.getModel().hasAttribute("3rd number", "-340.0"));
         Assert.assertTrue(model.getModel().hasAttribute("3rd number", 340.0));
         Assert.assertTrue(!model.getModel().hasAttribute("3rd number", 340.1));
+        Assert.assertTrue(model.getModel().getNumberAttribute("3rd number").doubleValue() == 340.0);
 
         Assert.assertTrue(model.getModel().hasAttribute("4th number", "0.5"));
         Assert.assertTrue(!model.getModel().hasAttribute("4th number", "0.6"));
         Assert.assertTrue(model.getModel().hasAttribute("4th number", .5));
         Assert.assertTrue(!model.getModel().hasAttribute("4th number", 0.6));
+        Assert.assertTrue(model.getModel().getNumberAttribute("4th number").doubleValue() == .5);
 
         Assert.assertTrue(model.getModel().hasAttribute("5th number", "-0.6"));
         Assert.assertTrue(!model.getModel().hasAttribute("5th number", "0.6"));
         Assert.assertTrue(model.getModel().hasAttribute("5th number", -0.6));
         Assert.assertTrue(!model.getModel().hasAttribute("5th number", 0.6));
+        Assert.assertTrue(model.getModel().getNumberAttribute("5th number").doubleValue() == -0.6);
 
         Assert.assertTrue(model.getModel().hasAttribute("6th number", "-0.78"));
         Assert.assertTrue(!model.getModel().hasAttribute("6th number", "0.78"));
         Assert.assertTrue(model.getModel().hasAttribute("6th number", -7.8E-1));
         Assert.assertTrue(!model.getModel().hasAttribute("6th number", 0.79));
+        Assert.assertTrue(model.getModel().getNumberAttribute("6th number").doubleValue() == -0.78);
 
         Assert.assertTrue(!model.getModel().hasObjects());
       }
