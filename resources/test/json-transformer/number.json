@@ -5,7 +5,11 @@
     "apiVersion": "5.0",
 
     "model" : {
-        "name": "value",
-        "number": 1
+        "1st number": 1,
+        "2nd number": 2.0,
+        "3rd number": 3.4E2,
+        "4th number": .5,
+        "5th number": -0.6,
+        "6th number": -7.8e-1
     }
 }
