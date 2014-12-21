@@ -352,7 +352,7 @@ public class UserTransformerTest extends OpenRemoteTest
   private static class ExtendedTransformer extends UserTransformer
   {
 
-    @Override public ExtendedUser deserialize(ModelPrototype prototype)
+    @Override public ExtendedUser deserialize(JSONModel model)
     {
       return new ExtendedUser();
     }
