@@ -1,9 +1,5 @@
 /*
- * OpenRemote, the Home of the Digital Home.
- * Copyright 2008-2014, OpenRemote Inc.
- *
- * See the contributors.txt file in the distribution for a
- * full listing of individual contributors.
+ * Copyright 2013-2015, Juha Lindfors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -22,16 +18,12 @@ package org.openremote.model.data.json;
 
 import java.io.BufferedReader;
 import java.io.Reader;
-import java.util.List;
-import java.util.Map;
 
 import flexjson.JSONContext;
 import flexjson.JSONDeserializer;
 import flexjson.TypeContext;
 import flexjson.transformer.AbstractTransformer;
 
-import org.openremote.base.APIVersion;
-import org.openremote.base.Version;
 import org.openremote.base.exception.IncorrectImplementationException;
 import org.openremote.model.Model;
 
@@ -45,7 +37,7 @@ import org.openremote.model.Model;
  *
  * @param <T> the Java type to convert to JSON representation
  *
- * @author <a href = "mailto:juha@openremote.org">Juha Lindfors</a>
+ * @author Juha Lindfors
  */
 public abstract class JSONTransformer<T> extends AbstractTransformer
 {
@@ -285,7 +277,7 @@ public abstract class JSONTransformer<T> extends AbstractTransformer
    * The reader stream should point to a beginning of a JSON object that starts with a
    * {@link JSONHeader} representation. The JSON headers are parsed first, after which the
    * model object JSON attributes and values are passed to a concrete domain object deserializer
-   * via a call to {@link #deserialize(ModelPrototype)} method.
+   * via a call to {@link #deserialize(JSONModel)} method.
    * The concrete domain model implementation should construct the Java instance based on this
    * JSON data. <p>
    *
@@ -304,14 +296,14 @@ public abstract class JSONTransformer<T> extends AbstractTransformer
   {
     // Use flex JSON to deserialize representation to a JSON prototype with header fields...
 
-    ModelPrototype prototype;
+    JSONModel model;
 
     try
     {
-      prototype = new JSONDeserializer<ModelPrototype>()
-          .deserialize(new BufferedReader(reader), ModelPrototype.class);
+      model = new JSONDeserializer<JSONModel>()
+          .deserialize(new BufferedReader(reader), JSONModel.class);
 
-      // TODO : log debug  "Deserialized " + prototype
+      // TODO : log debug --> "Deserialized " + model
     }
 
     catch (Throwable throwable)
@@ -325,39 +317,39 @@ public abstract class JSONTransformer<T> extends AbstractTransformer
 
     // Reject the JSON if it doesn't belong to this library...
 
-    if (!prototype.isValidLibrary())
+    if (!model.isValidLibrary())
     {
       throw new DeserializationException(
-          "Ignoring JSON object with library identifier '{0}'.", prototype.libraryName
+          "Ignoring JSON object with library identifier '{0}'.", model.libraryName
       );
     }
 
     // Reject the JSON if the model didn't resolve to any attributes or nested objects...
 
-    if (!prototype.getModel().hasAttributes() && !prototype.getModel().hasObjects())
+    if (!model.getModel().hasAttributes() && !model.getModel().hasObjects())
     {
       throw new DeserializationException(
           "Model object JSON representation did not resolve correctly. " +
           "Class: ''{0}'', Schema : {1}, API : {2}",
-          prototype.javaFullClassName, prototype.schemaVersion, prototype.apiVersion
+          model.javaFullClassName, model.schema, model.api
       );
     }
 
     // Resolve the domain object model into a Java instance (via concrete subclass impl.)...
 
-    return deserialize(prototype);
+    return deserialize(model);
   }
 
   /**
    * Override this method to provide the implementation of how to deserialize a given set of
    * JSON attribute names and values into a typed Java domain object instance.
    *
-   * @param prototype
-   *          A model prototype that represents the structures parsed from the JSON document
+   * @param model
+   *          A model frame that represents the structures parsed from the JSON document
    *          instance. This prototype should be used to construct the deserialized Java
    *          instance the JSON represented.
    */
-  protected abstract T deserialize(ModelPrototype prototype) throws DeserializationException;
+  protected abstract T deserialize(JSONModel model) throws DeserializationException;
 
 
 
@@ -372,249 +364,6 @@ public abstract class JSONTransformer<T> extends AbstractTransformer
   public static interface JSONValidator<T>
   {
     public void validate(T attribute) throws Model.ValidationException;
-  }
-
-
-
-  // Nested Classes -------------------------------------------------------------------------------
-
-  /**
-   * A deserialization data container used by FlexJSON deserializer. The deserializer creates a
-   * model prototype by parsing the expected JSON document schema. This container still includes
-   * JSON header fields such as library name and schema version that can be used to determine how
-   * to deserialize and construct the model objects contained within. <p>
-   *
-   * This prototype instance contains the JSON document header fields (for example,
-   * schema version, generating implementation API version, etc.) that can be used to attempt
-   * to deserialize the JSON structure into a Java instance. The JSON structure that represents
-   * the model object (without headers) can be retrieved via a call to {@link #getModel()} method.
-   */
-  public static class ModelPrototype
-  {
-
-    // Constants ----------------------------------------------------------------------------------
-
-    /**
-     * Class name value used if none is defined in the incoming JSON document (which is an error
-     * for this mandatory header propery).
-     */
-    public static final String UNDEFINED_CLASS = "<undefined>";
-
-
-    // Instance Fields ----------------------------------------------------------------------------
-
-    /**
-     * JSON schema version this prototype model corresponds to.
-     */
-    private Version schema = Version.UNKNOWN;
-
-    /**
-     * Implementation API version that generated the JSON document this prototype represents.
-     */
-    private APIVersion api;   // TODO
-
-    /**
-     * Library identifier for a collection of JSON schemas that represent this object model,
-     * see {@link JSONHeader#LIBRARY_NAME}.
-     *
-     * @see #isValidLibrary()
-     */
-    private String libraryName;
-
-    /**
-     * Class name this prototype structure represents.
-     */
-    private String javaFullClassName = UNDEFINED_CLASS;
-
-    /**
-     * JSON structure of the model object.
-     */
-    private ModelObject prototype = new ModelObject("");
-
-
-    // Constructors -------------------------------------------------------------------------------
-
-    /**
-     * A no-args constructor required by the FlexJSON deserialization framework.
-     */
-    private ModelPrototype()
-    {
-
-    }
-
-
-    // Public Instance Methods --------------------------------------------------------------------
-
-    /**
-     * Indicates if this prototype corresponds to the given schema version.
-     *
-     * @param schema
-     *          schema version to match with this prototype's schema
-     *
-     * @return
-     *          true if the schema versions are equal
-     */
-    public boolean containsSchema(Version schema)
-    {
-      return this.schema.equals(schema);
-    }
-
-
-    /**
-     * Returns the classname of the expected model implementation.
-     *
-     * @return
-     *          The fully qualified class name of the model this JSON document and schema
-     *          represents.
-     */
-    public String getModelClass()
-    {
-      return javaFullClassName;
-    }
-
-
-    /**
-     * Returns a JSON representation of the included model object.
-     *
-     * @return
-     *          a JSON structure that represents the 'model' object of this OpenRemote Object
-     *          Model JSON document.
-     */
-    public ModelObject getModel()
-    {
-      return prototype;
-    }
-
-
-
-    // Object Overrides ---------------------------------------------------------------------------
-
-
-    @Override public String toString()
-    {
-      if (prototype == null)
-      {
-        return "Model prototype : (null)";
-      }
-
-      return "Model prototype for " + javaFullClassName + ", schema : " + schema +
-             ", API : " + apiVersion + " (" + libraryName + ")";
-    }
-
-
-    // Private Instance Methods -------------------------------------------------------------------
-
-    private ModelObject constructModel(String name, Map<String, Object> structure)
-    {
-      // TODO :
-      //
-      //      The FlexJSON does little to document the structure it returns from its deserializer,
-      //      using a very generic String, Object map only. In order to make it slightly easier
-      //      and less error prone for subclasses to implement deserialization logic, attempt
-      //      to convert the late-bound types to compile-time types for known JSON structures.
-      //
-      //      Currently implements only JSON objects (HashMap to ModelObject conversion) and
-      //      basic String name,value properties. Other JSON types (arrays, booleans, integers,
-      //      etc) still need to be added to be complete.
-
-
-      ModelObject json = new ModelObject(name);
-
-      for (String valueName : structure.keySet())
-      {
-        Object value = structure.get(valueName);
-
-        if (value instanceof Map)
-        {
-          Map<String, Object> objectStructure = (Map)value;
-
-          ModelObject nested = constructModel(valueName, objectStructure);
-
-          json.objects.put(valueName, nested);
-        }
-
-        else if (value instanceof String)
-        {
-          json.attributes.put(valueName, (String) value);
-        }
-
-      }
-
-      return json;
-    }
-
-    /**
-     * Checks the given library name in the header fields of this JSON representation against
-     * the library name this implementation belongs to.
-     *
-     * @return  true if library names match
-     */
-    private boolean isValidLibrary()
-    {
-      return libraryName != null && libraryName.equalsIgnoreCase(JSONHeader.LIBRARY_NAME);
-    }
-
-
-    // FlexJSON Setters ---------------------------------------------------------------------------
-
-
-    // These fields are still required by the FlexJSON deserializer (for unknown reasons)
-    // despite the fact that corresponding setters have been defined (and that do not assign
-    // values to these types). Therefore they need to be present, even they are unused.
-
-    private String schemaVersion;
-    private Map<String, Object> model;
-    private String apiVersion;
-
-
-    /**
-     * Private setter required by the FlexJSON framework to deserialize a JSONPrototype instance.
-     */
-    private void setModel(Map<String, Object> json)
-    {
-      prototype = constructModel("model", json);
-    }
-
-    /**
-     * Private setter required by the FlexJSON framework to deserialize a JSONPrototype instance.
-     */
-    private void setSchemaVersion(String schema)
-    {
-      try
-      {
-        this.schema = new Version(schema);
-      }
-
-      catch (IllegalArgumentException exception)
-      {
-        // TODO : log
-        System.err.println(exception.getMessage());
-      }
-    }
-
-    /**
-     * Private setter required by the FlexJSON framework to deserialize a JSONPrototype instance.
-     */
-    private void setApiVersion(String api)
-    {
-      // this.api = new APIVersion()  TODO
-    }
-
-    /**
-     * Private setter required by the FlexJSON framework to deserialize a JSONPrototype instance.
-     */
-    private void setLibraryName(String name)
-    {
-      this.libraryName = name;
-    }
-
-    /**
-     * Private setter required by the FlexJSON framework to deserialize a JSONPrototype instance.
-     */
-    private void setJavaFullClassName(String name)
-    {
-      this.javaFullClassName = name;
-    }
   }
 
 
