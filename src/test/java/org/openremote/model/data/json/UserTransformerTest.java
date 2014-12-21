@@ -47,6 +47,10 @@ public class UserTransformerTest extends OpenRemoteTest
   private byte[] userJSON;
   private byte[] userNoEmailJSON;
   private byte[] userCharsetJSON;
+  private byte[] userEscapeJSON;
+  private byte[] userAttributesJSON;
+  private byte[] userEmptyAttributesJSON;
+
 
   @BeforeClass public void loadJSONDocuments()
   {
@@ -55,6 +59,9 @@ public class UserTransformerTest extends OpenRemoteTest
       userJSON = loadResourceTextFile(new URI("user/user.json")).getBytes(Model.UTF8);
       userNoEmailJSON = loadResourceTextFile(new URI("user/user-no-email.json")).getBytes(Model.UTF8);
       userCharsetJSON = loadResourceTextFile(new URI("user/user-charset.json")).getBytes(Model.UTF8);
+      userEscapeJSON = loadResourceTextFile(new URI("user/user-escaping.json")).getBytes(Model.UTF8);
+      userAttributesJSON = loadResourceTextFile(new URI("user/user-attributes.json")).getBytes(Model.UTF8);
+      userEmptyAttributesJSON = loadResourceTextFile(new URI("user/user-empty-attributes.json")).getBytes(Model.UTF8);
     }
 
     catch (Exception e)
@@ -268,6 +275,57 @@ public class UserTransformerTest extends OpenRemoteTest
     Assert.assertTrue(tu.email.equals("email@host.domain"));
   }
 
+
+  /**
+   * Loads a user JSON document with escaped characters into deserializer.
+   *
+   * @throws Exception    if test fails
+   */
+  @Test public void testReadUserCharEscaping() throws Exception
+  {
+    ByteArrayInputStream in = new ByteArrayInputStream(userEscapeJSON);
+
+    UserTransformer t = new UserTransformer();
+    TestUser tu = new TestUser(t.read(new InputStreamReader(in, Model.UTF8)));
+
+    Assert.assertTrue(tu.username.equals("a\"a"), "got '" + tu.username + "'");
+    Assert.assertTrue(tu.email.equals("<a&b>@somewhere.com"));
+  }
+
+  /**
+   * Loads a user with attributes JSON document into deserializer.
+   *
+   * @throws Exception    if test fails
+   */
+  @Test public void testReadUserAttributes() throws Exception
+  {
+    ByteArrayInputStream in = new ByteArrayInputStream(userAttributesJSON);
+
+    UserTransformer t = new UserTransformer();
+    TestUser tu = new TestUser(t.read(new InputStreamReader(in, Model.UTF8)));
+
+    Assert.assertTrue(tu.username.equals("foo"));
+    Assert.assertTrue(tu.email.equals("email@host.domain"));
+    Assert.assertTrue(!tu.attributes.isEmpty());
+    Assert.assertTrue(tu.getAttribute("credentials").equals("bar"));
+  }
+
+
+  /**
+   * Loads a user with empty attributes object into deserializer.
+   *
+   * @throws Exception    if test fails
+   */
+  @Test public void testReadEmptyAttributes() throws Exception
+  {
+    ByteArrayInputStream in = new ByteArrayInputStream(userEmptyAttributesJSON);
+
+    UserTransformer t = new UserTransformer();
+    TestUser tu = new TestUser(t.read(new InputStreamReader(in, Model.UTF8)));
+
+    Assert.assertTrue(tu.username.equals("foo"));
+    Assert.assertTrue(tu.attributes.isEmpty());
+  }
 
 
   // Nested Classes -------------------------------------------------------------------------------
