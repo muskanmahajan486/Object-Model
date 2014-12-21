@@ -253,36 +253,48 @@ public class JSONTransformerTest extends OpenRemoteTest
         Assert.assertTrue(model.getModel().hasAttribute("1st number", 1));
         Assert.assertTrue(!model.getModel().hasAttribute("1st number", 2));
         Assert.assertTrue(model.getModel().getNumberAttribute("1st number").intValue() == 1);
+        Assert.assertTrue(model.getModel().getAttribute("1st number").equals("1"));
+        Assert.assertTrue(model.getModel().getBooleanAttribute("1st number") == null);
 
         Assert.assertTrue(model.getModel().hasAttribute("2nd number", "2.0"));
         Assert.assertTrue(!model.getModel().hasAttribute("2nd number", "-2.0"));
         Assert.assertTrue(model.getModel().hasAttribute("2nd number", 2.0));
         Assert.assertTrue(!model.getModel().hasAttribute("2nd number", 3.0));
         Assert.assertTrue(model.getModel().getNumberAttribute("2nd number").doubleValue() == 2.0);
+        Assert.assertTrue(model.getModel().getAttribute("2nd number").equals("2.0"));
+        Assert.assertTrue(model.getModel().getBooleanAttribute("2nd number") == null);
 
         Assert.assertTrue(model.getModel().hasAttribute("3rd number", "340.0"));
         Assert.assertTrue(!model.getModel().hasAttribute("3rd number", "-340.0"));
         Assert.assertTrue(model.getModel().hasAttribute("3rd number", 340.0));
         Assert.assertTrue(!model.getModel().hasAttribute("3rd number", 340.1));
         Assert.assertTrue(model.getModel().getNumberAttribute("3rd number").doubleValue() == 340.0);
+        Assert.assertTrue(model.getModel().getAttribute("3rd number").equals("340.0"));
+        Assert.assertTrue(model.getModel().getBooleanAttribute("3rd number") == null);
 
         Assert.assertTrue(model.getModel().hasAttribute("4th number", "0.5"));
         Assert.assertTrue(!model.getModel().hasAttribute("4th number", "0.6"));
         Assert.assertTrue(model.getModel().hasAttribute("4th number", .5));
         Assert.assertTrue(!model.getModel().hasAttribute("4th number", 0.6));
         Assert.assertTrue(model.getModel().getNumberAttribute("4th number").doubleValue() == .5);
+        Assert.assertTrue(model.getModel().getAttribute("4th number").equals("0.5"));
+        Assert.assertTrue(model.getModel().getBooleanAttribute("4th number") == null);
 
         Assert.assertTrue(model.getModel().hasAttribute("5th number", "-0.6"));
         Assert.assertTrue(!model.getModel().hasAttribute("5th number", "0.6"));
         Assert.assertTrue(model.getModel().hasAttribute("5th number", -0.6));
         Assert.assertTrue(!model.getModel().hasAttribute("5th number", 0.6));
         Assert.assertTrue(model.getModel().getNumberAttribute("5th number").doubleValue() == -0.6);
+        Assert.assertTrue(model.getModel().getAttribute("5th number").equals("-0.6"));
+        Assert.assertTrue(model.getModel().getBooleanAttribute("5th number") == null);
 
         Assert.assertTrue(model.getModel().hasAttribute("6th number", "-0.78"));
         Assert.assertTrue(!model.getModel().hasAttribute("6th number", "0.78"));
         Assert.assertTrue(model.getModel().hasAttribute("6th number", -7.8E-1));
         Assert.assertTrue(!model.getModel().hasAttribute("6th number", 0.79));
         Assert.assertTrue(model.getModel().getNumberAttribute("6th number").doubleValue() == -0.78);
+        Assert.assertTrue(model.getModel().getAttribute("6th number").equals("-0.78"));
+        Assert.assertTrue(model.getModel().getBooleanAttribute("6th number") == null);
 
         Assert.assertTrue(!model.getModel().hasObjects());
       }
@@ -323,6 +335,9 @@ public class JSONTransformerTest extends OpenRemoteTest
         testList.add("c");
 
         Assert.assertTrue(model.hasAttribute("name", testList));
+        Assert.assertTrue(testList.equals(model.getStringArray("name")));
+        Assert.assertTrue(model.getNumberArray("name") == null);
+        Assert.assertTrue(model.getAttribute("name").equals("[a, b, c]"));
 
         testList.add("d");
 
@@ -365,6 +380,9 @@ public class JSONTransformerTest extends OpenRemoteTest
         testList.add(" foo  \nbar ");
 
         Assert.assertTrue(model.hasAttribute("name", testList));
+        Assert.assertTrue(model.getStringArray("name").equals(testList));
+        Assert.assertTrue(model.getNumberArray("name") == null);
+        Assert.assertTrue(model.getAttribute("name").equals("[ test ,  foo  \nbar ]"));
 
         Assert.assertTrue(!model.hasObjects());
       }
@@ -408,6 +426,8 @@ public class JSONTransformerTest extends OpenRemoteTest
         testList.add(9.18E+09);
 
         Assert.assertTrue(model.hasAttribute("name", testList));
+        Assert.assertTrue(model.getNumberArray("name").equals(testList));
+        Assert.assertTrue(model.getStringArray("name") == null);
 
         testList.add(8E2);
 
@@ -450,6 +470,9 @@ public class JSONTransformerTest extends OpenRemoteTest
         testList.add(true);
 
         Assert.assertTrue(model.hasAttribute("name", testList));
+        Assert.assertTrue(model.getBooleanArray("name").equals(testList));
+        Assert.assertTrue(model.getAttribute("name").equals("[true, false, true]"));
+        Assert.assertTrue(model.getStringArray("name") == null);
 
         testList.add(false);
 
