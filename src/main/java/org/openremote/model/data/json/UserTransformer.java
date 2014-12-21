@@ -1,9 +1,5 @@
 /*
- * OpenRemote, the Home of the Digital Home.
- * Copyright 2008-2014, OpenRemote Inc.
- *
- * See the contributors.txt file in the distribution for a
- * full listing of individual contributors.
+ * Copyright 2013-2015, Juha Lindfors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -20,7 +16,6 @@
  */
 package org.openremote.model.data.json;
 
-import java.io.Reader;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -34,7 +29,7 @@ import org.openremote.model.User;
  * Implementation of the Transformer interface for the FlexJSON library that handles
  * serialization and deserialization of the {@link org.openremote.model.User} instances.
  *
- * @author <a href = "mailto:juha@openremote.org">Juha Lindfors</a>
+ * @author Juha Lindfors
  */
 public class UserTransformer extends JSONTransformer<User>
 {
@@ -137,30 +132,27 @@ public class UserTransformer extends JSONTransformer<User>
     endObject();
   }
 
-  public User read(Reader reader) throws DeserializationException
-  {
-    return super.read(reader);
-  }
+
 
   /**
    * Recreates an {@link org.openremote.model.User} instance from a deserialized JSON model
    * prototype.
    *
-   * @see   ModelPrototype
+   * @see   JSONModel
    *
-   * @param prototype
-   *          A model prototype that represents the structures parsed from the JSON document
+   * @param json
+   *          A JSON frame that represents the structures parsed from the JSON document
    *          representing an user instance.
    *
    * @return  A corresponding Java User instance
    *
    * @throws  DeserializationException if deserialization fails
    */
-  @Override protected User deserialize(ModelPrototype prototype) throws DeserializationException
+  @Override protected User deserialize(JSONModel json) throws DeserializationException
   {
     try
     {
-      ModelObject model = prototype.getModel();
+      ModelObject model = json.getModel();
 
       // User model will deal with validating the incoming data...
 
