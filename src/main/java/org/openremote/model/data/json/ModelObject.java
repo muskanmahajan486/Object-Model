@@ -21,7 +21,6 @@ import org.openremote.base.exception.IncorrectImplementationException;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -225,7 +224,7 @@ public class ModelObject
     {
       // safe cast given the check above...
 
-      return new Double( ((NumberAttribute)attr).getNumber().doubleValue())
+      return new Double(((NumberAttribute)attr).getNumber().doubleValue())
           .compareTo(value.doubleValue()) == 0;
     }
 
