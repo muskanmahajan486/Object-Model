@@ -221,12 +221,14 @@ public class UserTransformer extends JSONTransformer<User>
 
       // Username specific checks, as per the resources/json/User.orderly schema...
 
-      if (username.length() < MINIMUM_USERNAME_LENGTH)
+      int len = (username == null) ? 0 : username.length();
+
+      if (len < MINIMUM_USERNAME_LENGTH)
       {
         throw new Model.ValidationException(
             "Username value is too short, must be at least {0} characters. " +
             "Given username argument '{1}' was only {2} characters in length.",
-            MINIMUM_USERNAME_LENGTH, username, username.length()
+            MINIMUM_USERNAME_LENGTH, username, len
         );
       }
     }
