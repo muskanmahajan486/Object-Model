@@ -269,6 +269,8 @@ public class ModelObject
    * Returns a string representation of this model object's attribute. JSON numbers and boolean
    * types are converted to Java strings. Arrays are converted to string beginning and ending
    * with square brackets [] and with each array element separated with a comma and space character.
+   * Note that for string arrays, white space and line change characters are preserved if present
+   * in the JSON document.
    *
    * @param name
    *            name of the attribute
@@ -281,6 +283,140 @@ public class ModelObject
 
     return (attr == null) ? null : attr.getValue();
   }
+
+  /**
+   * Returns a boolean attribute value.
+   *
+   * @param name
+   *            name of the attribute
+   *
+   * @return    true, false, or null if attribute is not present or is not boolean type
+   */
+  public Boolean getBooleanAttribute(String name)
+  {
+    Attribute attr = attributes.get(name);
+
+    if (attr != null && attr instanceof BooleanAttribute)
+    {
+      return ((BooleanAttribute)attr).getBoolean();
+    }
+
+    else
+    {
+      return null;
+    }
+  }
+
+  /**
+   * Returns a number attribute value.
+   *
+   * @param name
+   *            name of the attribute
+   *
+   * @return    number or null if attribute is not present or is not number type
+   */
+  public Number getNumberAttribute(String name)
+  {
+    // NOTE:
+    //        returning a generic number type here instead of more specific types -- while it
+    //        would be possible to make a distinction between integer and decimal numbers, it
+    //        would depend on how the number is specified in the JSON document,
+    //        e.g. '1' vs. '1.0' in the JSON would translate either to Long or Double type,
+    //        which could cause confusion and errors in code if numbers are not consistently
+    //        specified by type in JSON document. While use of Number type is clumsy, it moves
+    //        the responsibility of typing to the user of API, i.e. whether they decide to treat
+    //        the number with intValue() or doubleValue().
+    //
+    //        That's the behavior at least for now until there's an argument for changing it.
+
+    Attribute attr = attributes.get(name);
+
+    if (attr != null && attr instanceof NumberAttribute)
+    {
+      return ((NumberAttribute)attr).getNumber();
+    }
+
+    return null;
+  }
+
+  /**
+   * Returns a string array attribute.
+   *
+   * @param name
+   *            name of the attribute
+   *
+   * @return    a list of strings in the array, or null if the attribute is not present or is
+   *            not of string array type
+   */
+  public List<String> getStringArray(String name)
+  {
+    Attribute attr = attributes.get(name);
+
+    if (attr != null && attr instanceof ArrayAttribute)
+    {
+      ArrayAttribute array = (ArrayAttribute)attr;
+
+      if (array.isStringArray)
+      {
+        return new ArrayList<String>(array.value);
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Returns a number array attribute.
+   *
+   * @param name
+   *            name of the attribute
+   *
+   * @return    a list of numbers in the array, or null if the attribute is not present or is
+   *            not of number array type
+   */
+  public List<Number> getNumberArray(String name)
+  {
+    Attribute attr = attributes.get(name);
+
+    if (attr != null && attr instanceof ArrayAttribute)
+    {
+      ArrayAttribute array = (ArrayAttribute)attr;
+
+      if (array.isNumberArray)
+      {
+        return new ArrayList<Number>(array.value);
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Returns a boolean array attribute.
+   *
+   * @param name
+   *            name of the attribute
+   *
+   * @return    a list of booleans in the array, or null if the attribute is not present or is
+   *            not of number array type
+   */
+  public List<Boolean> getBooleanArray(String name)
+  {
+    Attribute attr = attributes.get(name);
+
+    if (attr != null && attr instanceof ArrayAttribute)
+    {
+      ArrayAttribute array = (ArrayAttribute)attr;
+
+      if (array.isBooleanArray)
+      {
+        return new ArrayList<Boolean>(array.value);
+      }
+    }
+
+    return null;
+  }
+
 
   /**
    * Returns a read-only enumeration of the attributes contained within this model's JSON
@@ -335,7 +471,7 @@ public class ModelObject
   }
 
 
-  // Object Overrides ---------------------------------------------------------------------------
+  // Object Overrides -----------------------------------------------------------------------------
 
   @Override public String toString()
   {
@@ -344,33 +480,79 @@ public class ModelObject
   }
 
 
-  // Nested Classes -----------------------------------------------------------------------------
+
+  // Protected Instance Methods -------------------------------------------------------------------
+
+  /**
+   * Adds a JSON attribute value to this model object.
+   *
+   * @see Attribute
+   * @see ArrayAttribute
+   *
+   * @param attr
+   *          attribute to add
+   */
+  protected void addAttribute(Attribute attr)
+  {
+    attributes.put(attr.name, attr);
+  }
+
+  /**
+   * Adds a JSON object to this model.
+   *
+   * @see #addAttribute
+   *
+   * @param object
+   *          object to add
+   */
+  protected void addObject(ModelObject object)
+  {
+    objects.put(object.name, object);
+  }
+
+
+  // Nested Classes -------------------------------------------------------------------------------
 
   /**
    * This is a container class for JSON attributes in model objects. It represents a non-object
-   * JSON attribute: string, number or boolean. <p>
+   * JSON attribute: string, number or boolean, or an array of these basic types. <p>
    *
    * This implementation returns a string representation of an attribute. Specific subclasses
    * can provide an attribute-specific and type-specific APIs.
    */
   public static class Attribute
   {
+    /**
+     * Indicates whether this attribute represents an array of attribute values.
+     */
     protected boolean isArray = false;
 
+    /**
+     * Attribute value.
+     */
     private String value;
+
+    /**
+     * Attribute name.
+     */
     private String name;
 
-    private Attribute(String name, String value)
+
+    // Constructors -------------------------------------------------------------------------------
+
+    protected Attribute(String name, String value)
     {
       this.name = name;
       this.value = value;
     }
 
     /**
-     * Returns a string representation of JSON non-object primitives: string, number, boolean.
+     * Returns a string representation of JSON non-object primitives: string, number, boolean,
+     * or an array of these types. Arrays are converted to string beginning and ending
+     * with square brackets [] and with each array element separated with a comma and
+     * space character.
      *
-     * @return  A string representation of JSON value. Boolean and number types are converted
-     *          to Java strings.
+     * @return  A string representation of JSON value.
      */
     public String getValue()
     {
@@ -401,7 +583,7 @@ public class ModelObject
   {
     private Boolean value;
 
-    private BooleanAttribute(String name, Boolean value)
+    protected BooleanAttribute(String name, Boolean value)
     {
       super(name, value.toString());
 
@@ -419,16 +601,16 @@ public class ModelObject
    */
   public static class NumberAttribute extends Attribute
   {
-    private Long value;
+    private Number value;
 
-    private NumberAttribute(String name, Long number)
+    protected NumberAttribute(String name, Number number)
     {
       super(name, number.toString());
 
       this.value = number;
     }
 
-    public Long getNumber()
+    public Number getNumber()
     {
       return value;
     }
@@ -441,18 +623,28 @@ public class ModelObject
    *
    *    Not intended as a complete implementation in it's current state.
    *
-   *     - Will not (and maybe should not) support arrays with mixed types, e.g.
-   *       string elements with objects in an array. Should most likely only
-   *       support uniform array types if more array support is required.
-   *     - Does not support nested arrays.
-   *
-   *
-   *    This is currently present here as a place holder if more specific array support
-   *    is later needed (current schemas don't require them).
+   *     - Will not (and maybe should not) support arrays with JSON mixed types, e.g.
+   *       string elements with objects in an array. May never support these mixed type
+   *       arrays unless there's a really compelling reason to do so.
+   *     - Does not currently support nested arrays.
    */
-  public static class ArrayAttribute extends Attribute
+  public static class ArrayAttribute<T> extends Attribute
   {
-    private static String buildArrayString(List array)
+
+    // Class Members ------------------------------------------------------------------------------
+
+    /**
+     * Creates a string representation of this JSON array that begins and ends the string with
+     * brackets [] and has array elements in a comma separated list.
+     *
+     * @param array
+     *            array to build a string representation for
+     *
+     * @return
+     *            string in the format [element, element, element] where element may be a string
+     *            value, boolean value or JSON number value
+     */
+    private static String buildArrayString(List<?> array)
     {
       StringBuilder builder = new StringBuilder();
       builder.append('[');
@@ -465,7 +657,7 @@ public class ModelObject
 
         if (it.hasNext())
         {
-          builder.append(',');
+          builder.append(", ");
         }
       }
 
@@ -474,12 +666,122 @@ public class ModelObject
       return builder.toString();
     }
 
-    private ArrayAttribute(String name, List array)
+
+    // Instance Fields ----------------------------------------------------------------------------
+
+    /**
+     * The values in the array.
+     */
+    private AbstractList<T> value;
+
+    /**
+     * Array type: indicates the elements in the array (all of them) are of JSON string type.
+     */
+    private boolean isStringArray = false;
+
+    /**
+     * Array type: indicates the elements in the array (all of them) are of JSON number type.
+     */
+    private boolean isNumberArray = false;
+
+    /**
+     * Array type: indicates the elements in the array (all of them) are of JSON boolean type.
+     */
+    private boolean isBooleanArray = false;
+
+
+    // Constructors -------------------------------------------------------------------------------
+
+    protected ArrayAttribute(String name, List<T> array)
     {
       super(name, buildArrayString(array));
 
       isArray = true;
+
+      determineArrayType(array);
+
+      value = new ArrayList<T>(array);
+    }
+
+
+    // Public Instance Methods --------------------------------------------------------------------
+
+    /**
+     * Compares the given list to the contents of this array.
+     *
+     * @param array
+     *            the list that is compared to this array
+     *
+     * @return
+     *            true of false based on list equality to this array's values
+     */
+    public boolean compare(List<T> array)
+    {
+      return value.equals(array);
+    }
+
+
+    // Private Instance Methods -------------------------------------------------------------------
+
+
+    /**
+     * Attempts to resolve the array type from array elements (as resolved to Java types by
+     * the FlexJSON framework). Will not accept mixed JSON type arrays. All elements in array
+     * must be of the same type.
+     *
+     * @param array
+     *            array elements to inspect
+     */
+    private void determineArrayType(List<T> array)
+    {
+      // TODO : add nested arrays if/when necessary
+
+      for (Object o : array)
+      {
+        if (o instanceof String)
+        {
+          if (isBooleanArray || isNumberArray)
+          {
+            throw new IncorrectImplementationException(
+                "Mixed JSON type arrays are not supported. Array {0} contains strings combined " +
+                "with boolean or number types.",
+                array
+            );
+          }
+
+          isStringArray = true;
+        }
+
+        else if (o instanceof Number)
+        {
+          if (isStringArray || isBooleanArray)
+          {
+            throw new IncorrectImplementationException(
+                "Mixed JSON type arrays are not supported. Array {0} contains numbers combined " +
+                "with boolean or string types.",
+                array
+            );
+          }
+
+          isNumberArray = true;
+        }
+
+        else if (o instanceof Boolean)
+        {
+          if (isStringArray || isNumberArray)
+          {
+            throw new IncorrectImplementationException(
+                "Mixed JSON type arrays are not supported. Array {0} contains booleans combined " +
+                "with string or number types.",
+                array
+            );
+          }
+
+          isBooleanArray = true;
+        }
+      }
     }
   }
+
 }
 
