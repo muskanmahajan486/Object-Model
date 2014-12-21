@@ -1,9 +1,5 @@
 /*
- * OpenRemote, the Home of the Digital Home.
- * Copyright 2008-2014, OpenRemote Inc.
- *
- * See the contributors.txt file in the distribution for a
- * full listing of individual contributors.
+ * Copyright 2013-2015, Juha Lindfors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -26,8 +22,6 @@ import flexjson.transformer.Transformer;
 import org.openremote.base.APIVersion;
 import org.openremote.base.Version;
 import org.openremote.base.exception.IncorrectImplementationException;
-
-import java.util.Map;
 
 
 /**
@@ -62,7 +56,7 @@ import java.util.Map;
  * The API version property indicates the versioning of the underlying object model
  * implementation.
  *
- * @author <a href="mailto:juha@openremote.org">Juha Lindfors</a>
+ * @author Juha Lindfors</a>
  */
 public class JSONHeader<T>
 {
@@ -277,8 +271,7 @@ public class JSONHeader<T>
       endObject();
     }
 
-    @Override public JSONHeader deserialize(Version schemaVersion, String className,
-                                            Map<String, String> jsonProperties)
+    @Override public JSONHeader deserialize(JSONModel model)
     {
       // TODO
 
@@ -318,8 +311,7 @@ public class JSONHeader<T>
       writeValue(version.toString());
     }
 
-    @Override public Version deserialize(Version schemaVersion, String className,
-                                         Map<String, String> jsonProperties)
+    @Override public Version deserialize(JSONModel model)
     {
       // TODO
 

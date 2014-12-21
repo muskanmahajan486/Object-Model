@@ -1,9 +1,5 @@
 /*
- * OpenRemote, the Home of the Digital Home.
- * Copyright 2008-2014, OpenRemote Inc.
- *
- * See the contributors.txt file in the distribution for a
- * full listing of individual contributors.
+ * Copyright 2013-2015, Juha Lindfors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -20,7 +16,6 @@
  */
 package org.openremote.model.data.json;
 
-import org.openremote.base.Version;
 import org.openremote.base.exception.IncorrectImplementationException;
 import org.openremote.model.DeviceDiscovery;
 
@@ -32,7 +27,7 @@ import java.util.Map;
  * The expected JSON structure is defined in schema documents located in project's
  * /resources/json directory.
  *
- * @author <a href="mailto:juha@openremote.org">Juha Lindfors</a>
+ * @author Juha Lindfors
  */
 public class DeviceDiscoveryTransformer extends JSONTransformer<DeviceDiscovery>
 {
@@ -82,8 +77,7 @@ public class DeviceDiscoveryTransformer extends JSONTransformer<DeviceDiscovery>
   }
 
 
-  @Override protected DeviceDiscovery deserialize(Version schemaVersion, String className,
-                                                  Map<String, String> jsonProperties)
+  @Override protected DeviceDiscovery deserialize(JSONModel model)
   {
     // TODO
 
