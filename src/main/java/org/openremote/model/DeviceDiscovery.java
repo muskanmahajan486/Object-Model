@@ -1,9 +1,5 @@
 /*
- * OpenRemote, the Home of the Digital Home.
- * Copyright 2008-2014, OpenRemote Inc.
- *
- * See the contributors.txt file in the distribution for a
- * full listing of individual contributors.
+ * Copyright 2013-2015, Juha Lindfors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -40,9 +36,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * The JSON serialization format for this class is described in the project's resources/json
  * directory.
  *
- * @author <a href="mailto:juha@openremote.org">Juha Lindfors</a>
+ * @author Juha Lindfors
  */
-public class DeviceDiscovery
+public class DeviceDiscovery extends Model
 {
 
   // Constants ------------------------------------------------------------------------------------
@@ -60,11 +56,6 @@ public class DeviceDiscovery
    */
   public static final int DEVICE_ATTRIBUTE_VALUE_LENGTH_CONSTRAINT = 1000;
 
-  /**
-   * The default string attribute length in the relational persistence model when no
-   * specific configuration is given.
-   */
-  public static final int DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT = 255;
 
 
   // Protected Instance Fields --------------------------------------------------------------------
@@ -116,6 +107,8 @@ public class DeviceDiscovery
    */
   protected DeviceDiscovery(DeviceDiscovery copy)
   {
+    super(copy.jsonTransformer);
+
     this.model = copy.model;
     this.deviceName = copy.deviceName;
     this.protocol = copy.protocol;
@@ -144,6 +137,8 @@ public class DeviceDiscovery
    */
   public DeviceDiscovery(String deviceName, String deviceProtocol, String model)
   {
+    super(new DeviceDiscoveryTransformer());
+
     if (deviceName == null || deviceName.equals(""))
     {
       throw new IllegalArgumentException("Device name cannot be null or empty string.");
