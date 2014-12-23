@@ -259,9 +259,21 @@ public class ModelObject
       return false;
     }
 
-    ArrayAttribute array = (ArrayAttribute)attr;
+    try
+    {
+      @SuppressWarnings("unchecked") ArrayAttribute<T> array = (ArrayAttribute<T>)attr;
 
-    return array.compare(value);
+      return array.compare(value);
+    }
+
+    catch (ClassCastException exception)
+    {
+      // TODO : log
+
+      System.err.println("Type error: " + exception.getMessage());
+
+      return false;
+    }
   }
 
   /**
@@ -351,14 +363,24 @@ public class ModelObject
   {
     Attribute attr = attributes.get(name);
 
-    if (attr != null && attr instanceof ArrayAttribute)
+    try
     {
-      ArrayAttribute array = (ArrayAttribute)attr;
-
-      if (array.isStringArray)
+      if (attr != null && attr instanceof ArrayAttribute)
       {
-        return new ArrayList<String>(array.value);
+        @SuppressWarnings("unchecked") ArrayAttribute<String> array = (ArrayAttribute<String>)attr;
+
+        if (array.isStringArray)
+        {
+          return new ArrayList<String>(array.value);
+        }
       }
+    }
+
+    catch (ClassCastException exception)
+    {
+      // TODO : log
+
+      System.err.println("Attribute " + name + " is not string array type.");
     }
 
     return null;
@@ -377,14 +399,24 @@ public class ModelObject
   {
     Attribute attr = attributes.get(name);
 
-    if (attr != null && attr instanceof ArrayAttribute)
+    try
     {
-      ArrayAttribute array = (ArrayAttribute)attr;
-
-      if (array.isNumberArray)
+      if (attr != null && attr instanceof ArrayAttribute)
       {
-        return new ArrayList<Number>(array.value);
+        @SuppressWarnings("unchecked") ArrayAttribute<Number> array = (ArrayAttribute<Number>)attr;
+
+        if (array.isNumberArray)
+        {
+          return new ArrayList<Number>(array.value);
+        }
       }
+    }
+
+    catch (ClassCastException exception)
+    {
+      // TODO : log
+
+      System.err.println("Attribute " + name + " is not number array type.");
     }
 
     return null;
@@ -403,14 +435,24 @@ public class ModelObject
   {
     Attribute attr = attributes.get(name);
 
-    if (attr != null && attr instanceof ArrayAttribute)
+    try
     {
-      ArrayAttribute array = (ArrayAttribute)attr;
-
-      if (array.isBooleanArray)
+      if (attr != null && attr instanceof ArrayAttribute)
       {
-        return new ArrayList<Boolean>(array.value);
+        @SuppressWarnings("unchecked") ArrayAttribute<Boolean> array = (ArrayAttribute<Boolean>)attr;
+
+        if (array.isBooleanArray)
+        {
+          return new ArrayList<Boolean>(array.value);
+        }
       }
+    }
+
+    catch (ClassCastException exception)
+    {
+      // TODO : log
+
+      System.err.println("Attribute " + name + " is not boolean array type.");
     }
 
     return null;
@@ -625,7 +667,7 @@ public class ModelObject
    *     - Will not (and maybe should not) support arrays with JSON mixed types, e.g.
    *       string elements with objects in an array. May never support these mixed type
    *       arrays unless there's a really compelling reason to do so.
-   *     - Does not currently support nested arrays.
+   *     - Does not currently support nested arrays. Should be added for completeness.
    */
   public static class ArrayAttribute<T> extends Attribute
   {
