@@ -34,6 +34,26 @@ import org.openremote.model.User;
 public class UserTransformer extends JSONTransformer<User>
 {
 
+  // Constants ------------------------------------------------------------------------------------
+
+  /**
+   * The JSON property name value used in user JSON document for usernames: {@value}
+   */
+  public static final String USERNAME_JSON_PROPERTY_NAME = "username";
+
+  /**
+   * The JSON property name value used in user JSON document for emails: {@value}
+   */
+  public static final String EMAIL_JSON_PROPERTY_NAME = "email";
+
+  /**
+   * The JSON property name value used in user JSON document for user attributes: {@value}
+   */
+  public static final String USER_ATTRIBUTES_JSON_PROPERTY_NAME = "userAttributes";
+
+
+
+
   // Class Members --------------------------------------------------------------------------------
 
   /**
@@ -90,6 +110,7 @@ public class UserTransformer extends JSONTransformer<User>
         new UserTransformer.AttributeValidator();
 
 
+
   // Constructors ---------------------------------------------------------------------------------
 
   /**
@@ -117,8 +138,8 @@ public class UserTransformer extends JSONTransformer<User>
 
     startObject();
 
-    writeProperty("username", data.userName);
-    writeProperty("email", data.email);
+    writeProperty(USERNAME_JSON_PROPERTY_NAME, data.userName);
+    writeProperty(EMAIL_JSON_PROPERTY_NAME, data.email);
 
     // Extension point for subclasses...
 
@@ -126,7 +147,7 @@ public class UserTransformer extends JSONTransformer<User>
 
     if (!data.attributes.isEmpty())
     {
-      writeProperty("userAttributes", data.attributes);
+      writeProperty(USER_ATTRIBUTES_JSON_PROPERTY_NAME, data.attributes);
     }
 
     endObject();
@@ -156,9 +177,12 @@ public class UserTransformer extends JSONTransformer<User>
 
       // User model will deal with validating the incoming data...
 
-      User user = new User(model.getAttribute("username"), model.getAttribute("email"));
+      User user = new User(
+          model.getAttribute(USERNAME_JSON_PROPERTY_NAME),
+          model.getAttribute(EMAIL_JSON_PROPERTY_NAME)
+      );
 
-      ModelObject attributes = model.getObject("userAttributes");
+      ModelObject attributes = model.getObject(USER_ATTRIBUTES_JSON_PROPERTY_NAME);
 
       if (attributes != null)
       {
@@ -167,6 +191,8 @@ public class UserTransformer extends JSONTransformer<User>
         while (enumeration.hasMoreElements())
         {
           ModelObject.Attribute attr = enumeration.nextElement();
+
+          // TODO : could validate specific attributes here...
 
           user.addAttribute(attr.getName(), attr.getValue());
         }
