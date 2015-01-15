@@ -18,6 +18,8 @@ package org.openremote.model.data.json;
 
 import java.io.BufferedReader;
 import java.io.Reader;
+import java.util.Collection;
+import java.util.Iterator;
 
 import flexjson.JSONContext;
 import flexjson.JSONDeserializer;
@@ -207,6 +209,51 @@ public abstract class JSONTransformer<T> extends AbstractTransformer
 
     writeValue(value);
   }
+
+  /**
+   * Adds an array with a given name and array elements to the JSON representation. The
+   * element values are transformed to JSON representation per the registered type transformers
+   * registered to the FlexJSON framework. <p>
+   *
+   * @param name
+   *          the array name to add to the JSON representation
+   *
+   * @param values
+   *          the elements of the array (converted by transformers if/when present)
+   */
+  protected void writeArray(String name, Collection values)
+  {
+    JSONContext ctx = getContext();
+
+    if (!firstProperty)
+    {
+      ctx.writeComma();
+    }
+
+    else
+    {
+      firstProperty = false;
+    }
+
+    ctx.writeName(name);
+
+    ctx.writeOpenArray();
+
+    Iterator it = values.iterator();
+
+    while (it.hasNext())
+    {
+      writeValue(it.next());
+
+      if (it.hasNext())
+      {
+        ctx.writeComma();
+      }
+    }
+
+    ctx.writeCloseArray();
+  }
+
 
   /**
    * Writes a JSON value. This is useful for simple type transformers that translate to a single
