@@ -149,6 +149,11 @@ public abstract class JSONTransformer<T> extends AbstractTransformer
    */
   @Override public void transform(Object object)
   {
+    // FlexJSON reuses transformer instances so need to make sure we reset this context
+    // variable at the beginning of each call to transform()...
+
+    firstProperty = true;
+
     JSONContext ctx = getContext();
 
     TypeContext typeCtx = ctx.peekTypeContext();
@@ -182,9 +187,8 @@ public abstract class JSONTransformer<T> extends AbstractTransformer
    * The reader stream should point to a beginning of a JSON object that starts with a
    * {@link JSONHeader} representation. The JSON headers are parsed first, after which the
    * model object JSON attributes and values are passed to a concrete domain object deserializer
-   * via a call to {@link #deserialize(JSONModel)} method.
-   * The concrete domain model implementation should construct the Java instance based on this
-   * JSON data. <p>
+   * via a call to {@link #deserialize(JSONModel)} method. The concrete domain model implementation
+   * should construct the Java instance based on this JSON data. <p>
    *
    * This implementation will automatically reject any JSON representation that does not
    * match the library name {@link JSONHeader#LIBRARY_NAME} in its header fields.
