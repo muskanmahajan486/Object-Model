@@ -174,6 +174,79 @@ public abstract class JSONTransformer<T> extends AbstractTransformer
   }
 
 
+
+  /**
+   * Reads from a stream a JSON representation of a domain object and deserializes it to a full
+   * Java type. <p>
+   *
+   * The reader stream should point to a beginning of a JSON object that starts with a
+   * {@link JSONHeader} representation. The JSON headers are parsed first, after which the
+   * model object JSON attributes and values are passed to a concrete domain object deserializer
+   * via a call to {@link #deserialize(JSONModel)} method.
+   * The concrete domain model implementation should construct the Java instance based on this
+   * JSON data. <p>
+   *
+   * This implementation will automatically reject any JSON representation that does not
+   * match the library name {@link JSONHeader#LIBRARY_NAME} in its header fields.
+   *
+   * @param   reader
+   *            a reference to the stream reader
+   *
+   * @throws  DeserializationException
+   *            if the domain object cannot be resolved from the JSON representation
+   *
+   * @return  initialized domain object instance
+   */
+  public T read(Reader reader) throws DeserializationException
+  {
+    // Use flex JSON to deserialize representation to a JSON prototype with header fields...
+
+    JSONModel model;
+
+    try
+    {
+      model = new JSONDeserializer<JSONModel>()
+          .deserialize(new BufferedReader(reader), JSONModel.class);
+
+      // TODO : log debug --> "Deserialized " + model
+    }
+
+    catch (Throwable throwable)
+    {
+      throw new DeserializationException(
+          "JSON representation could not be resolved to a proper prototype from the stream : {0}",
+          throwable, throwable.getMessage()
+      );
+    }
+
+
+    // Reject the JSON if it doesn't belong to this library...
+
+    if (!model.isValidLibrary())
+    {
+      throw new DeserializationException(
+          "Ignoring JSON object with library identifier '{0}'.", model.libraryName
+      );
+    }
+
+    // Reject the JSON if the model didn't resolve to any attributes or nested objects...
+
+    if (!model.getModel().hasAttributes() && !model.getModel().hasObjects())
+    {
+      throw new DeserializationException(
+          "Model object JSON representation did not resolve correctly. " +
+          "Class: ''{0}'', Schema : {1}, API : {2}",
+          model.javaFullClassName, model.schema, model.api
+      );
+    }
+
+    // Resolve the domain object model into a Java instance (via concrete subclass impl.)...
+
+    return deserialize(model);
+  }
+
+
+
   // Protected Instance Methods -------------------------------------------------------------------
 
   /**
@@ -316,76 +389,6 @@ public abstract class JSONTransformer<T> extends AbstractTransformer
    */
   protected abstract void write(T object);
 
-
-  /**
-   * Reads from a stream a JSON representation of a domain object and deserializes it to a full
-   * Java type. <p>
-   *
-   * The reader stream should point to a beginning of a JSON object that starts with a
-   * {@link JSONHeader} representation. The JSON headers are parsed first, after which the
-   * model object JSON attributes and values are passed to a concrete domain object deserializer
-   * via a call to {@link #deserialize(JSONModel)} method.
-   * The concrete domain model implementation should construct the Java instance based on this
-   * JSON data. <p>
-   *
-   * This implementation will automatically reject any JSON representation that does not
-   * match the library name {@link JSONHeader#LIBRARY_NAME} in its header fields.
-   *
-   * @param   reader
-   *            a reference to the stream reader
-   *
-   * @throws  DeserializationException
-   *            if the domain object cannot be resolved from the JSON representation
-   *
-   * @return  initialized domain object instance
-   */
-  protected T read(Reader reader) throws DeserializationException
-  {
-    // Use flex JSON to deserialize representation to a JSON prototype with header fields...
-
-    JSONModel model;
-
-    try
-    {
-      model = new JSONDeserializer<JSONModel>()
-          .deserialize(new BufferedReader(reader), JSONModel.class);
-
-      // TODO : log debug --> "Deserialized " + model
-    }
-
-    catch (Throwable throwable)
-    {
-      throw new DeserializationException(
-          "JSON representation could not be resolved to a proper prototype from the stream : {0}",
-          throwable, throwable.getMessage()
-      );
-    }
-
-
-    // Reject the JSON if it doesn't belong to this library...
-
-    if (!model.isValidLibrary())
-    {
-      throw new DeserializationException(
-          "Ignoring JSON object with library identifier '{0}'.", model.libraryName
-      );
-    }
-
-    // Reject the JSON if the model didn't resolve to any attributes or nested objects...
-
-    if (!model.getModel().hasAttributes() && !model.getModel().hasObjects())
-    {
-      throw new DeserializationException(
-          "Model object JSON representation did not resolve correctly. " +
-          "Class: ''{0}'', Schema : {1}, API : {2}",
-          model.javaFullClassName, model.schema, model.api
-      );
-    }
-
-    // Resolve the domain object model into a Java instance (via concrete subclass impl.)...
-
-    return deserialize(model);
-  }
 
   /**
    * Override this method to provide the implementation of how to deserialize a given set of
