@@ -1,0 +1,64 @@
+{
+  "type": "object",
+  "properties": {
+    "libraryName": {
+      "type": "string",
+      "pattern": "^OpenRemote Object Model$"
+    },
+    "javaFullClassName": {
+      "type": "string",
+      "pattern": "^org.openremote.model(.[a-zA-Z0-9_]+)+$"
+    },
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^4.0.0(_.*)?$"
+    },
+    "apiVersion": {
+      "type": "string",
+      "pattern": "^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,4}(_.*)?$"
+    },
+    "model": {
+      "type": "object",
+      "properties": {
+        "identity": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "^.*$"
+        },
+        "macAddresses": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 17,
+            "maxLength": 17,
+            "pattern": "^[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}$"
+          },
+          "additionalProperties": false
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "optional": true,
+          "pattern": "^.*$"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000,
+          "optional": true,
+          "pattern": "^.*$"
+        },
+        "controllerConfiguration": {
+          "type": "object",
+          "optional": true
+        },
+        "controllerAttributes": {
+          "type": "object",
+          "optional": true
+        }
+      }
+    }
+  }
+}
