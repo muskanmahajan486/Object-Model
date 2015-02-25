@@ -1,9 +1,5 @@
 // ------------------------------------------------------------------------------------------------
-//  OpenRemote, the Home of the Digital Home.
-//  Copyright 2008-2014, OpenRemote Inc.
-//
-//  See the contributors.txt file in the distribution for a
-//  full listing of individual contributors.
+//  Copyright 2013-2015, Juha Lindfors. All rights reserved.
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU Affero General Public License as
@@ -22,9 +18,10 @@
 
 // ================================================================================================
 //
-//  User JSON 2.0.0 Schema
+//  User JSON 4.0.0 Schema
 //
 // ================================================================================================
+
 object {
 
   // Headers to support versioning and version migration.
@@ -41,18 +38,27 @@ object {
   string schemaVersion     /^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,4}(_.*)?$/;
   string apiVersion        /^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,4}(_.*)?$/;
 
+
+  // The model object consists of mandatory username and an optional email attribute.
+  // Email is typically present but is an optional attribute in case it has been deemed not
+  // necessary for the system, or considered not appropriate to distribute as part of the
+  // network communication.
+  //
+  // NOTES:
+  //   - User model is restricted to minimal username and email only. This should make a
+  //     transition to a shared identity service easy.
+
   object {
 
-    // The model object consists of mandatory username and an optional email attribute.
-    // Email is typically present but is an optional attribute in case it has been deemed not
-    // necessary for the system, or considered not appropriate to distribute as part of the
-    // network communication.
-    //
+
     // The username has been defined as an arbitrary string with minimum length
     // of one and maximum of 255 characters. The user model implementation can enforce additional
     // username minimum length restrictions and content restrictions if necessary. The
     // upper length limit is typically restricted by the database schema in use.
-    //
+
+    string{1,255} username          /^.*$/;
+
+
     // The email attribute, if present, has been defined as an arbitrary string with minimum
     // length of six characters and maximum length of 255 characters with format that expects
     // emails to be in the form 'email@host.domain'. The user model implementation
@@ -60,7 +66,10 @@ object {
     // typically restricted by the database schema in use. If user's email is not included but
     // the email attribute is included within the JSON document, the email defaults to an empty
     // string.
-    //
+
+    string{6,255} email             /^.*@.*\..*$/ = "" ?;
+
+
     // An optional user attribute key,value pairs can be included with this object. The maximum
     // allowed key length for attributes is 255 characters and for attribute values is 999
     // charactes. These limitations are typically enforced by the backing database schema and
@@ -69,9 +78,7 @@ object {
     // should be omitted by the JSON format altogether.
     //
     // NOTES:
-    //   - User model is restricted to minimal username and email only. This should make a
-    //     transition to a shared identity service easy.
-    //   - Additional user attributes present in the current Beehive schema (legacy version 1)
+    //   - Additional user attributes present in the current Beehive schema
     //     are present and can be retrieved through userAttributes object
     //
     // Beehive legacy schema (version 1):
@@ -80,10 +87,8 @@ object {
     //     attribute is a String representation of Java 64-bit Long type containing the number
     //     of milliseconds since January 1, 1970, 00:00:00 GMT
 
-    string{1,255} username          /^.*$/;
-    string{6,255} email             /^.*@.*\..*$/ = "" ?;
-
     object { } * userAttributes?;
 
   } * model;
+
 } * ;

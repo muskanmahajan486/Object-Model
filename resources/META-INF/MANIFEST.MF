@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
-Created-By: OpenRemote, Inc.
+Created-By: Copyright (c) 2013-105 Juha Lindfors. All rights reserved.
 Name: openremote-object-model
-Specification-Title: OpenRemote Object Model
+Specification-Title: OpenRemote Object  Model
 Specification-Version: ${api.version}
-Specification-Vendor: OpenRemote, Inc.
+Specification-Vendor: Copyright (c) 2013-105 Juha Lindfors. All rights reserved.
 Implementation-Title: OpenRemote Object Model
 Implementation-Version: ${release.version}
-Implementation-Vendor: OpenRemote, Inc.
+Implementation-Vendor: Copyright (c) 2013-105 Juha Lindfors. All rights reserved.
