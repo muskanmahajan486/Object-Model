@@ -16,10 +16,11 @@
  */
 package org.openremote.model.data.json;
 
-import org.openremote.base.exception.IncorrectImplementationException;
+import java.util.Enumeration;
+import java.util.Map;
+
 import org.openremote.model.DeviceDiscovery;
 
-import java.util.Map;
 
 /**
  * A FlexJSON transformer for {@link DeviceDiscovery} implementation.
