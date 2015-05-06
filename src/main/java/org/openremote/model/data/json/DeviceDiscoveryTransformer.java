@@ -32,6 +32,38 @@ import java.util.Map;
 public class DeviceDiscoveryTransformer extends JSONTransformer<DeviceDiscovery>
 {
 
+
+  // Constants ------------------------------------------------------------------------------------
+
+  /**
+   * The JSON property name value used in device discovery JSON document for device names: {@value}
+   */
+  public static final String DEVICE_NAME_JSON_PROPERTY_NAME = "deviceName";
+
+  /**
+   * The JSON property name value used in device discovery JSON document for device protocol:
+   * {@value}
+   */
+  public static final String DEVICE_PROTOCOL_JSON_PROPERTY_NAME = "deviceProtocol";
+
+  /**
+   * The JSON property name value used in device discovery JSON document for device model: {@value}
+   */
+  public static final String DEVICE_MODEL_JSON_PROPERTY_NAME = "deviceModel";
+
+  /**
+   * The JSON property name value used in device discovery JSON document for device type: {@value}
+   */
+  public static final String DEVICE_TYPE_JSON_PROPERTY_NAME = "deviceType";
+
+  /**
+   * The JSON property name value used in device discovery JSON document for device attributes:
+   * {@value}
+   */
+  public static final String DEVICE_ATTRIBUTES_JSON_PROPERTY_NAME = "deviceAttributes";
+
+
+
   // Constructors ---------------------------------------------------------------------------------
 
   /**
@@ -77,11 +109,67 @@ public class DeviceDiscoveryTransformer extends JSONTransformer<DeviceDiscovery>
   }
 
 
-  @Override protected DeviceDiscovery deserialize(JSONModel model)
+  /**
+   * Recreates an {@link org.openremote.model.DeviceDiscovery} instance from a deserialized
+   * JSON model prototype.
+   *
+   * @see   JSONModel
+   *
+   * @param json
+   *          A JSON frame that represents the structures parsed from the JSON document
+   *          representing an user instance.
+   *
+   * @return  A corresponding Java DeviceDiscovery instance
+   *
+   * @throws  DeserializationException if deserialization fails
+   */
+  @Override protected DeviceDiscovery deserialize(JSONModel json) throws DeserializationException
   {
-    // TODO
+    try
+    {
+      ModelObject model = json.getModel();
 
-    throw new IncorrectImplementationException("Not Implemented.");
+      String deviceName = model.getAttribute(DEVICE_NAME_JSON_PROPERTY_NAME);
+      String deviceProtocol = model.getAttribute(DEVICE_PROTOCOL_JSON_PROPERTY_NAME);
+      String deviceModel = model.getAttribute(DEVICE_MODEL_JSON_PROPERTY_NAME);
+      String deviceType = model.getAttribute(DEVICE_TYPE_JSON_PROPERTY_NAME);
+
+      ModelObject attributes = model.getObject(DEVICE_ATTRIBUTES_JSON_PROPERTY_NAME);
+
+      DeviceDiscovery discovery = new DeviceDiscovery(
+
+          // TODO : add ctor that doesnt require attributes ref (null) when device type is included
+
+          deviceName, deviceProtocol, deviceModel, deviceType, null
+      );
+
+      if (attributes != null)
+      {
+        Enumeration<ModelObject.Attribute> enumeration = attributes.getAttributes();
+
+        while (enumeration.hasMoreElements())
+        {
+          ModelObject.Attribute attr = enumeration.nextElement();
+
+          // TODO : could validate specific attributes here...
+
+          discovery.addAttribute(attr.getName(), attr.getValue());
+        }
+      }
+
+      return discovery;
+    }
+
+    // TODO : convert DeviceDiscovery to throw validation exceptions instead of illegal arg exc.
+    // catch (Model.ValidationException exception)
+
+    catch (Throwable throwable)
+    {
+      throw new DeserializationException(
+          "Cannot create new DeviceDiscovery instance, received values are not valid : {0}",
+          throwable, throwable.getMessage()
+      );
+    }
   }
 
 
