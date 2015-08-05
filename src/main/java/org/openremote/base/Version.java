@@ -262,8 +262,12 @@ public class Version
 
     if (matcher.groupCount() == 4)
     {
-      String identifier = matcher.group(4).trim();
-      buildIdentifier = identifier.substring(1, identifier.length());
+      String identifier = matcher.group(4);
+      if (identifier != null)
+      {
+        identifier = identifier.trim();
+        buildIdentifier = identifier.substring(1, identifier.length());
+      }
     }
 
     try
