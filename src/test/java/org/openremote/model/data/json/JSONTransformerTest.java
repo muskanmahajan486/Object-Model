@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openremote.base.Version;
+import org.openremote.base.Defaults;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -107,7 +108,7 @@ public class JSONTransformerTest extends OpenRemoteTest
 
     MyModelTransformer mmt = new MyModelTransformer(deserializer);
 
-    ByteArrayInputStream bain = new ByteArrayInputStream(basicJSON.getBytes(DEFAULT_CHARSET));
+    ByteArrayInputStream bain = new ByteArrayInputStream(basicJSON.getBytes(Defaults.DEFAULT_CHARSET));
 
     mmt.read(new InputStreamReader(bain));
   }
@@ -142,7 +143,7 @@ public class JSONTransformerTest extends OpenRemoteTest
 
     MyModelTransformer mmt = new MyModelTransformer(deserializer);
 
-    ByteArrayInputStream bain = new ByteArrayInputStream(nestedJSON.getBytes(DEFAULT_CHARSET));
+    ByteArrayInputStream bain = new ByteArrayInputStream(nestedJSON.getBytes(Defaults.DEFAULT_CHARSET));
 
     mmt.read(new InputStreamReader(bain));
   }
@@ -172,7 +173,7 @@ public class JSONTransformerTest extends OpenRemoteTest
 
     MyModelTransformer mmt = new MyModelTransformer(deserializer);
 
-    ByteArrayInputStream bain = new ByteArrayInputStream(noSchemaJSON.getBytes(DEFAULT_CHARSET));
+    ByteArrayInputStream bain = new ByteArrayInputStream(noSchemaJSON.getBytes(Defaults.DEFAULT_CHARSET));
 
     mmt.read(new InputStreamReader(bain));
   }
@@ -189,7 +190,7 @@ public class JSONTransformerTest extends OpenRemoteTest
   {
     MyModelTransformer mmt = new MyModelTransformer();
 
-    ByteArrayInputStream bain = new ByteArrayInputStream(incorrectLibJSON.getBytes(DEFAULT_CHARSET));
+    ByteArrayInputStream bain = new ByteArrayInputStream(incorrectLibJSON.getBytes(Defaults.DEFAULT_CHARSET));
 
     mmt.read(new InputStreamReader(bain));
   }
