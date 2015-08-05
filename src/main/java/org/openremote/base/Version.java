@@ -316,6 +316,29 @@ public class Version
     return builder.toString();
   }
 
+  public int hashCode()
+  {
+    return this.majorVersion + this.minorVersion + this.bugfixVersion + this.buildIdentifier.hashCode();
+  }
+
+  public boolean equals(Object o)
+  {
+    if (o == null)
+    {
+      return false;
+    } else if (o.getClass() != this.getClass())
+    {
+      return false;
+    } else
+    {
+      Version v = (Version) o;
+      return v.majorVersion == this.majorVersion
+              && v.minorVersion == this.minorVersion
+              && v.bugfixVersion == this.bugfixVersion
+              && v.buildIdentifier.equals(this.buildIdentifier);
+    }
+  }
+
 
   // Protected Instance Methods -------------------------------------------------------------------
 
