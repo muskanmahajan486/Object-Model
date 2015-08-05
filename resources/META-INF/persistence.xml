@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Copyright 2013-2015, Juha Lindfors. All rights reserved.
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU Affero General Public License as
+  published by the Free Software Foundation; either version 3 of the
+  License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with this program; if not, see <http://www.gnu.org/licenses/>.
+-->
+
+
+<!--
+
+  TODO
+
+  Author: Juha Lindfors
+
+-->
+<persistence
+    xmlns = "http://java.sun.com/xml/ns/persistence"
+    xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation = "http://java.sun.com/xml/ns/persistence
+                          http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+    version="2.0">
+
+  <persistence-unit name = "H2">
+    <description>TODO</description>
+    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+    <mapping-file>Account.xml</mapping-file>
+    <mapping-file>User.xml</mapping-file>
+    <mapping-file>Controller.xml</mapping-file>
+
+    <class>org.openremote.model.persistence.jpa.RelationalAccount</class>
+    <class>org.openremote.model.persistence.jpa.RelationalUser</class>
+    <class>org.openremote.model.persistence.jpa.RelationalController</class>
+
+    <properties>
+      <property name = "javax.persistence.jdbc.driver" value = "org.h2.Driver"/>
+      <property name = "javax.persistence.jdbc.url" value = "jdbc:h2:~/Production"/>
+      <property name = "javax.persistence.jdbc.user" value = "sa"/>
+
+      <property name = "hibernate.connection.pool_size" value = "10"/>
+      <property name = "hibernate.cache.provider_class" value = "org.hibernate.cache.internal.NoCacheProvider"/>
+      <property name = "hibernate.dialect" value = "org.hibernate.dialect.H2Dialect"/>
+      <property name = "hibernate.hbm2ddl.auto" value = "create"/>
+      <property name = "hibernate.current_session_context_class" value = "managed"/>
+    </properties>
+
+  </persistence-unit>
+
+
+
+  <persistence-unit name = "H2-LegacyBeehive">
+    <description>TODO</description>
+    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+    <mapping-file>beehive/Account.xml</mapping-file>
+    <mapping-file>beehive/User.xml</mapping-file>
+    <mapping-file>beehive/Controller.xml</mapping-file>
+
+
+    <class>org.openremote.model.persistence.jpa.RelationalAccount</class>
+    <class>org.openremote.model.persistence.jpa.beehive.BeehiveUser</class>
+    <class>org.openremote.model.persistence.jpa.beehive.BeehiveController</class>
+
+    <!-- Not interested in other classes not explicitly declared here... -->
+
+    <exclude-unlisted-classes/>
+
+    <properties>
+      <property name = "javax.persistence.jdbc.driver" value = "org.h2.Driver"/>
+      <property name = "javax.persistence.jdbc.url" value = "jdbc:h2:tcp://localhost/~/LegacyBeehive"/>
+      <property name = "javax.persistence.jdbc.user" value = "sa"/>
+
+      <property name = "hibernate.connection.pool_size" value = "10"/>
+      <property name = "hibernate.cache.provider_class" value = "org.hibernate.cache.internal.NoCacheProvider"/>
+      <property name = "hibernate.dialect" value = "org.hibernate.dialect.H2Dialect"/>
+      <property name = "hibernate.hbm2ddl.auto" value = "create"/>
+      <property name = "hibernate.current_session_context_class" value = "managed"/>
+    </properties>
+
+  </persistence-unit>
+
+
+  <persistence-unit name = "MySQL">
+    <description>TODO</description>
+    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+    <mapping-file>Account.xml</mapping-file>
+    <mapping-file>User.xml</mapping-file>
+    <mapping-file>Controller.xml</mapping-file>
+
+    <class>org.openremote.model.persistence.jpa.RelationalAccount</class>
+    <class>org.openremote.model.persistence.jpa.RelationalUser</class>
+    <class>org.openremote.model.persistence.jpa.RelationalController</class>
+
+    <properties>
+      <property name = "javax.persistence.jdbc.driver" value = "com.mysql.jdbc.Driver"/>
+      <property name = "javax.persistence.jdbc.url" value = "jdbc:mysql://localhost:3306/acct_mgr_2_0_0?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF-8"/>
+
+      <property name = "hibernate.connection.pool_size" value = "10"/>
+      <property name = "hibernate.cache.provider_class" value = "org.hibernate.cache.internal.NoCacheProvider"/>
+      <property name = "hibernate.dialect" value = "org.hibernate.dialect.MySQLDialect"/>
+      <property name = "hibernate.hbm2ddl.auto" value = "create"/>
+      <property name = "hibernate.current_session_context_class" value = "managed"/>
+    </properties>
+
+  </persistence-unit>
+
+
+
+  <persistence-unit name = "MySQL-LegacyBeehive">
+    <description>TODO</description>
+    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+    <mapping-file>beehive/Account.xml</mapping-file>
+    <mapping-file>beehive/User.xml</mapping-file>
+    <mapping-file>beehive/Controller.xml</mapping-file>
+
+
+    <class>org.openremote.model.persistence.jpa.RelationalAccount</class>
+    <class>org.openremote.model.persistence.jpa.beehive.BeehiveUser</class>
+    <class>org.openremote.model.persistence.jpa.beehive.BeehiveController</class>
+
+    <!-- Not interested in other classes not explicitly declared here... -->
+
+    <exclude-unlisted-classes/>
+
+    <properties>
+      <property name = "javax.persistence.jdbc.driver" value = "com.mysql.jdbc.Driver"/>
+      <property name = "javax.persistence.jdbc.url" value = "jdbc:mysql://localhost:3306/beehive_3_0_0_alpha5?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF-8"/>
+
+      <property name = "hibernate.connection.pool_size" value = "10"/>
+      <property name = "hibernate.cache.provider_class" value = "org.hibernate.cache.internal.NoCacheProvider"/>
+      <property name = "hibernate.dialect" value = "org.hibernate.dialect.MySQLDialect"/>
+      <property name = "hibernate.current_session_context_class" value = "managed"/>
+    </properties>
+
+  </persistence-unit>
+
+</persistence>
