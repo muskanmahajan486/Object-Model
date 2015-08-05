@@ -27,6 +27,7 @@ import org.openremote.model.data.json.UserTransformer;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -65,7 +66,6 @@ public class User extends Model
    * {@link org.openremote.model.data.json.UserTransformer#getNameValidator()}
    */
   public static final Validator<String> DEFAULT_NAME_VALIDATOR = new NameValidator();
-
 
 
   // Class Members --------------------------------------------------------------------------------
@@ -142,15 +142,13 @@ public class User extends Model
   }
 
 
-
   // Instance Fields ------------------------------------------------------------------------------
 
   protected String username = "<undefined>";
 
   protected String email = "";
 
-
-
+  protected Set<Account> accounts = new CopyOnWriteArraySet<Account>();
 
   /**
    * A key,value map for storing an arbitrary number of data entries describing a user.
@@ -162,10 +160,14 @@ public class User extends Model
 
   // Constructors ---------------------------------------------------------------------------------
 
-  // TODO
   protected User()
   {
     super(new UserTransformer());
+    this.username = "<undefined>";
+    this.email = "";
+    this.accounts = new CopyOnWriteArraySet<Account>();
+    this.userAttributes = new ConcurrentHashMap<String, String>(0);
+    this.isNullEmail = false;
   }
 
 
@@ -305,6 +307,20 @@ public class User extends Model
     return this;
   }
 
+  public String getAttribute(String attributeName)
+  {
+    return (String) this.userAttributes.get(attributeName);
+  }
+
+  public boolean hasAttribute(String attributeName)
+  {
+    return this.userAttributes.containsKey(attributeName);
+  }
+
+  public String getName()
+  {
+    return this.username;
+  }
 
   // Serialization --------------------------------------------------------------------------------
 
@@ -428,6 +444,77 @@ public class User extends Model
     @Override public String toString()
     {
       return "Default Name Validator: must be non-null, non-empty string";
+    }
+  }
+
+  public static class Authentication
+  {
+    private transient byte[] credentials;
+    protected User.CredentialsEncoding encoding;
+    protected String salt = "";
+
+    protected Authentication()
+    {
+    }
+
+    protected Authentication(User.Authentication copy)
+    {
+      this.credentials = copy.credentials;
+      this.encoding = User.CredentialsEncoding.valueOf(copy.encoding.name());
+      this.salt = copy.salt;
+    }
+
+    public Authentication(byte[] credentials, User.CredentialsEncoding encoding)
+    {
+      this.credentials = credentials;
+      this.encoding = encoding;
+      this.salt = UUID.randomUUID().toString();
+    }
+
+    public void clear()
+    {
+      byte[] arr$ = this.credentials;
+      int len$ = arr$.length;
+
+      for (int i$ = 0; i$ < len$; ++i$)
+      {
+        byte var10000 = arr$[i$];
+        boolean b = false;
+      }
+
+    }
+
+    protected byte[] getCredentials()
+    {
+      return this.credentials;
+    }
+  }
+
+  public static enum CredentialsEncoding
+  {
+    SCRYPT,
+    LEGACY_BEEHIVE,
+    UNSPECIFIED;
+
+    public static final User.CredentialsEncoding DEFAULT;
+
+    private CredentialsEncoding()
+    {
+    }
+
+    public String toString()
+    {
+      return this.getEncodingName();
+    }
+
+    public String getEncodingName()
+    {
+      return this.name().toLowerCase();
+    }
+
+    static
+    {
+      DEFAULT = SCRYPT;
     }
   }
 
