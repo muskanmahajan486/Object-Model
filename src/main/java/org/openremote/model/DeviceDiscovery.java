@@ -24,6 +24,7 @@ import org.openremote.base.Version;
 import org.openremote.model.data.json.DeviceDiscoveryTransformer;
 import org.openremote.model.data.json.JSONHeader;
 
+import java.util.IllegalFormatCodePointException;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -63,6 +64,11 @@ public class DeviceDiscovery extends Model
 
 
   // Protected Instance Fields --------------------------------------------------------------------
+
+  /**
+   * A mandatory, unique and persistent (valid throughout the life of the object) opaque identifier.
+   */
+  protected String deviceIdentifier;
 
   /**
    * A mandatory device name string. In most cases this should be a human-readable name
@@ -113,6 +119,7 @@ public class DeviceDiscovery extends Model
   {
     super(copy.jsonTransformer);
 
+    this.deviceIdentifier = copy.deviceIdentifier;
     this.model = copy.model;
     this.deviceName = copy.deviceName;
     this.protocol = copy.protocol;
@@ -128,6 +135,9 @@ public class DeviceDiscovery extends Model
    * Constructs a new device discovery data structure with a given device name, protocol and
    * model.
    *
+   * @param deviceIdentifier
+   *            A unique device identifier
+   *
    * @param deviceName
    *            A descriptive device name
    *
@@ -139,9 +149,14 @@ public class DeviceDiscovery extends Model
    * @param model
    *            A device model identifier
    */
-  public DeviceDiscovery(String deviceName, String deviceProtocol, String model)
+  public DeviceDiscovery(String deviceIdentifier, String deviceName, String deviceProtocol, String model)
   {
     super(new DeviceDiscoveryTransformer());
+
+    if (deviceIdentifier == null || deviceIdentifier.equals(""))
+    {
+      throw new IllegalArgumentException("Device identifier cannot be null or empty string.");
+    }
 
     if (deviceName == null || deviceName.equals(""))
     {
@@ -158,9 +173,18 @@ public class DeviceDiscovery extends Model
       model = "";
     }
 
+    deviceIdentifier = deviceIdentifier.trim();
     deviceName = deviceName.trim();
     deviceProtocol = deviceProtocol.trim();
     model = model.trim();
+
+    if (deviceIdentifier.length() > DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT)
+    {
+      throw new ConstraintException(
+              "Device identifier can be at most {0} characters long, identifier ''{1}'' is {2} characters long.",
+              DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT, deviceIdentifier, deviceIdentifier.length()
+      );
+    }
 
     if (deviceName.length() > DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT)
     {
@@ -188,6 +212,7 @@ public class DeviceDiscovery extends Model
       );
     }
 
+    this.deviceIdentifier = deviceIdentifier;
     this.deviceName = deviceName;
     this.protocol = deviceProtocol;
     this.model = model;
@@ -197,6 +222,9 @@ public class DeviceDiscovery extends Model
   /**
    * Constructs a new device discovery data structure with a given device name, protocol,
    * model and device attributes.
+   *
+   * @param deviceIdentifier
+   *            A unique device identifier
    *
    * @param deviceName
    *            A descriptive device name
@@ -212,10 +240,10 @@ public class DeviceDiscovery extends Model
    * @param attributes
    *            Device attributes which are copied to this instance.
    */
-  public DeviceDiscovery(String deviceName, String deviceProtocol, String model,
+  public DeviceDiscovery(String deviceIdentifier, String deviceName, String deviceProtocol, String model,
                          Map<String, String> attributes)
   {
-    this(deviceName, deviceProtocol, model);
+    this(deviceIdentifier, deviceName, deviceProtocol, model);
 
     // TODO :
     //
@@ -246,6 +274,9 @@ public class DeviceDiscovery extends Model
    * Constructs a new device discovery data structure with a given device name, protocol,
    * model, type and device attributes.
    *
+   * @param deviceIdentifier
+   *            A unique device identifier
+   *
    * @param deviceName
    *            A descriptive device name
    *
@@ -271,7 +302,7 @@ public class DeviceDiscovery extends Model
    *            in {@link #DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT}, or if any of the key
    *            or value strings in attribute map exceed their length constraints
    */
-  public DeviceDiscovery(String deviceName, String deviceProtocol, String model,
+  public DeviceDiscovery(String deviceIdentifier, String deviceName, String deviceProtocol, String model,
                          String type, Map<String, String> attributes)
   {
     // TODO :
@@ -281,7 +312,7 @@ public class DeviceDiscovery extends Model
     //   the addAttribute() call may behave more consistently. So should probably remove
     //   this constructor altogether and replace with one that only takes the additional type.
 
-    this(deviceName, deviceProtocol, model, attributes);
+    this(deviceIdentifier, deviceName, deviceProtocol, model, attributes);
 
     type = (type == null)
           ? ""

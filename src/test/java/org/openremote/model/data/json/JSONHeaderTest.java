@@ -62,12 +62,13 @@ public class JSONHeaderTest
   @Test public void testToJSONDeviceDiscovery()
   {
     String json = JSONHeader.toJSON(
-        new DeviceDiscovery("mydevice", "myprotocol", "mymodel"),
+        new DeviceDiscovery("identifier", "mydevice", "myprotocol", "mymodel"),
         DeviceDiscovery.JSON_SCHEMA_VERSION, new DeviceDiscoveryTransformer()
     );
 
     assertDefaultHeaders(json, DeviceDiscovery.JSON_SCHEMA_VERSION, DeviceDiscovery.class);
 
+    Assert.assertTrue(json.contains("\"identifier\""), json);
     Assert.assertTrue(json.contains("\"mydevice\""), json);
     Assert.assertTrue(json.contains("\"myprotocol\""), json);
     Assert.assertTrue(json.contains("\"mymodel\""), json);

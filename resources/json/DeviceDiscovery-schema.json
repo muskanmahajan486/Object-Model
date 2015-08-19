@@ -26,6 +26,12 @@
           "maxLength": 255,
           "pattern": "^.*$"
         },
+        "deviceIdentifier": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "^.*$"
+        },
         "deviceProtocol": {
           "type": "string",
           "minLength": 1,

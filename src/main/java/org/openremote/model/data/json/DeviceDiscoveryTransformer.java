@@ -41,6 +41,11 @@ public class DeviceDiscoveryTransformer extends JSONTransformer<DeviceDiscovery>
   // Constants ------------------------------------------------------------------------------------
 
   /**
+   * The JSON property name value used in device discovery JSON document for device identifier: {@value}
+   */
+  public static  final String DEVICE_IDENTIFIER_JSON_PROPERTY_NAME = "deviceIdentifier";
+
+  /**
    * The JSON property name value used in device discovery JSON document for device names: {@value}
    */
   public static final String DEVICE_NAME_JSON_PROPERTY_NAME = "deviceName";
@@ -96,6 +101,7 @@ public class DeviceDiscoveryTransformer extends JSONTransformer<DeviceDiscovery>
 
     startObject();
 
+    writeProperty(DEVICE_IDENTIFIER_JSON_PROPERTY_NAME, data.deviceIdentifier);
     writeProperty("deviceName", data.deviceName);
     writeProperty("deviceProtocol", data.deviceProtocol);
     writeProperty("deviceModel", data.model);
@@ -134,6 +140,7 @@ public class DeviceDiscoveryTransformer extends JSONTransformer<DeviceDiscovery>
     {
       ModelObject model = json.getModel();
 
+      String deviceIdentifier = model.getAttribute(DEVICE_IDENTIFIER_JSON_PROPERTY_NAME);
       String deviceName = model.getAttribute(DEVICE_NAME_JSON_PROPERTY_NAME);
       String deviceProtocol = model.getAttribute(DEVICE_PROTOCOL_JSON_PROPERTY_NAME);
       String deviceModel = model.getAttribute(DEVICE_MODEL_JSON_PROPERTY_NAME);
@@ -145,7 +152,7 @@ public class DeviceDiscoveryTransformer extends JSONTransformer<DeviceDiscovery>
 
           // TODO : add ctor that doesnt require attributes ref (null) when device type is included
 
-          deviceName, deviceProtocol, deviceModel, deviceType, null
+          deviceIdentifier, deviceName, deviceProtocol, deviceModel, deviceType, null
       );
 
       if (attributes != null)
@@ -189,6 +196,7 @@ public class DeviceDiscoveryTransformer extends JSONTransformer<DeviceDiscovery>
    */
   private static class DeviceDiscoveryData extends DeviceDiscovery
   {
+    private String deviceIdentifier = super.deviceIdentifier;
     private String deviceName = super.deviceName;
     private String deviceProtocol = super.protocol;
     private String model = super.model;

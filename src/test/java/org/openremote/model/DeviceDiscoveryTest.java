@@ -54,8 +54,9 @@ public class DeviceDiscoveryTest
    */
   @Test public void testBasicConstructor()
   {
-    DeviceDiscovery dd = new DeviceDiscovery("name", "protocol", "model");
+    DeviceDiscovery dd = new DeviceDiscovery("identifier", "name", "protocol", "model");
 
+    Assert.assertTrue(dd.deviceIdentifier.equals("identifier"));
     Assert.assertTrue(dd.deviceName.equals("name"));
     Assert.assertTrue(dd.protocol.equals("protocol"));
     Assert.assertTrue(dd.model.equals("model"));
@@ -65,39 +66,57 @@ public class DeviceDiscoveryTest
   }
 
   /**
-   * Null arg test on base constructor.
+   * Null arg test (identifier) on base constructor.
    */
   @Test(expectedExceptions = IllegalArgumentException.class)
-  public void testBasicConstructorNullArg()
+  public void testBasicConstructorNullIdentifierArg()
   {
-    new DeviceDiscovery(null, "protocol", "model");
+    new DeviceDiscovery(null, "device", "protocol", "model");
+  }
+
+  /**
+   * Null arg test (device name) on base constructor.
+   */
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void testBasicConstructorNullNameArg()
+  {
+    new DeviceDiscovery("idenfitier", null, "protocol", "model");
   }
 
   /**
    * Null arg test (protocol string) on base constructor.
    */
   @Test(expectedExceptions = IllegalArgumentException.class)
-  public void testBasicConstructorNullArg2()
+  public void testBasicConstructorNullProtocolArg()
   {
-    new DeviceDiscovery("name", null, "model");
+    new DeviceDiscovery("identifier", "name", null, "model");
   }
 
   /**
-   * Empty string arg test on base constructor.
+   * Empty string arg test (identifier) on base constructor.
    */
   @Test(expectedExceptions = IllegalArgumentException.class)
-  public void testBasicConstructorEmptyArg()
+  public void testBasicConstructorEmptyIdentifierArg()
   {
-    new DeviceDiscovery("", "protocol", "model");
+    new DeviceDiscovery("", "name", "protocol", "model");
+  }
+
+  /**
+   * Empty string arg test (device name) on base constructor.
+   */
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void testBasicConstructorEmptyNameArg()
+  {
+    new DeviceDiscovery("identifier", "", "protocol", "model");
   }
 
   /**
    * Empty string arg test (protocol string) on base constructor.
    */
   @Test(expectedExceptions = IllegalArgumentException.class)
-  public void testBasicConstructorEmptyArg2()
+  public void testBasicConstructorEmptyProtocolArg()
   {
-    new DeviceDiscovery("name", "", "model");
+    new DeviceDiscovery("identifier", "name", "", "model");
   }
 
 
@@ -106,8 +125,9 @@ public class DeviceDiscoveryTest
    */
   @Test public void testBasicConstructorNullModel()
   {
-    DeviceDiscovery dd = new DeviceDiscovery("name", "protocol", null);
+    DeviceDiscovery dd = new DeviceDiscovery("identifier", "name", "protocol", null);
 
+    Assert.assertTrue(dd.deviceIdentifier.equals("identifier"));
     Assert.assertTrue(dd.deviceName.equals("name"));
     Assert.assertTrue(dd.protocol.equals("protocol"));
     Assert.assertTrue(dd.model.equals(""));
@@ -130,24 +150,34 @@ public class DeviceDiscoveryTest
 
     // Test limit values...
 
-    DeviceDiscovery dd = new DeviceDiscovery(builder.toString(), "protocol", "model");
+    DeviceDiscovery dd = new DeviceDiscovery(builder.toString(), "name", "protocol", "model");
 
+    Assert.assertTrue(dd.deviceIdentifier.equals(builder.toString()));
+    Assert.assertTrue(dd.deviceName.equals("name"));
+    Assert.assertTrue(dd.protocol.equals("protocol"));
+    Assert.assertTrue(dd.model.equals("model"));
+    Assert.assertTrue(dd.type.equals(""));
+
+    dd = new DeviceDiscovery("identifier", builder.toString(), "protocol", "model");
+
+    Assert.assertTrue(dd.deviceIdentifier.equals("identifier"));
     Assert.assertTrue(dd.deviceName.equals(builder.toString()));
     Assert.assertTrue(dd.protocol.equals("protocol"));
     Assert.assertTrue(dd.model.equals("model"));
     Assert.assertTrue(dd.type.equals(""));
 
+    dd = new DeviceDiscovery("identifier", "name", builder.toString(), "model");
 
-    dd = new DeviceDiscovery("name", builder.toString(), "model");
-
+    Assert.assertTrue(dd.deviceIdentifier.equals("identifier"));
     Assert.assertTrue(dd.deviceName.equals("name"));
     Assert.assertTrue(dd.protocol.equals(builder.toString()));
     Assert.assertTrue(dd.model.equals("model"));
     Assert.assertTrue(dd.type.equals(""));
 
 
-    dd = new DeviceDiscovery("name", "protocol", builder.toString());
+    dd = new DeviceDiscovery("identifier", "name", "protocol", builder.toString());
 
+    Assert.assertTrue(dd.deviceIdentifier.equals("identifier"));
     Assert.assertTrue(dd.deviceName.equals("name"));
     Assert.assertTrue(dd.protocol.equals("protocol"));
     Assert.assertTrue(dd.model.equals(builder.toString()));
@@ -160,7 +190,7 @@ public class DeviceDiscoveryTest
 
     try
     {
-      new DeviceDiscovery(builder.toString(), "b", "c");
+      new DeviceDiscovery(builder.toString(), "name", "protocol", "model");
 
       Assert.fail("should not get here...");
     }
@@ -172,7 +202,7 @@ public class DeviceDiscoveryTest
 
     try
     {
-      new DeviceDiscovery(builder.toString(), "b", "c");
+      new DeviceDiscovery("identifier", builder.toString(), "protocol", "model");
 
       Assert.fail("should not get here...");
     }
@@ -184,7 +214,7 @@ public class DeviceDiscoveryTest
 
     try
     {
-      new DeviceDiscovery("a", builder.toString(), "c");
+      new DeviceDiscovery("identifier", "name", builder.toString(), "model");
 
       Assert.fail("should not get here...");
     }
@@ -196,7 +226,7 @@ public class DeviceDiscoveryTest
 
     try
     {
-      new DeviceDiscovery("a", "b", builder.toString());
+      new DeviceDiscovery("identifier", "name", "protocol", builder.toString());
 
       Assert.fail("should not get here...");
     }
@@ -220,8 +250,9 @@ public class DeviceDiscoveryTest
     attrs.put("2", "two");
     attrs.put("3", "three");
 
-    DeviceDiscovery dd = new DeviceDiscovery("name", "protocol", null, attrs);
+    DeviceDiscovery dd = new DeviceDiscovery("identifier", "name", "protocol", null, attrs);
 
+    Assert.assertTrue(dd.deviceIdentifier.equals("identifier"));
     Assert.assertTrue(dd.deviceName.equals("name"));
     Assert.assertTrue(dd.protocol.equals("protocol"));
     Assert.assertTrue(dd.model.equals(""));
@@ -243,8 +274,9 @@ public class DeviceDiscoveryTest
    */
   @Test public void testAttributeConstructorNullArg()
   {
-    DeviceDiscovery dd = new DeviceDiscovery("name", "protocol", null, null);
+    DeviceDiscovery dd = new DeviceDiscovery("identifier", "name", "protocol", null, null);
 
+    Assert.assertTrue(dd.deviceIdentifier.equals("identifier"));
     Assert.assertTrue(dd.deviceName.equals("name"));
     Assert.assertTrue(dd.protocol.equals("protocol"));
     Assert.assertTrue(dd.model.equals(""));
@@ -269,24 +301,36 @@ public class DeviceDiscoveryTest
 
     // Test limit values...
 
-    DeviceDiscovery dd = new DeviceDiscovery(builder.toString(), "protocol", "model", null);
+    DeviceDiscovery dd = new DeviceDiscovery(builder.toString(), "name", "protocol", "model", null);
 
+    Assert.assertTrue(dd.deviceIdentifier.equals(builder.toString()));
+    Assert.assertTrue(dd.deviceName.equals("name"));
+    Assert.assertTrue(dd.protocol.equals("protocol"));
+    Assert.assertTrue(dd.model.equals("model"));
+    Assert.assertTrue(dd.type.equals(""));
+
+
+    dd = new DeviceDiscovery("identifier", builder.toString(), "protocol", "model", null);
+
+    Assert.assertTrue(dd.deviceIdentifier.equals("identifier"));
     Assert.assertTrue(dd.deviceName.equals(builder.toString()));
     Assert.assertTrue(dd.protocol.equals("protocol"));
     Assert.assertTrue(dd.model.equals("model"));
     Assert.assertTrue(dd.type.equals(""));
 
 
-    dd = new DeviceDiscovery("name", builder.toString(), "model", null);
+    dd = new DeviceDiscovery("identifier", "name", builder.toString(), "model", null);
 
+    Assert.assertTrue(dd.deviceIdentifier.equals("identifier"));
     Assert.assertTrue(dd.deviceName.equals("name"));
     Assert.assertTrue(dd.protocol.equals(builder.toString()));
     Assert.assertTrue(dd.model.equals("model"));
     Assert.assertTrue(dd.type.equals(""));
 
 
-    dd = new DeviceDiscovery("name", "protocol", builder.toString(), null);
+    dd = new DeviceDiscovery("identifier", "name", "protocol", builder.toString(), null);
 
+    Assert.assertTrue(dd.deviceIdentifier.equals("identifier"));
     Assert.assertTrue(dd.deviceName.equals("name"));
     Assert.assertTrue(dd.protocol.equals("protocol"));
     Assert.assertTrue(dd.model.equals(builder.toString()));
@@ -299,7 +343,7 @@ public class DeviceDiscoveryTest
 
     try
     {
-      new DeviceDiscovery(builder.toString(), "b", "c", null);
+      new DeviceDiscovery(builder.toString(), "name", "protocol", "model", null);
 
       Assert.fail("should not get here...");
     }
@@ -311,7 +355,7 @@ public class DeviceDiscoveryTest
 
     try
     {
-      new DeviceDiscovery(builder.toString(), "b", "c", null);
+      new DeviceDiscovery("identifier", builder.toString(), "protocol", "model", null);
 
       Assert.fail("should not get here...");
     }
@@ -323,7 +367,7 @@ public class DeviceDiscoveryTest
 
     try
     {
-      new DeviceDiscovery("a", builder.toString(), "c", null);
+      new DeviceDiscovery("identifier", builder.toString(), "protocol", "model", null);
 
       Assert.fail("should not get here...");
     }
@@ -335,7 +379,19 @@ public class DeviceDiscoveryTest
 
     try
     {
-      new DeviceDiscovery("a", "b", builder.toString(), null);
+      new DeviceDiscovery("identifier", "name", builder.toString(), "model", null);
+
+      Assert.fail("should not get here...");
+    }
+
+    catch (ConstraintException e)
+    {
+      // expected...
+    }
+
+    try
+    {
+      new DeviceDiscovery("identifier", "name", "protocol", builder.toString(), null);
 
       Assert.fail("should not get here...");
     }
@@ -354,8 +410,9 @@ public class DeviceDiscoveryTest
    */
   @Test public void testTypeConstructor()
   {
-    DeviceDiscovery dd = new DeviceDiscovery("name", "protocol", "model", "type", null);
+    DeviceDiscovery dd = new DeviceDiscovery("identifier", "name", "protocol", "model", "type", null);
 
+    Assert.assertTrue(dd.deviceIdentifier.equals("identifier"));
     Assert.assertTrue(dd.deviceName.equals("name"));
     Assert.assertTrue(dd.protocol.equals("protocol"));
     Assert.assertTrue(dd.model.equals("model"));
@@ -369,8 +426,9 @@ public class DeviceDiscoveryTest
    */
   @Test public void testTypeConstructorNullArg()
   {
-    DeviceDiscovery dd = new DeviceDiscovery("name", "protocol", "model", null, null);
+    DeviceDiscovery dd = new DeviceDiscovery("identifier", "name", "protocol", "model", null, null);
 
+    Assert.assertTrue(dd.deviceIdentifier.equals("identifier"));
     Assert.assertTrue(dd.deviceName.equals("name"));
     Assert.assertTrue(dd.protocol.equals("protocol"));
     Assert.assertTrue(dd.model.equals("model"));
@@ -393,8 +451,9 @@ public class DeviceDiscoveryTest
       builder.append('a');
     }
 
-    DeviceDiscovery dd = new DeviceDiscovery("name", "protocol", "model", builder.toString(), null);
+    DeviceDiscovery dd = new DeviceDiscovery("identifier", "name", "protocol", "model", builder.toString(), null);
 
+    Assert.assertTrue(dd.deviceIdentifier.equals("identifier"));
     Assert.assertTrue(dd.deviceName.equals("name"));
     Assert.assertTrue(dd.protocol.equals("protocol"));
     Assert.assertTrue(dd.model.equals("model"));
@@ -407,7 +466,7 @@ public class DeviceDiscoveryTest
 
     try
     {
-      new DeviceDiscovery("a", "b", "c", builder.toString(), null);
+      new DeviceDiscovery("identifier", "a", "b", "c", builder.toString(), null);
 
       Assert.fail("should not get here...");
     }
@@ -433,24 +492,36 @@ public class DeviceDiscoveryTest
 
     // Test limit values...
 
-    DeviceDiscovery dd = new DeviceDiscovery(builder.toString(), "protocol", "model", "type", null);
+    DeviceDiscovery dd = new DeviceDiscovery(builder.toString(), "name", "protocol", "model", "type", null);
 
+    Assert.assertTrue(dd.deviceIdentifier.equals(builder.toString()));
+    Assert.assertTrue(dd.deviceName.equals("name"));
+    Assert.assertTrue(dd.protocol.equals("protocol"));
+    Assert.assertTrue(dd.model.equals("model"));
+    Assert.assertTrue(dd.type.equals("type"));
+
+
+    dd = new DeviceDiscovery("identifier", builder.toString(), "protocol", "model", "type", null);
+
+    Assert.assertTrue(dd.deviceIdentifier.equals("identifier"));
     Assert.assertTrue(dd.deviceName.equals(builder.toString()));
     Assert.assertTrue(dd.protocol.equals("protocol"));
     Assert.assertTrue(dd.model.equals("model"));
     Assert.assertTrue(dd.type.equals("type"));
 
 
-    dd = new DeviceDiscovery("name", builder.toString(), "model", "type", null);
+    dd = new DeviceDiscovery("identifier", "name", builder.toString(), "model", "type", null);
 
+    Assert.assertTrue(dd.deviceIdentifier.equals("identifier"));
     Assert.assertTrue(dd.deviceName.equals("name"));
     Assert.assertTrue(dd.protocol.equals(builder.toString()));
     Assert.assertTrue(dd.model.equals("model"));
     Assert.assertTrue(dd.type.equals("type"));
 
 
-    dd = new DeviceDiscovery("name", "protocol", builder.toString(), "type", null);
+    dd = new DeviceDiscovery("identifier", "name", "protocol", builder.toString(), "type", null);
 
+    Assert.assertTrue(dd.deviceIdentifier.equals("identifier"));
     Assert.assertTrue(dd.deviceName.equals("name"));
     Assert.assertTrue(dd.protocol.equals("protocol"));
     Assert.assertTrue(dd.model.equals(builder.toString()));
@@ -463,7 +534,7 @@ public class DeviceDiscoveryTest
 
     try
     {
-      new DeviceDiscovery(builder.toString(), "b", "c", "d", null);
+      new DeviceDiscovery(builder.toString(), "name", "protocol", "model", "type", null);
 
       Assert.fail("should not get here...");
     }
@@ -475,7 +546,7 @@ public class DeviceDiscoveryTest
 
     try
     {
-      new DeviceDiscovery(builder.toString(), "b", "c", "d", null);
+      new DeviceDiscovery("identifier", builder.toString(), "protocol", "model", "type", null);
 
       Assert.fail("should not get here...");
     }
@@ -487,7 +558,7 @@ public class DeviceDiscoveryTest
 
     try
     {
-      new DeviceDiscovery("a", builder.toString(), "c", "d", null);
+      new DeviceDiscovery("identifier", builder.toString(), "b", "c", "d", null);
 
       Assert.fail("should not get here...");
     }
@@ -499,7 +570,19 @@ public class DeviceDiscoveryTest
 
     try
     {
-      new DeviceDiscovery("a", "b", builder.toString(), "d", null);
+      new DeviceDiscovery("identifier", "a", builder.toString(), "c", "d", null);
+
+      Assert.fail("should not get here...");
+    }
+
+    catch (ConstraintException e)
+    {
+      // expected...
+    }
+
+    try
+    {
+      new DeviceDiscovery("identifier", "a", "b", builder.toString(), "d", null);
 
       Assert.fail("should not get here...");
     }
@@ -518,10 +601,11 @@ public class DeviceDiscoveryTest
    */
   @Test public void testCopyConstructor()
   {
-    DeviceDiscovery dd = new DeviceDiscovery("name", "protocol", "model");
+    DeviceDiscovery dd = new DeviceDiscovery("identifier", "name", "protocol", "model");
 
     DeviceDiscovery copy = new DeviceDiscovery(dd);
 
+    Assert.assertTrue(copy.deviceIdentifier.equals("identifier"));
     Assert.assertTrue(copy.deviceName.equals("name"));
     Assert.assertTrue(copy.protocol.equals("protocol"));
     Assert.assertTrue(copy.model.equals("model"));
@@ -535,10 +619,11 @@ public class DeviceDiscoveryTest
    */
   @Test public void testCopyConstructorType()
   {
-    DeviceDiscovery dd = new DeviceDiscovery("name", "protocol", "model", "type", null);
+    DeviceDiscovery dd = new DeviceDiscovery("identifier", "name", "protocol", "model", "type", null);
 
     DeviceDiscovery copy = new DeviceDiscovery(dd);
 
+    Assert.assertTrue(copy.deviceIdentifier.equals("identifier"));
     Assert.assertTrue(copy.deviceName.equals("name"));
     Assert.assertTrue(copy.protocol.equals("protocol"));
     Assert.assertTrue(copy.model.equals("model"));
@@ -557,10 +642,11 @@ public class DeviceDiscoveryTest
     attributes.put("2", "two");
     attributes.put("3", "three");
 
-    DeviceDiscovery dd = new DeviceDiscovery("name", "protocol", "model", "type", attributes);
+    DeviceDiscovery dd = new DeviceDiscovery("identifier", "name", "protocol", "model", "type", attributes);
 
     DeviceDiscovery copy = new DeviceDiscovery(dd);
 
+    Assert.assertTrue(copy.deviceIdentifier.equals("identifier"));
     Assert.assertTrue(copy.deviceName.equals("name"));
     Assert.assertTrue(copy.protocol.equals("protocol"));
     Assert.assertTrue(copy.model.equals("model"));
@@ -584,7 +670,7 @@ public class DeviceDiscoveryTest
    */
   @Test public void testCopyConstructorConcurrency() throws Exception
   {
-    final DeviceDiscovery disco = new DeviceDiscovery("name", "protocol", "model");
+    final DeviceDiscovery disco = new DeviceDiscovery("identifier", "name", "protocol", "model");
     disco.addAttribute("foo", "bar");
     disco.addAttribute("acme", "ecma");
 
@@ -621,7 +707,7 @@ public class DeviceDiscoveryTest
    */
   @Test public void testToJSONString()
   {
-    DeviceDiscovery dd = new DeviceDiscovery("name", "protocol", "mark1");
+    DeviceDiscovery dd = new DeviceDiscovery("identifier", "name", "protocol", "mark1");
 
     String json = dd.toJSONString();
 
@@ -641,6 +727,8 @@ public class DeviceDiscoveryTest
 
     Assert.assertTrue(json.contains("\"model\""));
 
+    Assert.assertTrue(json.contains("\"deviceIdentifier\""));
+    Assert.assertTrue(json.contains("\"identifier\""));
     Assert.assertTrue(json.contains("\"deviceName\""));
     Assert.assertTrue(json.contains("\"name\""));
     Assert.assertTrue(json.contains("\"deviceProtocol\""));
@@ -657,7 +745,7 @@ public class DeviceDiscoveryTest
    */
   @Test public void testToJSONStringWithType()
   {
-    DeviceDiscovery dd = new DeviceDiscovery("name", "protocol", "mark1", "type", null);
+    DeviceDiscovery dd = new DeviceDiscovery("identifier", "name", "protocol", "mark1", "type", null);
 
     String json = dd.toJSONString();
 
@@ -675,6 +763,8 @@ public class DeviceDiscoveryTest
 
     Assert.assertTrue(json.contains("\"model\""));
 
+    Assert.assertTrue(json.contains("\"deviceIdentifier\""));
+    Assert.assertTrue(json.contains("\"identifier\""));
     Assert.assertTrue(json.contains("\"deviceName\""));
     Assert.assertTrue(json.contains("\"name\""));
     Assert.assertTrue(json.contains("\"deviceProtocol\""));
@@ -692,7 +782,7 @@ public class DeviceDiscoveryTest
    */
   @Test public void testToJSONStringWithAttributes()
   {
-    DeviceDiscovery dd = new DeviceDiscovery("name", "protocol", "mark1", null, null);
+    DeviceDiscovery dd = new DeviceDiscovery("identifier", "name", "protocol", "mark1", null, null);
     dd.addAttribute("foo", "bar");
     dd.addAttribute("acme", "ecma");
 
@@ -712,6 +802,8 @@ public class DeviceDiscoveryTest
 
     Assert.assertTrue(json.contains("\"model\""));
 
+    Assert.assertTrue(json.contains("\"deviceIdentifier\""));
+    Assert.assertTrue(json.contains("\"identifier\""));
     Assert.assertTrue(json.contains("\"deviceName\""));
     Assert.assertTrue(json.contains("\"name\""));
     Assert.assertTrue(json.contains("\"deviceProtocol\""));
@@ -734,7 +826,7 @@ public class DeviceDiscoveryTest
   @Test public void testToJSONStringWithEmptyAttributes()
   {
     DeviceDiscovery dd = new DeviceDiscovery(
-        "name", "protocol", "mark1", null, new HashMap<String, String>()
+        "identifier", "name", "protocol", "mark1", null, new HashMap<String, String>()
     );
 
     String json = dd.toJSONString();
@@ -753,6 +845,8 @@ public class DeviceDiscoveryTest
 
     Assert.assertTrue(json.contains("\"model\""));
 
+    Assert.assertTrue(json.contains("\"deviceIdentifier\""));
+    Assert.assertTrue(json.contains("\"identifier\""));
     Assert.assertTrue(json.contains("\"deviceName\""));
     Assert.assertTrue(json.contains("\"name\""));
     Assert.assertTrue(json.contains("\"deviceProtocol\""));
@@ -769,7 +863,7 @@ public class DeviceDiscoveryTest
    */
   @Test public void testToJSONStringWithUnicode()
   {
-    DeviceDiscovery dd = new DeviceDiscovery("äöüåß", "巨人", "mark1");
+    DeviceDiscovery dd = new DeviceDiscovery("éèç", "äöüåß", "巨人", "mark1");
 
     String json = dd.toJSONString();
 
@@ -787,6 +881,8 @@ public class DeviceDiscoveryTest
 
     Assert.assertTrue(json.contains("\"model\""));
 
+    Assert.assertTrue(json.contains("\"deviceIdentifier\""));
+    Assert.assertTrue(json.contains("\"éèç\""));
     Assert.assertTrue(json.contains("\"deviceName\""));
     Assert.assertTrue(json.contains("\"äöüåß\""));
     Assert.assertTrue(json.contains("\"deviceProtocol\""));
@@ -806,10 +902,12 @@ public class DeviceDiscoveryTest
    */
   @Test public void testToJSONStringEscaping()
   {
-    DeviceDiscovery dd = new DeviceDiscovery("a\"a", "<a&b>", "foo\nbar");
+    DeviceDiscovery dd = new DeviceDiscovery("identifier", "a\"a", "<a&b>", "foo\nbar");
 
     String json = dd.toJSONString();
 
+    Assert.assertTrue(json.contains("\"deviceIdentifier\""));
+    Assert.assertTrue(json.contains("\"identifier\""));
     Assert.assertTrue(json.contains("\"deviceName\""));
     Assert.assertTrue(json.contains("\"a\\u0022a\""), json);
     Assert.assertTrue(json.contains("\"deviceProtocol\""));
@@ -823,11 +921,13 @@ public class DeviceDiscoveryTest
    */
   @Test public void testToJSONStringValueTrimming()
   {
-    DeviceDiscovery dd = new DeviceDiscovery("\t\taa\n", " ab ", "foo\n", "\nacme\n", null);
+    DeviceDiscovery dd = new DeviceDiscovery("  identifier \t", "\t\taa\n", " ab ", "foo\n", "\nacme\n", null);
     dd.addAttribute("\t\tnana", "\n\nnono\n\n");
 
     String json = dd.toJSONString();
 
+    Assert.assertTrue(json.contains("\"deviceIdentifier\""));
+    Assert.assertTrue(json.contains("\"identifier\""));
     Assert.assertTrue(json.contains("\"deviceName\""));
     Assert.assertTrue(json.contains("\"aa\""), json);
     Assert.assertTrue(json.contains("\"deviceProtocol\""));
@@ -849,7 +949,7 @@ public class DeviceDiscoveryTest
     Map<String, String> attributes = new HashMap<String, String>();
     attributes.put("koko", "momo");
 
-    DeviceDiscovery dd = new DeviceDiscovery("name", "protocol", "model", null, attributes);
+    DeviceDiscovery dd = new DeviceDiscovery("identifier", "name", "protocol", "model", null, attributes);
 
     String json = dd.toJSONString();
 
@@ -872,7 +972,7 @@ public class DeviceDiscoveryTest
     Map<String, String> attributes = new HashMap<String, String>();
     attributes.put("\t\tkoko\r", "momo\n");
 
-    DeviceDiscovery dd = new DeviceDiscovery("name", "protocol", "model", null, attributes);
+    DeviceDiscovery dd = new DeviceDiscovery("identifier", "name", "protocol", "model", null, attributes);
 
     String json = dd.toJSONString();
 
@@ -898,7 +998,7 @@ public class DeviceDiscoveryTest
   @Test public void testAddAttribute()
   {
     TestDeviceDiscoveryAttributes discovery = new TestDeviceDiscoveryAttributes(
-        new DeviceDiscovery("name", "protocol", "model")
+        new DeviceDiscovery("identifier", "name", "protocol", "model")
     );
 
     discovery.addAttribute("foo", "bar");
@@ -934,7 +1034,7 @@ public class DeviceDiscoveryTest
   @Test public void testAddAttributeNullKey()
   {
     TestDeviceDiscoveryAttributes discovery = new TestDeviceDiscoveryAttributes(
-        new DeviceDiscovery("name", "protocol", "model")
+        new DeviceDiscovery("identifier", "name", "protocol", "model")
     );
 
     // should be no op
@@ -956,7 +1056,7 @@ public class DeviceDiscoveryTest
   @Test public void testAddAttributeTrim()
   {
     TestDeviceDiscoveryAttributes discovery = new TestDeviceDiscoveryAttributes(
-        new DeviceDiscovery("name", "protocol", "model")
+        new DeviceDiscovery("identifier", "name", "protocol", "model")
     );
 
     discovery.addAttribute("foo", " bar ");
@@ -974,7 +1074,7 @@ public class DeviceDiscoveryTest
   @Test public void testAddAttributeNameConstraint()
   {
     TestDeviceDiscoveryAttributes discovery = new TestDeviceDiscoveryAttributes(
-        new DeviceDiscovery("name", "protocol", "model")
+        new DeviceDiscovery("identifier", "name", "protocol", "model")
     );
 
     // Test limit length...
@@ -1013,7 +1113,7 @@ public class DeviceDiscoveryTest
   @Test public void testAddAttributeValueConstraint()
   {
     TestDeviceDiscoveryAttributes discovery = new TestDeviceDiscoveryAttributes(
-        new DeviceDiscovery("name", "protocol", "model")
+        new DeviceDiscovery("identifier", "name", "protocol", "model")
     );
 
     // Test value limit...
@@ -1054,7 +1154,7 @@ public class DeviceDiscoveryTest
    */
   @Test public void testAddAttributeConcurrency() throws Exception
   {
-    final DeviceDiscovery discovery = new DeviceDiscovery("name", "protocol", "model");
+    final DeviceDiscovery discovery = new DeviceDiscovery("identifier", "name", "protocol", "model");
     discovery.addAttribute("foo", "bar");
     discovery.addAttribute("acme", "ecma");
 
@@ -1103,8 +1203,3 @@ public class DeviceDiscoveryTest
     }
   }
 }
-
-
-
-
-

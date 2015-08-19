@@ -43,7 +43,7 @@ object {
 
   object {
 
-    // The model object consists of mandatory device name, device protocol and device
+    // The model object consists of mandatory device identifier, device name, device protocol and device
     // model properties. Each can have an arbitrary single line string with minimum length
     // of one and maximum of 255 characters. An optional device type property and an optional
     // arbitrary attribute key,value pairs object can be included.
@@ -58,10 +58,11 @@ object {
     //         For a stricter schema validation, the Java Map transformation to JSON should be
     //         implemented with a structure that is easier to validate.
 
-    string{1,255} deviceName     /^.*$/;
-    string{1,255} deviceProtocol /^.*$/;
-    string{1,255} deviceModel    /^.*$/;
-    string{1,255} deviceType     /^.*$/ ?;
+    string{1,255} deviceIdentifier  /^.*$/;
+    string{1,255} deviceName        /^.*$/;
+    string{1,255} deviceProtocol    /^.*$/;
+    string{1,255} deviceModel       /^.*$/;
+    string{1,255} deviceType        /^.*$/ ?;
 
     object { } * deviceAttributes?;
 
