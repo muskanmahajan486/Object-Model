@@ -62,7 +62,7 @@ public class PersistentDeviceDiscovery extends DeviceDiscovery
    */
   private PersistentDeviceDiscovery()
   {
-    super(new DeviceDiscovery("<undefined>", "<undefined>", ""));
+    super(new DeviceDiscovery("<undefined>", "<undefined>", "<undefined>", ""));
   }
 
   /**
