@@ -24,7 +24,6 @@ import org.openremote.base.Version;
 import org.openremote.model.data.json.DeviceDiscoveryTransformer;
 import org.openremote.model.data.json.JSONHeader;
 
-import java.util.IllegalFormatCodePointException;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
