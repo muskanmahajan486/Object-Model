@@ -393,6 +393,11 @@ public class DeviceDiscovery extends Model
     return this;
   }
 
+  public String getDeviceIdentifier()
+  {
+    return deviceIdentifier;
+  }
+
   // Serialization --------------------------------------------------------------------------------
 
   /**
