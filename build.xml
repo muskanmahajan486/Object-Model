@@ -185,6 +185,9 @@
         <include name = "org/openremote/base/**/*.class"/>
       </fileset>
 
+      <fileset dir = "${classes.dir}">
+        <include name = "org/openremote/beehive/**/*.class"/>
+      </fileset>
     </copy>
 
     <!-- Package... -->
