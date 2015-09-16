@@ -26,8 +26,10 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Unit tests for {@link org.openremote.model.DeviceDiscovery} class
@@ -980,14 +982,55 @@ public class DeviceDiscoveryTest
     Assert.assertTrue(json.contains("\"momo\""), json);
   }
 
+  /**
+   * Set of DeviceDiscovery to JSON data exchange format.
+   */
+  @Test public void testToJSONStringSetOfDeviceDiscovery()
+  {
+    Set<DeviceDiscovery> devices = new HashSet<DeviceDiscovery>();
+    devices.add(new DeviceDiscovery("1", "name1", "protocol1", "model1"));
+    devices.add(new DeviceDiscovery("2", "name2", "protocol2", "model2"));
+
+    String json = DeviceDiscovery.toJSONString(devices);
+
+    Assert.assertTrue(json.contains("\"libraryName\""));
+    Assert.assertTrue(json.contains("\"OpenRemote Object Model\""));
+    Assert.assertTrue(json.contains("\"javaFullClassName\""));
+    Assert.assertTrue(json.contains(DeviceDiscovery.class.getName()));
+    Assert.assertTrue(json.contains("\"schemaVersion\""));
+    Assert.assertTrue(json.contains(DeviceDiscovery.JSON_SCHEMA_VERSION.toString()));
+
+    Assert.assertTrue(json.contains("\"apiVersion\""));
+    Assert.assertTrue(
+            json.contains("\"" + apiVersion + "\""),
+            "API version is " + apiVersion + "\n" + json);
+
+    Assert.assertTrue(apiVersion.equals(JSONHeader.API_VERSION.toString()));
+
+    Assert.assertTrue(json.contains("\"model\""));
+
+    Assert.assertTrue(json.contains("\"deviceIdentifier\""));
+    Assert.assertTrue(json.contains("\"1\""));
+    Assert.assertTrue(json.contains("\"2\""));
+    Assert.assertTrue(json.contains("\"deviceName\""));
+    Assert.assertTrue(json.contains("\"name1\""));
+    Assert.assertTrue(json.contains("\"name2\""));
+    Assert.assertTrue(json.contains("\"deviceProtocol\""));
+    Assert.assertTrue(json.contains("\"protocol1\""));
+    Assert.assertTrue(json.contains("\"protocol2\""));
+    Assert.assertTrue(json.contains("\"deviceModel\""));
+    Assert.assertTrue(json.contains("\"model1\""));
+    Assert.assertTrue(json.contains("\"model2\""));
+
+    Assert.assertTrue(!json.contains("deviceType"));
+    Assert.assertTrue(!json.contains("deviceAttributes"));
+  }
 
   @Test public void testJSONSerializerAPIVersion()
   {
     // TODO : integration test
     //Assert.assertTrue(json.contains("\"apiVersion\""));
   }
-
-
 
 
   // AddAttribute Tests ---------------------------------------------------------------------------
@@ -1180,8 +1223,6 @@ public class DeviceDiscoveryTest
 
     iterator.next();
   }
-
-
 
   // Nested Classes -------------------------------------------------------------------------------
 
