@@ -167,9 +167,9 @@ public class DeviceDiscoveryTransformer extends JSONTransformer<DeviceDiscovery>
 
       DeviceDiscovery discovery = new DeviceDiscovery(
 
-              // TODO : add ctor that doesnt require attributes ref (null) when device type is included
+          // TODO : add ctor that doesnt require attributes ref (null) when device type is included
 
-              deviceIdentifier, deviceName, deviceProtocol, deviceModel, deviceType, null
+          deviceIdentifier, deviceName, deviceProtocol, deviceModel, deviceType, null
       );
 
       if (attributes != null)
@@ -189,8 +189,7 @@ public class DeviceDiscoveryTransformer extends JSONTransformer<DeviceDiscovery>
       return discovery;
     }
 
-
-      // TODO : convert DeviceDiscovery to throw validation exceptions instead of illegal arg exc.
+    // TODO : convert DeviceDiscovery to throw validation exceptions instead of illegal arg exc.
     // catch (Model.ValidationException exception)
 
     catch (Throwable throwable)
