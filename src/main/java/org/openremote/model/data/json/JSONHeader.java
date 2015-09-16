@@ -27,6 +27,8 @@ import org.openremote.base.APIVersion;
 import org.openremote.base.Version;
 import org.openremote.base.exception.IncorrectImplementationException;
 
+import java.util.Map;
+
 
 /**
  * This implementation encapsulates an model object JSON representation within a standard
@@ -170,6 +172,82 @@ public class JSONHeader<T>
     return serializer.serialize(new JSONHeader<M>(model, schemaVersion));
   }
 
+  /**
+   * Utility method to convert a given object model instance to JSON data exchange format. <p>
+   *
+   * This method adds a set of header properties to each JSON representation that includes
+   * fields for schema version and API compatibility. This header can be used to
+   * classify each JSON object and also to migrate the data structures between implementation
+   * versions. <p>
+   *
+   * Currently the headers that are included with each model object JSON representation include:
+   *
+   * <ul>
+   *   <li>libraryName</li>
+   *   <li>javaFullClassName</li>
+   *   <li>schemaVersion</li>
+   *   <li>apiVersion</li>
+   * </ul>
+   *
+   * The library name property can be used as a quick classification mechanism in cases where
+   * multiple JSON objects must be dealt with that originate from many different sources. It's
+   * value is defined in {@link #LIBRARY_NAME} and is the same for every JSON object created
+   * through this method. <p>
+   *
+   * The Java full class name property contains the fully qualified Java class name of the
+   * model instance that is embedded in this JSON header object. This method allows the caller
+   * to specify to className to use in the header. This is used mainly when the generated represents
+   * a collection, where the className refers to the class within the collection and not to the
+   * class representing the collection itself. <p>
+   *
+   * The schema version property is a version number for the JSON schema that is used
+   * to transfer the Java object model instance between processes. While an object model
+   * implementation may evolve (and as such have a new API version number), the schema
+   * version number does not need to change if the newer implementations can still be represented
+   * by the same JSON data format. <p>
+   *
+   * The API version property indicates the versioning of the underlying object model
+   * implementation.
+   *
+   * @param model
+   *          the object model instance to embed into this JSON header
+   *
+   * @param className
+   *          the full class name of the model class to indicate in the header
+   *
+   * @param schemaVersion
+   *          the schema version that indicates the JSON data structure version used when
+   *          externalizing the object model instance to JSON format
+   *
+   * @param transformers
+   *          FlexJSON transformers that may be required to translate model object
+   *          instances to their JSON data format. This is a map where the key is a class
+   *          of the model object to transform and the value is the transformer to use
+   *
+   * @param <M>
+   *          the type of the class that is transformed to JSON data format.
+   *          This might be the model class or e.g. a collection class
+   *
+   * @return
+   *          JSON string representing the given model instance or collection of instances
+   *
+   */
+  public static <M> String toJSON(M model, String className, Version schemaVersion, Map<Class, Transformer> transformers)
+  {
+    JSONSerializer serializer = new JSONSerializer()
+            .transform(new HeaderTransformer(), JSONHeader.class)
+            .transform(new VersionTransformer(), Version.class)
+            .exclude("*.class")
+            .prettyPrint(true);
+
+    for (Map.Entry<Class, Transformer> transformerEntry : transformers.entrySet())
+    {
+      serializer = serializer.transform(transformerEntry.getValue(), transformerEntry.getKey());
+    }
+
+    return serializer.serialize(new JSONHeader<M>(model, className, schemaVersion));
+  }
+
 
   // Instance Fields ------------------------------------------------------------------------------
 
@@ -215,6 +293,29 @@ public class JSONHeader<T>
   protected JSONHeader(T model, Version schemaVersion)
   {
     this.javaFullClassName = model.getClass().getName();
+
+    this.schemaVersion = schemaVersion;
+
+    this.model = model;
+  }
+
+  /**
+   * Constructs new JSON header instance for a given object model instance with a given
+   * JSON data exchange schema version.
+   *
+   * @param model
+   *          the object model instance to externalize as part of this JSON header instance
+   *
+   * @param className
+   *          the full class name of the model class to indicate in the header
+   *
+   * @param schemaVersion
+   *          the version information included in this JSON header that can be used to determine
+   *          the schema of the externalized JSON data format
+   */
+  protected JSONHeader(T model, String className, Version schemaVersion)
+  {
+    this.javaFullClassName = className;
 
     this.schemaVersion = schemaVersion;
 
