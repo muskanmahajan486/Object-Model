@@ -391,6 +391,43 @@ public class ModelObject
   }
 
   /**
+   * Returns a ModelObject array attribute.
+   *
+   * @param name
+   *            name of the attribute
+   *
+   * @return    a list of ModelObject in the array, or null if the attribute is not present or is
+   *            not of model object array type
+   */
+
+  public List<ModelObject> getObjectArray(String name)
+  {
+    Attribute attr = attributes.get(name);
+    try
+    {
+      if (attr != null && attr instanceof ArrayAttribute)
+      {
+        @SuppressWarnings("unchecked") ArrayAttribute<ModelObject> array = (ArrayAttribute<ModelObject>)attr;
+
+        if (array.isModelObjectArray)
+        {
+          return new ArrayList<ModelObject>(array.value);
+        }
+      }
+    }
+
+    catch (ClassCastException exception)
+    {
+      // TODO : log
+
+      System.err.println("Attribute " + name + " is not object array type.");
+    }
+
+    return null;
+
+  }
+
+  /**
    * Returns a number array attribute.
    *
    * @param name
@@ -734,6 +771,11 @@ public class ModelObject
      */
     private boolean isBooleanArray = false;
 
+    /**
+     * Array type: indicates the elements in the array (all of them) are of ModelObject type (JSON object).
+     */
+    private boolean isModelObjectArray = false;
+
 
     // Constructors -------------------------------------------------------------------------------
 
@@ -785,11 +827,11 @@ public class ModelObject
       {
         if (o instanceof String)
         {
-          if (isBooleanArray || isNumberArray)
+          if (isBooleanArray || isNumberArray || isModelObjectArray)
           {
             throw new IncorrectImplementationException(
                 "Mixed JSON type arrays are not supported. Array {0} contains strings combined " +
-                "with boolean or number types.",
+                "with boolean, number or object types.",
                 array
             );
           }
@@ -799,11 +841,11 @@ public class ModelObject
 
         else if (o instanceof Number)
         {
-          if (isStringArray || isBooleanArray)
+          if (isStringArray || isBooleanArray || isModelObjectArray)
           {
             throw new IncorrectImplementationException(
                 "Mixed JSON type arrays are not supported. Array {0} contains numbers combined " +
-                "with boolean or string types.",
+                "with boolean, string or objects types.",
                 array
             );
           }
@@ -813,7 +855,7 @@ public class ModelObject
 
         else if (o instanceof Boolean)
         {
-          if (isStringArray || isNumberArray)
+          if (isStringArray || isNumberArray || isModelObjectArray)
           {
             throw new IncorrectImplementationException(
                 "Mixed JSON type arrays are not supported. Array {0} contains booleans combined " +
@@ -823,6 +865,20 @@ public class ModelObject
           }
 
           isBooleanArray = true;
+        }
+
+        else if (o instanceof ModelObject)
+        {
+          if (isStringArray || isBooleanArray || isNumberArray)
+          {
+            throw new IncorrectImplementationException(
+                    "Mixed JSON type arrays are not supported. Array {0} contains objects combined " +
+                            "with string, boolean or number types.",
+                    array
+            );
+          }
+
+          isModelObjectArray = true;
         }
       }
     }

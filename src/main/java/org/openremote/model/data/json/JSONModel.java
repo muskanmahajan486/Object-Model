@@ -20,6 +20,7 @@
  */
 package org.openremote.model.data.json;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -218,11 +219,23 @@ public class JSONModel
       else if (value instanceof List)
       {
         // TODO :
-        //          note that the array support is not complete, nested arrays are not supported
-        //          at the moment. Mixed type arrays that JSON allows are not supported, and maybe
-        //          won't be.
+        //          note that the array support is not complete, mixed type arrays
+        //          that JSON allows are not supported, and maybe won't be.
 
         @SuppressWarnings("unchecked") List<Object> values = (List)value;
+
+        if (!values.isEmpty())
+        {
+          if (values.get(0) instanceof Map)
+          {
+            List<Object> convertedValues = new ArrayList<Object>();
+            for (Object m : values)
+            {
+              convertedValues.add(constructModel(name, (Map<String, Object>)m));
+            }
+            values = convertedValues;
+          }
+        }
 
         json.addAttribute(new ModelObject.ArrayAttribute<Object>(valueName, values));
       }
