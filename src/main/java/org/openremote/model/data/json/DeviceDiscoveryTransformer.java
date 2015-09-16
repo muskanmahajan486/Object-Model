@@ -128,7 +128,7 @@ public class DeviceDiscoveryTransformer extends JSONTransformer<DeviceDiscovery>
    *
    * @param json
    *          A JSON frame that represents the structures parsed from the JSON document
-   *          representing an user instance.
+   *          representing a device discovery instance.
    *
    * @return  A corresponding Java DeviceDiscovery instance
    *
@@ -140,14 +140,14 @@ public class DeviceDiscoveryTransformer extends JSONTransformer<DeviceDiscovery>
   }
 
   /**
-   * Recreates an {@link org.openremote.model.DeviceDiscovery} instance from a deserialized
-   * JSON model prototype.
+   * Recreates an {@link org.openremote.model.DeviceDiscovery} instance from the 'model' object
+   * of a deserialized JSON model prototype.
    *
-   * @see   JSONModel
+   * @see   ModelObject
    *
    * @param model
-   *          A JSON frame that represents the structures parsed from the JSON document
-   *          representing an user instance.
+   *          A JSON frame that represents the model object parsed from the JSON document
+   *          representing a device discovery instance.
    *
    * @return  A corresponding Java DeviceDiscovery instance
    *
