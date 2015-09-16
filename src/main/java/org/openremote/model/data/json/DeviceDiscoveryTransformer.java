@@ -136,10 +136,27 @@ public class DeviceDiscoveryTransformer extends JSONTransformer<DeviceDiscovery>
    */
   @Override protected DeviceDiscovery deserialize(JSONModel json) throws DeserializationException
   {
+    return deserialize(json.getModel());
+  }
+
+  /**
+   * Recreates an {@link org.openremote.model.DeviceDiscovery} instance from a deserialized
+   * JSON model prototype.
+   *
+   * @see   JSONModel
+   *
+   * @param model
+   *          A JSON frame that represents the structures parsed from the JSON document
+   *          representing an user instance.
+   *
+   * @return  A corresponding Java DeviceDiscovery instance
+   *
+   * @throws  DeserializationException if deserialization fails
+   */
+  protected DeviceDiscovery deserialize(ModelObject model) throws DeserializationException
+  {
     try
     {
-      ModelObject model = json.getModel();
-
       String deviceIdentifier = model.getAttribute(DEVICE_IDENTIFIER_JSON_PROPERTY_NAME);
       String deviceName = model.getAttribute(DEVICE_NAME_JSON_PROPERTY_NAME);
       String deviceProtocol = model.getAttribute(DEVICE_PROTOCOL_JSON_PROPERTY_NAME);
@@ -150,9 +167,9 @@ public class DeviceDiscoveryTransformer extends JSONTransformer<DeviceDiscovery>
 
       DeviceDiscovery discovery = new DeviceDiscovery(
 
-          // TODO : add ctor that doesnt require attributes ref (null) when device type is included
+              // TODO : add ctor that doesnt require attributes ref (null) when device type is included
 
-          deviceIdentifier, deviceName, deviceProtocol, deviceModel, deviceType, null
+              deviceIdentifier, deviceName, deviceProtocol, deviceModel, deviceType, null
       );
 
       if (attributes != null)
@@ -172,7 +189,8 @@ public class DeviceDiscoveryTransformer extends JSONTransformer<DeviceDiscovery>
       return discovery;
     }
 
-    // TODO : convert DeviceDiscovery to throw validation exceptions instead of illegal arg exc.
+
+      // TODO : convert DeviceDiscovery to throw validation exceptions instead of illegal arg exc.
     // catch (Model.ValidationException exception)
 
     catch (Throwable throwable)
