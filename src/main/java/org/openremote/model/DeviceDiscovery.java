@@ -20,10 +20,13 @@
  */
 package org.openremote.model;
 
+import flexjson.transformer.Transformer;
 import org.openremote.base.Version;
+import org.openremote.model.data.json.DeviceDiscoverySetTransformer;
 import org.openremote.model.data.json.DeviceDiscoveryTransformer;
 import org.openremote.model.data.json.JSONHeader;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -411,6 +414,23 @@ public class DeviceDiscovery extends Model
   public String toJSONString()
   {
     return JSONHeader.toJSON(this, JSON_SCHEMA_VERSION, new DeviceDiscoveryTransformer());
+  }
+
+  /**
+   * Serializes a collection of DeviceDiscovery to JSON format.
+   *
+   *
+   * See the project's resources/json directory for an Orderly definition of the data exchange
+   * format and the corresponding JSON schema.
+   *
+   * @return a JSON structure for transferring this collection of device discovery information
+   */
+  public static String toJSONString(Set<DeviceDiscovery> devices)
+  {
+    Map<Class, Transformer> transformers = new HashMap<Class, Transformer>();
+    transformers.put(DeviceDiscovery.class, new DeviceDiscoveryTransformer());
+    transformers.put((Class<Set<DeviceDiscovery>>) ((Class) Set.class), new DeviceDiscoverySetTransformer());
+    return JSONHeader.toJSON(devices, DeviceDiscovery.class.getName(), JSON_SCHEMA_VERSION, transformers);
   }
 }
 
