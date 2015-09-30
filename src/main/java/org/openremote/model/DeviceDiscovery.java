@@ -59,7 +59,7 @@ public class DeviceDiscovery extends Model
   /**
    * Constraint for the value string size in device attributes map. This is currently
    * derived from the constraints in the persistence model defined in
-   * {@link org.openremote.model.persistence.jpa.PersistentDeviceDiscovery}
+   * Beehive Device Discovery service implementation.
    */
   public static final int DEVICE_ATTRIBUTE_VALUE_LENGTH_CONSTRAINT = 1000;
 
