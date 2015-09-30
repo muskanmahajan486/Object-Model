@@ -220,61 +220,9 @@ public class DeviceDiscovery extends Model
     this.model = model;
   }
 
-
   /**
    * Constructs a new device discovery data structure with a given device name, protocol,
-   * model and device attributes.
-   *
-   * @param deviceIdentifier
-   *            A unique device identifier
-   *
-   * @param deviceName
-   *            A descriptive device name
-   *
-   * @param deviceProtocol
-   *            A device protocol identifier used by this device. The identifier string should
-   *            match one of the configured/installed device command builder identifiers in
-   *            the controller.
-   *
-   * @param model
-   *            A device model identifier
-   *
-   * @param attributes
-   *            Device attributes which are copied to this instance.
-   */
-  public DeviceDiscovery(String deviceIdentifier, String deviceName, String deviceProtocol, String model,
-                         Map<String, String> attributes)
-  {
-    this(deviceIdentifier, deviceName, deviceProtocol, model);
-
-    // TODO :
-    //
-    //   Should recommend to use the {@link #addAttribute(String, String)} instead of
-    //   this constructor. In some multi-threaded scenarios with obscure corner cases
-    //   the addAttribute() call may behave more consistently. So should probably remove
-    //   this constructor altogether.
-
-    if (attributes != null)
-    {
-      this.deviceAttributes = new ConcurrentHashMap<String, String>(attributes.size());
-
-      Set<Map.Entry<String, String>> entries = attributes.entrySet();
-
-      for (Map.Entry<String, String> entry : entries)
-      {
-        addAttribute(entry.getKey(), entry.getValue());
-      }
-    }
-
-    else
-    {
-      this.deviceAttributes = new ConcurrentHashMap<String, String>(0);
-    }
-  }
-
-  /**
-   * Constructs a new device discovery data structure with a given device name, protocol,
-   * model, type and device attributes.
+   * model and type.
    *
    * @param deviceIdentifier
    *            A unique device identifier
@@ -296,25 +244,14 @@ public class DeviceDiscovery extends Model
    *            "Temperature Sensor" or something else. When multiple key,value strings
    *            are required, use the attributes map instead.
    *
-   * @param attributes
-   *            Device attributes
-   *
    * @throws  ConstraintException
    *            if deviceName, deviceProtocol, model or type strings exceed the length defined
-   *            in {@link #DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT}, or if any of the key
-   *            or value strings in attribute map exceed their length constraints
+   *            in {@link #DEFAULT_STRING_ATTRIBUTE_LENGTH_CONSTRAINT}
    */
-  public DeviceDiscovery(String deviceIdentifier, String deviceName, String deviceProtocol, String model,
-                         String type, Map<String, String> attributes)
+  public DeviceDiscovery(String deviceIdentifier, String deviceName, String deviceProtocol, String model, String type)
   {
-    // TODO :
-    //
-    //   Should recommend to use the {@link #addAttribute(String, String)} instead of
-    //   this constructor. In some multi-threaded scenarios with obscure corner cases
-    //   the addAttribute() call may behave more consistently. So should probably remove
-    //   this constructor altogether and replace with one that only takes the additional type.
 
-    this(deviceIdentifier, deviceName, deviceProtocol, model, attributes);
+    this(deviceIdentifier, deviceName, deviceProtocol, model);
 
     type = (type == null)
           ? ""

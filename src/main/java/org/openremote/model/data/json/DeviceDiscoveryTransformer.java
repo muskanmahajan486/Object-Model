@@ -166,11 +166,7 @@ public class DeviceDiscoveryTransformer extends JSONTransformer<DeviceDiscovery>
       ModelObject attributes = model.getObject(DEVICE_ATTRIBUTES_JSON_PROPERTY_NAME);
 
       DeviceDiscovery discovery = new DeviceDiscovery(
-
-          // TODO : add ctor that doesnt require attributes ref (null) when device type is included
-
-          deviceIdentifier, deviceName, deviceProtocol, deviceModel, deviceType, null
-      );
+          deviceIdentifier, deviceName, deviceProtocol, deviceModel, deviceType);
 
       if (attributes != null)
       {
