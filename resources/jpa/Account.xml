@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Copyright 2013-2015, Juha Lindfors. All rights reserved.
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU Affero General Public License as
+  published by the Free Software Foundation; either version 3 of the
+  License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with this program; if not, see <http://www.gnu.org/licenses/>.
+-->
+
+
+<!--
+
+  Persistence mapping for Account class (Beehive Account Manager 2.0)
+
+  To keep the different layers clearly separated (plain domain object layer used for data
+  transfer from persistence implementation), utilizing XML based configuration for the domain
+  object. Additional persistence configuration is included as annotations in the persistence
+  implementation. JPA will combine this XML and annotations as required.
+
+
+  Author: Juha Lindfors
+
+-->
+<entity-mappings
+    xmlns = "http://xmlns.jcp.org/xml/ns/persistence/orm"
+    xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation = "http://xmlns.jcp.org/xml/ns/persistence/orm
+                          http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd"
+    version = "2.1">
+
+  <!--
+       Use Mapped superclass to pick up the fields from the domain object to include in
+       persistence model.
+  -->
+  <mapped-superclass
+      class = "org.openremote.model.Account"
+      metadata-complete = "false"
+      access = "FIELD">
+
+    <attributes>
+
+      <basic name = "accountIdentifier">
+        <column name = "name"
+                length  = "255"
+                unique = "false"
+                nullable = "true"/>
+      </basic>
+
+      <many-to-many name = "users"
+                    target-entity = "org.openremote.model.persistence.jpa.RelationalUser"
+                    mapped-by = "accounts">
+      </many-to-many>
+
+      <element-collection name = "accountAttributes">
+
+        <!--
+          TODO
+          Name the device attribute key column in relational schema. Default length is 255
+          characters. Column is by default not nullable. Uniqueness of key is not enforced -
+          while key must be unique per instance, it does not need to be unique across all
+          instances stored in the table.
+        -->
+        <map-key-column name = "key"
+                        length = "255"
+                        nullable = "false"
+                        unique = "false"/>
+
+        <!--
+          TODO
+          Name the value column in relational schema. Set column length to 1000 characters.
+          Null values are not allowed, values are not unique.
+        -->
+        <column name = "value"
+                length = "1000"
+                nullable = "true"
+                unique = "false"/>
+
+        <!--
+          TODO
+          Name the device attribute key,value table and the join column used to map the
+          key,value pairs to devices.
+        -->
+        <collection-table name = "account_attributes">
+          <join-column name = "account_oid"/>
+        </collection-table>
+
+      </element-collection>
+
+
+    </attributes>
+
+  </mapped-superclass>
+
+</entity-mappings>
+

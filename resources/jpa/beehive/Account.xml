@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  OpenRemote, the Home of the Digital Home.
+  Copyright 2008-2014, OpenRemote Inc.
+
+  See the contributors.txt file in the distribution for a
+  full listing of individual contributors.
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU Affero General Public License as
+  published by the Free Software Foundation; either version 3 of the
+  License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with this program; if not, see <http://www.gnu.org/licenses/>.
+-->
+
+
+<!--
+
+  Persistence mapping for Account class.
+
+TODO
+
+  Author: Juha Lindfors
+
+-->
+<entity-mappings
+    xmlns = "http://xmlns.jcp.org/xml/ns/persistence/orm"
+    xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation = "http://xmlns.jcp.org/xml/ns/persistence/orm
+                          http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd"
+    version = "2.1">
+
+  <!--
+       Use Mapped superclass to pick up the fields from the domain object to include in
+       persistence model.
+  -->
+  <mapped-superclass
+      class = "org.openremote.model.Account"
+      metadata-complete = "false"
+      access = "FIELD">
+
+    <attributes>
+      <transient name = "accountIdentifier"/>
+      <transient name = "accountAttributes"/>
+      <transient name = "users"/>
+    </attributes>
+
+  </mapped-superclass>
+
+</entity-mappings>
+

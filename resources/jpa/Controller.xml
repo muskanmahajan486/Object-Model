@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Copyright 2013-2015, Juha Lindfors. All rights reserved.
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU Affero General Public License as
+  published by the Free Software Foundation; either version 3 of the
+  License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with this program; if not, see <http://www.gnu.org/licenses/>.
+-->
+
+
+<!--
+
+  TODO
+
+  Author: Juha Lindfors
+
+-->
+<entity-mappings
+    xmlns = "http://xmlns.jcp.org/xml/ns/persistence/orm"
+    xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation = "http://xmlns.jcp.org/xml/ns/persistence/orm
+                          http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd"
+    version = "2.1">
+
+
+  <!--
+     Use Mapped superclass to pick up the fields from the domain object to include in
+     persistence model.
+  -->
+  <mapped-superclass
+      class = "org.openremote.model.Controller"
+      metadata-complete = "false"
+      access = "FIELD">
+
+    <attributes>
+
+      <basic name = "name" access = "FIELD">
+        <column
+          name = "name"
+          nullable = "true"
+          unique = "false"
+          length = "255"
+        />
+      </basic>
+
+      <basic name = "identity" access = "FIELD">
+        <column
+          name = "identity"
+          nullable = "false"
+          unique = "true"
+          length = "255"
+        />
+      </basic>
+
+      <basic name = "description" access = "FIELD">
+        <column
+          name = "description"
+          nullable = "true"
+          unique = "false"
+          length = "1000"
+        />
+      </basic>
+
+
+      <many-to-one name = "account"
+                   target-entity = "org.openremote.model.persistence.jpa.RelationalAccount">
+
+        <join-column name = "account_oid"/>
+
+      </many-to-one>
+
+<!--      <element-collection name = "macAddresses" target-class = "[Ljava.lang.Byte;">-->
+      <element-collection name = "macAddresses">
+
+        <collection-table name = "controller_macs">
+          <join-column name = "controller_oid"/>
+        </collection-table>
+
+      </element-collection>
+
+      <element-collection name = "controllerAttributes">
+
+        <!--
+          Name of the controller attribute key column in relational schema. Default length is 255
+          characters. Column is by default not nullable. Uniqueness of key is not enforced -
+          while key must be unique per instance, it does not need to be unique across all
+          instances stored in the table.
+        -->
+        <map-key-column name = "key" nullable = "false" unique = "false"/>
+
+        <!--
+          Name of the value column in relational schema. Set column length to 1000 characters.
+          Null values are not allowed, values are not unique.
+        -->
+        <column name = "value" length = "1000" nullable = "false" unique = "false"/>
+
+        <!--
+          TODO
+          Name of the controller attribute key,value table and the join column used to map the
+          key,value pairs to controllers.
+        -->
+        <collection-table name = "controller_attributes">
+          <join-column name = "controller_oid"/>
+        </collection-table>
+
+      </element-collection>
+
+    </attributes>
+
+  </mapped-superclass>
+
+</entity-mappings>
