@@ -72,6 +72,8 @@
     <class>org.openremote.model.persistence.jpa.RelationalAccount</class>
     <class>org.openremote.model.persistence.jpa.beehive.BeehiveUser</class>
     <class>org.openremote.model.persistence.jpa.beehive.BeehiveController</class>
+    <class>org.openremote.model.persistence.jpa.beehive.MinimalBeehiveRole</class>
+    <class>org.openremote.model.persistence.jpa.beehive.MinimalBeehiveUserRole</class>
 
     <!-- Not interested in other classes not explicitly declared here... -->
 
@@ -131,6 +133,8 @@
     <class>org.openremote.model.persistence.jpa.RelationalAccount</class>
     <class>org.openremote.model.persistence.jpa.beehive.BeehiveUser</class>
     <class>org.openremote.model.persistence.jpa.beehive.BeehiveController</class>
+    <class>org.openremote.model.persistence.jpa.beehive.MinimalBeehiveRole</class>
+    <class>org.openremote.model.persistence.jpa.beehive.MinimalBeehiveUserRole</class>
 
     <!-- Not interested in other classes not explicitly declared here... -->
 
