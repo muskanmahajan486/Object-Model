@@ -67,6 +67,9 @@ public class User extends Model
    */
   public static final Validator<String> DEFAULT_NAME_VALIDATOR = new NameValidator();
 
+  public static final String CREDENTIALS_ATTRIBUTE_NAME = "credentials";
+
+  public static final String AUTHMODE_ATTRIBUTE_NAME = "authMode";
 
   // Class Members --------------------------------------------------------------------------------
 
