@@ -290,7 +290,7 @@ public class JSONHeader<T>
    *          the version information included in this JSON header that can be used to determine
    *          the schema of the externalized JSON data format
    */
-  protected JSONHeader(T model, Version schemaVersion)
+  public JSONHeader(T model, Version schemaVersion)
   {
     this.javaFullClassName = model.getClass().getName();
 
