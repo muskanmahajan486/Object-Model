@@ -232,7 +232,7 @@ public class JSONHeader<T>
    *          JSON string representing the given model instance or collection of instances
    *
    */
-  public static <M> String toJSON(M model, String className, Version schemaVersion, Map<Class, Transformer> transformers)
+  public static <M> String toJSON(M model, String className, Version schemaVersion, Map<Class<?>, Transformer> transformers)
   {
     JSONSerializer serializer = new JSONSerializer()
             .transform(new HeaderTransformer(), JSONHeader.class)
@@ -240,7 +240,7 @@ public class JSONHeader<T>
             .exclude("*.class")
             .prettyPrint(true);
 
-    for (Map.Entry<Class, Transformer> transformerEntry : transformers.entrySet())
+    for (Map.Entry<Class<?>, Transformer> transformerEntry : transformers.entrySet())
     {
       serializer = serializer.transform(transformerEntry.getValue(), transformerEntry.getKey());
     }

@@ -364,7 +364,7 @@ public class DeviceDiscovery extends Model
    */
   public static String toJSONString(Set<DeviceDiscovery> devices)
   {
-    Map<Class, Transformer> transformers = new HashMap<Class, Transformer>();
+    Map<Class<?>, Transformer> transformers = new HashMap<Class<?>, Transformer>();
     transformers.put(DeviceDiscovery.class, new DeviceDiscoveryTransformer());
     transformers.put((Class<Set<DeviceDiscovery>>) ((Class) Set.class), new DeviceDiscoverySetTransformer());
     return JSONHeader.toJSON(devices, DeviceDiscovery.class.getName(), JSON_SCHEMA_VERSION, transformers);
