@@ -193,7 +193,7 @@
     <!-- Package... -->
 
     <zip basedir = "${build.package.dir}"
-         destfile = "${output.dir}/openremote-object-model-${release.version}.jar"/>
+         destfile = "${output.dir}/or-object-model-${release.version}.jar"/>
 
 
     <!--
@@ -234,14 +234,56 @@
     <copy todir = "${build.package.dir}">
       <fileset dir = "${classes.dir}">
         <include name = "org/openremote/model/persistence/jpa/**/*.class"/>
+				<exclude name = "org/openremote/model/persistence/jpa/beehive/**"/>
       </fileset>
     </copy>
 
     <!-- Package... -->
 
     <zip basedir = "${build.package.dir}"
-         destfile = "${output.dir}/openremote-object-model-persistence-${release.version}.jar"/>
+         destfile = "${output.dir}/or-object-model-persistence-${release.version}.jar"/>
 
+
+
+     <!--
+      | Clear working dir for next archive preparation...
+      +-->
+
+     <delete dir = "${build.package.dir}"/>
+     <mkdir dir = "${build.package.dir}"/>
+
+
+     <!--
+      | Create relational persistence for domain model archive...
+      +-->
+
+     <copy todir = "${build.package.dir}/META-INF"
+           file = "${resources.dir}/META-INF/MANIFEST.MF">
+       <filterchain>
+         <expandproperties/>
+       </filterchain>
+     </copy>
+
+     <!-- Include beehive specific entity mappings... -->
+
+     <copy todir = "${build.package.dir}/beehive">
+       <fileset dir = "${resources.dir}/jpa/beehive">
+         <include name = "*.xml"/>
+       </fileset>
+     </copy>
+
+     <!-- Include relational persistence classes only... -->
+
+     <copy todir = "${build.package.dir}">
+       <fileset dir = "${classes.dir}">
+         <include name = "org/openremote/model/persistence/jpa/beehive/**/*.class"/>
+       </fileset>
+     </copy>
+
+     <!-- Package... -->
+
+     <zip basedir = "${build.package.dir}"
+          destfile = "${output.dir}/or-object-model-legacy-beehive-${release.version}.jar"/>
 
 
     <!--
