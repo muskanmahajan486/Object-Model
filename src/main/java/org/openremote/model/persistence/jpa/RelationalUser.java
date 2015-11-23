@@ -145,6 +145,11 @@ public class RelationalUser extends User
     return result;
   }
 
+  public Long getId()
+  {
+    return id;
+  }
+
   @Embeddable
   private static final class UserAuthentication extends Authentication
   {
