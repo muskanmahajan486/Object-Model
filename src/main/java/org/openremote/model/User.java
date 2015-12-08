@@ -325,6 +325,11 @@ public class User extends Model
     return this.username;
   }
 
+  public Set<Account> getAccounts()
+  {
+    return accounts;
+  }
+
   // Serialization --------------------------------------------------------------------------------
 
   /**

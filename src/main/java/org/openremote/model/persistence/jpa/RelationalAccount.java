@@ -53,6 +53,11 @@ public class RelationalAccount extends Account
     super(copy);
   }
 
+  public Long getId()
+  {
+    return id;
+  }
+
   public String toString()
   {
     return "JPA Account (ID = " + this.id + ")";
