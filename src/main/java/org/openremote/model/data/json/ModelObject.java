@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -100,7 +99,7 @@ public class ModelObject
   /**
    * Map of named model JSON objects nested within the root 'model' object.
    */
-  private Map<String, ModelObject> objects = new ConcurrentHashMap<String, ModelObject>(1);
+  private ConcurrentHashMap<String, ModelObject> objects = new ConcurrentHashMap<String, ModelObject>(1);
 
   /**
    * The JSON object name this instance represents.
@@ -555,12 +554,72 @@ public class ModelObject
 
   // Object Overrides -----------------------------------------------------------------------------
 
-  @Override public String toString()
+  @Override
+  public String toString()
   {
-    return "Name: " + name + ", Attributes: " + attributes.toString() +
-           ", Objects: " + objects.toString();
-  }
+    StringBuilder builder = new StringBuilder();
+    builder.append("{");
+    boolean hasAttributes = false;
+    Enumeration objKeys;
+    String key;
+    if(!this.attributes.isEmpty())
+    {
+      hasAttributes = true;
+      objKeys = this.attributes.keys();
 
+      while(objKeys.hasMoreElements())
+      {
+        key = (String)objKeys.nextElement();
+        builder.append("\"");
+        builder.append(key);
+        builder.append("\":");
+        String value = ((ModelObject.Attribute)this.attributes.get(key)).getValue().trim();
+        if(!value.startsWith("["))
+        {
+          builder.append("\"");
+          builder.append(value);
+          builder.append("\"");
+        }
+        else
+        {
+          builder.append("[\"");
+          builder.append(value.replace('[', ' ').replace(']', ' ').trim());
+          builder.append("\"]");
+        }
+
+        if(objKeys.hasMoreElements())
+        {
+          builder.append(",");
+        }
+      }
+    }
+
+    if(!this.objects.isEmpty())
+    {
+      if(hasAttributes)
+      {
+        builder.append(",");
+      }
+
+      objKeys = this.objects.keys();
+
+      while(objKeys.hasMoreElements())
+      {
+        key = (String)objKeys.nextElement();
+        builder.append("\"");
+        builder.append(key);
+        builder.append("\":");
+        builder.append(((ModelObject)this.objects.get(key)).toString());
+        if(objKeys.hasMoreElements())
+        {
+          builder.append(",");
+        }
+      }
+    }
+
+    builder.append("}");
+    return builder.toString();
+  }
 
 
   // Protected Instance Methods -------------------------------------------------------------------
