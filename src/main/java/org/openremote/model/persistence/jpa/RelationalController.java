@@ -54,4 +54,9 @@ public class RelationalController extends Controller
     super(copy);
     this.account = acct;
   }
+
+  public Long getId()
+  {
+    return id;
+  }
 }

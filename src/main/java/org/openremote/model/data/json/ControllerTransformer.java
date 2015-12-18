@@ -20,14 +20,15 @@
  */
 package org.openremote.model.data.json;
 
+import org.openremote.base.exception.IncorrectImplementationException;
+import org.openremote.model.Controller;
+import org.openremote.model.persistence.jpa.RelationalController;
+
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.openremote.base.exception.IncorrectImplementationException;
-import org.openremote.model.Controller;
 
 
 /**
@@ -105,6 +106,8 @@ public class ControllerTransformer extends JSONTransformer<Controller>
     ControllerData data = new ControllerData(controller);
 
     startObject();
+
+    writeProperty("controllerId", Long.toString(data.id));
 
     writeProperty(IDENTITY_JSON_PROPERTY_NAME, data.identity);
 
@@ -192,6 +195,7 @@ public class ControllerTransformer extends JSONTransformer<Controller>
 
   private static class ControllerData extends Controller
   {
+    private Long id;
     private Set<String> macs;
     private String identity = super.identity;
     private String name = super.name;
@@ -202,6 +206,10 @@ public class ControllerTransformer extends JSONTransformer<Controller>
     {
       super(controller);
 
+      if (controller instanceof RelationalController)
+      {
+        id = ((RelationalController)controller).getId();
+      }
       macs = super.macAddresses;
     }
   }
