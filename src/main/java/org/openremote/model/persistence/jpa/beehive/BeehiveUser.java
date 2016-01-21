@@ -72,6 +72,11 @@ public class BeehiveUser extends RelationalUser
     this.addAuth(new BeehiveUser.LegacyBeehiveAuthentication(this, password));
   }
 
+  public RelationalAccount getAccount()
+  {
+    return account;
+  }
+
   private void addAuth(BeehiveUser.LegacyBeehiveAuthentication authentication)
   {
     this.password = this.toHexString(authentication.credentials);
