@@ -22,6 +22,7 @@ package org.openremote.model.persistence.jpa.beehive;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import org.openremote.model.Controller;
 import org.openremote.model.persistence.jpa.RelationalAccount;
@@ -29,6 +30,10 @@ import org.openremote.model.persistence.jpa.RelationalController;
 
 @Entity(name = "BeehiveController")
 @Table(name = "controller")
+@NamedQuery(
+        name="findControllersForAccount",
+        query="SELECT c FROM BeehiveController c WHERE c.account = :account"
+)
 public class BeehiveController extends RelationalController
 {
   @Column(name = "linked", nullable = false, unique = false)
