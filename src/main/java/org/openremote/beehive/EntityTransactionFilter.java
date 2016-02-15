@@ -64,9 +64,6 @@ public class EntityTransactionFilter implements Filter
 
   private EntityManagerFactory emFactory = null;
 
-  private EntityManager entityManager = null;
-
-
   // Filter Overrides -----------------------------------------------------------------------------
 
   @Override public void init(FilterConfig config) throws UnavailableException
@@ -101,7 +98,6 @@ public class EntityTransactionFilter implements Filter
 
     emFactory = Persistence.createEntityManagerFactory(persistenceCtx, persistenceProperties);
 
-    entityManager = emFactory.createEntityManager();
 
     log.debug("Transaction management filter initialized.");
   }
@@ -109,9 +105,9 @@ public class EntityTransactionFilter implements Filter
 
   @Override public void destroy()
   {
-    if (entityManager != null)
+    if (emFactory != null && emFactory.isOpen())
     {
-      entityManager.close();
+      emFactory.close();
     }
   }
 
@@ -119,6 +115,7 @@ public class EntityTransactionFilter implements Filter
 
   @Override public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
   {
+    EntityManager entityManager = null;
     EntityTransaction tx = null;
     String user = "<no name>";
 
@@ -128,6 +125,8 @@ public class EntityTransactionFilter implements Filter
     try
     {
       user = request.getRemoteUser();
+
+      entityManager = emFactory.createEntityManager();
 
       request.setAttribute(PERSISTENCE_ENTITY_MANAGER_LOOKUP, entityManager);
 
@@ -162,30 +161,31 @@ public class EntityTransactionFilter implements Filter
           tx.rollback();
 
           log.info(
-              "ROLLBACK: tx for user ''{}'' was marked for roll back. Request : ''{} {}''",
-              user, request.getMethod(), request.getServletPath() + request.getPathInfo()
+                  "ROLLBACK: tx for user ''{}'' was marked for roll back. Request : ''{} {}''",
+                  user, request.getMethod(), request.getServletPath() + request.getPathInfo()
           );
-        }
-
-        else if (response.status >= 400)
+        } else if (response.status >= 400)
         {
           tx.rollback();
 
           log.info(
-              "ROLLBACK: error response ''{} : {}'' to user ''{}'' request ''{} {}''.",
-              response.status, response.statusMsg,
-              user, request.getMethod(), request.getServletPath() + request.getPathInfo()
+                  "ROLLBACK: error response ''{} : {}'' to user ''{}'' request ''{} {}''.",
+                  response.status, response.statusMsg,
+                  user, request.getMethod(), request.getServletPath() + request.getPathInfo()
           );
-        }
-
-        else
+        } else
         {
           tx.commit();
 
           log.info(
-              "COMMIT: user ''{}'' request ''{} {}''",
-              user, request.getMethod(), request.getServletPath() + request.getPathInfo()
+                  "COMMIT: user ''{}'' request ''{} {}''",
+                  user, request.getMethod(), request.getServletPath() + request.getPathInfo()
           );
+        }
+
+        if (entityManager != null && entityManager.isOpen())
+        {
+          entityManager.close();
         }
       }
     }
