@@ -158,28 +158,45 @@ public class EntityTransactionFilter implements Filter
       {
         if (tx.getRollbackOnly())
         {
-          tx.rollback();
+          try
+          {
+            tx.rollback();
 
-          log.info(
-                  "ROLLBACK: tx for user ''{}'' was marked for roll back. Request : ''{} {}''",
-                  user, request.getMethod(), request.getServletPath() + ((request.getPathInfo() != null)?request.getPathInfo():"")
-          );
+            log.info(
+                    "ROLLBACK: tx for user ''{}'' was marked for roll back. Request : ''{} {}''",
+                    user, request.getMethod(),
+                    request.getServletPath() + ((request.getPathInfo() != null) ? request.getPathInfo() : "")
+            );
+          }
+          catch (Exception e)
+          {
+            log.warn("Rollback failed : {}", e, e.getMessage());
+          }
         } else if (response.status >= 400)
         {
-          tx.rollback();
+          try
+          {
+            tx.rollback();
 
-          log.info(
-                  "ROLLBACK: error response ''{} : {}'' to user ''{}'' request ''{} {}''.",
-                  response.status, response.statusMsg,
-                  user, request.getMethod(), request.getServletPath() + ((request.getPathInfo() != null)?request.getPathInfo():"")
-          );
+            log.info(
+                    "ROLLBACK: error response ''{} : {}'' to user ''{}'' request ''{} {}''.",
+                    response.status, response.statusMsg,
+                    user, request.getMethod(),
+                    request.getServletPath() + ((request.getPathInfo() != null) ? request.getPathInfo() : "")
+            );
+          }
+          catch (Exception e)
+          {
+            log.warn("Rollback failed : {}", e, e.getMessage());
+          }
         } else
         {
           tx.commit();
 
           log.info(
                   "COMMIT: user ''{}'' request ''{} {}''",
-                  user, request.getMethod(), request.getServletPath() + ((request.getPathInfo() != null)?request.getPathInfo():"")
+                  user, request.getMethod(),
+                  request.getServletPath() + ((request.getPathInfo() != null)?request.getPathInfo():"")
           );
         }
 
