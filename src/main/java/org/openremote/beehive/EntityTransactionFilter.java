@@ -136,7 +136,7 @@ public class EntityTransactionFilter implements Filter
 
       log.info(
           "Started transaction for user ''{}'', request ''{} {}''...",
-          user, request.getMethod(), request.getServletPath() + request.getPathInfo()
+          user, request.getMethod(), request.getServletPath() + ((request.getPathInfo() != null)?request.getPathInfo():"")
       );
 
       chain.doFilter(request, response);
@@ -162,7 +162,7 @@ public class EntityTransactionFilter implements Filter
 
           log.info(
                   "ROLLBACK: tx for user ''{}'' was marked for roll back. Request : ''{} {}''",
-                  user, request.getMethod(), request.getServletPath() + request.getPathInfo()
+                  user, request.getMethod(), request.getServletPath() + ((request.getPathInfo() != null)?request.getPathInfo():"")
           );
         } else if (response.status >= 400)
         {
@@ -171,7 +171,7 @@ public class EntityTransactionFilter implements Filter
           log.info(
                   "ROLLBACK: error response ''{} : {}'' to user ''{}'' request ''{} {}''.",
                   response.status, response.statusMsg,
-                  user, request.getMethod(), request.getServletPath() + request.getPathInfo()
+                  user, request.getMethod(), request.getServletPath() + ((request.getPathInfo() != null)?request.getPathInfo():"")
           );
         } else
         {
@@ -179,7 +179,7 @@ public class EntityTransactionFilter implements Filter
 
           log.info(
                   "COMMIT: user ''{}'' request ''{} {}''",
-                  user, request.getMethod(), request.getServletPath() + request.getPathInfo()
+                  user, request.getMethod(), request.getServletPath() + ((request.getPathInfo() != null)?request.getPathInfo():"")
           );
         }
 
